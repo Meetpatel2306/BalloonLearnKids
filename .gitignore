@@ -1,0 +1,19 @@
+# Build output (matches app/build, build, etc. at any depth)
+build/
+.gradle/
+/captures
+.externalNativeBuild
+.cxx
+
+# IDE and OS
+*.iml
+/.idea/
+.DS_Store
+
+# Machine-specific
+local.properties
+
+# Never commit signing material
+keystore.properties
+*.jks
+*.keystore

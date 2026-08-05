@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Big bubble -->
+    <path
+        android:pathData="M54,29m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0"
+        android:fillColor="#FFFF8FA3" />
+    <path
+        android:pathData="M45,21m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0"
+        android:fillColor="#FFFFFFFF"
+        android:fillAlpha="0.75" />
+
+    <!-- Stem -->
+    <path
+        android:pathData="M54,58 C54,68 54,74 54,84"
+        android:strokeColor="#FF3E9B4F"
+        android:strokeWidth="5"
+        android:strokeLineCap="round" />
+    <!-- Leaf -->
+    <path
+        android:pathData="M54,72 C46,72 41,68 40,63 C48,61 53,65 54,72 Z"
+        android:fillColor="#FF4FBF63" />
+
+    <!-- Flower petals -->
+    <path android:pathData="M54,50m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" android:fillColor="#FFFFC24D" />
+    <path android:pathData="M42,58m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" android:fillColor="#FFFFA0C9" />
+    <path android:pathData="M66,58m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" android:fillColor="#FF8FD6FF" />
+    <path android:pathData="M54,58m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0" android:fillColor="#FFFFF3C4" />
+</vector>
