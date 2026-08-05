@@ -242,20 +242,44 @@ Three ways to get a screen, best first.
 
 Needs Android 11 or newer, with the phone on the same Wi-Fi as this machine.
 
-On the phone: **Settings → Developer options → Wireless debugging → on**, then
-tap **"Pair device with pairing code"**. It shows an IP, a port and a 6-digit
-code. Then here:
+**On the phone:**
+
+1. **Settings → Developer options → Wireless debugging → on**
+   (no Developer options? Settings → About phone → tap **Build number** seven times)
+2. Tap the words *"Wireless debugging"* to open its screen
+3. Tap **"Pair device with pairing code"**
+
+The popup shows two things — a 6-digit code and an `IP address & Port`:
+
+```
+Wi-Fi pairing code:  483726
+IP address & Port:   192.168.1.77:37419
+```
+
+**In the terminal**, using your own numbers:
 
 ```bash
 source env.sh
-adb pair 192.168.x.x:PORT        # the PAIRING port, then type the 6-digit code
-adb connect 192.168.x.x:5555     # the CONNECTION port, shown on the main screen
-adb devices                      # should now list the phone
+adb pair 192.168.1.77:37419      # then type 483726 at the prompt
+```
+
+Now **close the popup**. The main *Wireless debugging* screen shows a
+**different** `IP address & Port` — that is the one to connect to:
+
+```bash
+adb connect 192.168.1.77:41235
+adb devices                       # should now list the phone
 ./gradlew installDebug
 ```
 
-The two ports are different — pairing uses a random one, connecting usually
-uses 5555 or another number shown under the device name.
+> ⚠️ There are **two different ports**. The pairing port is random and only
+> appears in the popup; the connection port is a different random number on the
+> main screen. It is *not* 5555 on modern Android — that was the old
+> `adb tcpip 5555` flow, which is a different thing entirely.
+
+The phone must be on the same subnet as this machine. Check with
+`ip -4 addr show scope global` here and compare against the phone's IP —
+`192.168.1.43` and `192.168.1.77` match; `192.168.1.x` and `10.x.x.x` do not.
 
 A USB cable works too, if you have one: enable **USB debugging**, plug in, accept
 the prompt on the phone, then `adb devices`.
