@@ -19,7 +19,7 @@ analytics · no internet permission · ~790 KB**
 - [Quick start — run it in three commands](#quick-start--run-it-in-three-commands)
 - [Every command you need](#every-command-you-need)
 - [Running on a device](#running-on-a-device)
-- [Running on an emulator](#running-on-an-emulator)
+- [I have no Android device](#i-have-no-android-device)
 - [Signing a release build](#signing-a-release-build)
 - [Free distribution](#free-distribution)
 - [Project layout](#project-layout)
@@ -101,16 +101,19 @@ minSdk                 24
 
 ## Quick start — run it in three commands
 
-If you already have a JDK 17 and the Android SDK, and a phone plugged in with
-USB debugging on:
+From inside the project directory, with a phone connected and USB debugging on:
 
 ```bash
-cd PopAndGrow
+source env.sh                 # sets JAVA_HOME, ANDROID_HOME and fixes the adb on PATH
 ./gradlew installDebug
 adb shell am start -n com.meetpatel.popgrow.debug/com.meetpatel.popgrow.MainActivity
 ```
 
 That is it. The app is now running on your phone.
+
+**No device connected?** `installDebug` fails with `No connected devices!`.
+See [I have no Android device](#i-have-no-android-device) for the three ways to
+get a screen to run on — including turning this machine into one.
 
 ### Starting from absolutely nothing (Linux, no sudo, no Android Studio)
 
@@ -231,30 +234,85 @@ A tablet in landscape is by far the best way to experience two-player mode.
 
 ---
 
-## Running on an emulator
+## I have no Android device
 
-An emulator needs hardware virtualisation (KVM on Linux, HAXM/Hypervisor on
-Windows, native on Apple Silicon). Check Linux support with
-`ls /dev/kvm` — if that file is missing, the emulator will be far too slow to
-judge the game and you should use a real device.
+Three ways to get a screen, best first.
+
+### 1. Wireless debugging — your own phone, no cable (works in 2 minutes)
+
+Needs Android 11 or newer, with the phone on the same Wi-Fi as this machine.
+
+On the phone: **Settings → Developer options → Wireless debugging → on**, then
+tap **"Pair device with pairing code"**. It shows an IP, a port and a 6-digit
+code. Then here:
 
 ```bash
-# Install an image (x86_64 on Intel/AMD, arm64-v8a on Apple Silicon)
-sdkmanager "system-images;android-36;google_apis;x86_64" "emulator"
-
-# Create a tablet AVD — the two-player mode is designed for this shape
-avdmanager create avd -n popgrow -k "system-images;android-36;google_apis;x86_64" \
-  -d "pixel_tablet"
-
-# Boot it
-$ANDROID_HOME/emulator/emulator -avd popgrow &
-
-# Then install as usual
+source env.sh
+adb pair 192.168.x.x:PORT        # the PAIRING port, then type the 6-digit code
+adb connect 192.168.x.x:5555     # the CONNECTION port, shown on the main screen
+adb devices                      # should now list the phone
 ./gradlew installDebug
 ```
 
-Note that a mouse gives you one pointer, so you cannot test simultaneous
-two-player tapping on an emulator. That needs a real touchscreen.
+The two ports are different — pairing uses a random one, connecting usually
+uses 5555 or another number shown under the device name.
+
+A USB cable works too, if you have one: enable **USB debugging**, plug in, accept
+the prompt on the phone, then `adb devices`.
+
+### 2. Emulator — needs VT-x turned on in this machine's BIOS
+
+The emulator needs hardware virtualisation. Check:
+
+```bash
+ls /dev/kvm && echo OK || dmesg | grep -i "disabled by BIOS"
+```
+
+If that reports **`VMX (outside TXT) disabled by BIOS`**, the CPU supports it but
+the firmware has it switched off. Fix it once:
+
+1. Reboot and press <kbd>Del</kbd> or <kbd>F2</kbd> to enter BIOS/UEFI setup
+2. **Advanced → CPU Configuration → Intel Virtualization Technology → Enabled**
+   (sometimes under "Intel VT-x", "SVM Mode" on AMD, or a "Security" tab)
+3. Save and exit
+
+Then, back in Linux:
+
+```bash
+sudo modprobe kvm_intel          # usually loads automatically after the reboot
+sudo usermod -aG kvm "$USER"     # log out and back in for this to take effect
+ls -l /dev/kvm                   # should now exist
+```
+
+Now create and boot a tablet — two-player mode is designed for that shape:
+
+```bash
+source env.sh
+sdkmanager "system-images;android-36;google_apis;x86_64" "emulator"
+avdmanager create avd -n popgrow \
+  -k "system-images;android-36;google_apis;x86_64" -d "pixel_tablet"
+emulator -avd popgrow &
+./gradlew installDebug
+```
+
+That needs roughly 10 GB of free disk and a graphical session (this project was
+built on X11 `DISPLAY=:1`, which is fine).
+
+> Without KVM the emulator still starts with `-no-accel`, but it software-emulates
+> every instruction. Android takes 15+ minutes to boot and the game runs at a few
+> frames per second — useless for judging a 60 fps animation. Don't bother.
+
+### 3. Firebase Test Lab — real devices in the cloud, free tier
+
+Upload the APK and it runs on physical hardware, recording video and a
+screenshot. No local virtualisation needed. Free tier allows a handful of runs
+per day. Requires a Google account and internet.
+
+### A note on two-player mode
+
+A mouse gives you exactly one pointer, so simultaneous two-player tapping
+**cannot** be tested on an emulator or over scrcpy. That one needs a real
+touchscreen with two real fingers on it.
 
 ---
 
@@ -498,9 +556,21 @@ export JAVA_HOME=/path/to/jdk17
 You tried to install the unsigned release APK. Use the debug APK, or set up
 [signing](#signing-a-release-build).
 
-**`adb: no devices/emulators found`**
-USB debugging is off, the cable is charge-only, or you did not accept the
-authorisation prompt. Try `adb kill-server && adb devices`.
+**`adb: no devices/emulators found` or `No connected devices!`**
+Nothing is plugged in and no emulator is running. See
+[I have no Android device](#i-have-no-android-device). If a phone *is*
+connected: USB debugging is off, the cable is charge-only, or you did not accept
+the authorisation prompt. Try `adb kill-server && adb devices`.
+
+**`adb server version (41) doesn't match this client (39); killing...`**
+Two different `adb` binaries. Ubuntu's `android-tools-adb` package installs
+1.0.39 at `/usr/bin/adb`, while the SDK ships 1.0.41. `source env.sh` puts the
+SDK one first on `PATH` and fixes it. To confirm:
+```bash
+adb version          # want 1.0.41
+which -a adb         # SDK platform-tools must come before /usr/bin
+```
+Optionally remove the stale one: `sudo apt remove android-tools-adb`.
 
 **No sound**
 Check the device is not on silent, and check the in-app setting behind the
