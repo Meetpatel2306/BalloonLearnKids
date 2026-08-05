@@ -13,6 +13,7 @@ analytics · no internet permission · ~790 KB**
 
 ## Table of contents
 
+- [How to run it — simple steps](#how-to-run-it--simple-steps)
 - [What it is](#what-it-is)
 - [Design principles](#design-principles)
 - [Requirements](#requirements)
@@ -30,6 +31,200 @@ analytics · no internet permission · ~790 KB**
 - [Troubleshooting](#troubleshooting)
 - [Roadmap](#roadmap)
 - [License](#license)
+
+---
+
+## How to run it — simple steps
+
+Follow these in order. Five steps, about 15 minutes the first time.
+
+> **An Android app cannot run inside a terminal.** The terminal only *builds*
+> it. The game itself needs an Android screen — a phone, a tablet, or an
+> emulator. Step 3 is where you choose one.
+
+---
+
+### Step 1 — Install two things
+
+You need **JDK 17** and the **Android SDK**. Nothing else.
+
+<details open>
+<summary><b>🐧 Linux</b></summary>
+
+```bash
+# JDK 17
+mkdir -p ~/toolchain && cd ~/toolchain
+curl -L -o jdk17.tar.gz "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.13%2B11/OpenJDK17U-jdk_x64_linux_hotspot_17.0.13_11.tar.gz"
+tar xzf jdk17.tar.gz && mv jdk-17* jdk17
+
+# Android SDK
+curl -L -o cmdtools.zip "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
+mkdir -p ~/Android/Sdk/cmdline-tools
+unzip -q cmdtools.zip -d /tmp/cmdt
+mv /tmp/cmdt/cmdline-tools ~/Android/Sdk/cmdline-tools/latest
+
+# SDK packages (say yes to the licences)
+export JAVA_HOME=~/toolchain/jdk17
+yes | ~/Android/Sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+~/Android/Sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+```
+
+No `sudo` needed — everything goes in your home folder.
+</details>
+
+<details>
+<summary><b>🪟 Windows</b></summary>
+
+The easy way is one installer that brings both:
+
+1. Download **Android Studio** from <https://developer.android.com/studio>
+2. Run it, accept the defaults, let it finish downloading the SDK
+3. Open Studio → **More Actions → SDK Manager** → tick **Android 16 (API 36)** → Apply
+
+That gives you the SDK at `%LOCALAPPDATA%\Android\Sdk` and a bundled JDK 17.
+
+Prefer no IDE? Install JDK 17 from <https://adoptium.net> and the
+"Command line tools only" package from the Android Studio download page.
+</details>
+
+---
+
+### Step 2 — Open a terminal in the project and set it up
+
+<details open>
+<summary><b>🐧 Linux</b></summary>
+
+```bash
+cd ~/Music/PopAndGrow
+source env.sh
+```
+</details>
+
+<details>
+<summary><b>🪟 Windows</b></summary>
+
+Open **Command Prompt** (not PowerShell) in the project folder, then:
+
+```bat
+cd C:\path\to\PopAndGrow
+env.bat
+```
+
+If it says `java : NOT FOUND`, open `env.bat` in Notepad and correct the
+`JAVA_HOME` line to wherever your JDK 17 actually is.
+</details>
+
+Either one should print three lines:
+
+```
+java : openjdk version "17.0.13" ...
+adb  : Android Debug Bridge version 1.0.41
+sdk  : /home/you/Android/Sdk
+```
+
+**If `java` shows 11 or 21, stop here and fix it** — the build will fail
+otherwise. You must run this in *every new terminal window*, or add the same
+lines to your `~/.bashrc` (Linux) or system environment variables (Windows) to
+make them permanent.
+
+---
+
+### Step 3 — Get an Android screen
+
+Pick **one**.
+
+#### 3a. Phone by USB cable — easiest
+
+1. On the phone: **Settings → About phone → tap "Build number" 7 times**
+2. **Settings → Developer options → USB debugging → on**
+3. Plug the phone into the computer
+4. The phone shows *"Allow USB debugging?"* → tap **Allow**
+5. Check the computer can see it:
+   ```bash
+   adb devices
+   ```
+   You want a line ending in `device`. If it says `unauthorized`, unplug,
+   replug and accept the prompt. If nothing appears, your cable may be
+   charge-only — try another one.
+
+#### 3b. Phone over Wi-Fi — no cable needed
+
+Needs Android 11+, with the phone on the **same Wi-Fi network** as the computer.
+
+1. Enable Developer options as above
+2. **Settings → Developer options → Wireless debugging → on**
+3. Tap the words *"Wireless debugging"* to open its screen
+4. Tap **"Pair device with pairing code"** — a popup shows two things:
+   ```
+   Wi-Fi pairing code:  483726
+   IP address & Port:   192.168.1.77:37419
+   ```
+5. In your terminal, typing **your own numbers, not these**:
+   ```bash
+   adb pair 192.168.1.77:37419
+   ```
+   It asks `Enter pairing code:` → type `483726` → Enter
+6. **Close the popup.** The main *Wireless debugging* screen shows a
+   **different** IP address & Port. Connect to that one:
+   ```bash
+   adb connect 192.168.1.77:41235
+   adb devices
+   ```
+
+> ⚠️ The **pair** port and the **connect** port are two different random
+> numbers. Do not reuse the first one.
+
+#### 3c. Emulator — no phone at all
+
+See [I have no Android device](#i-have-no-android-device). It needs hardware
+virtualisation switched on in your computer's BIOS, so it is the slowest option
+to set up — but once done it needs no phone.
+
+---
+
+### Step 4 — Build and install
+
+Same command on both systems:
+
+```bash
+./gradlew installDebug          # Linux
+gradlew.bat installDebug        # Windows
+```
+
+First run downloads Gradle and the dependencies (a few minutes). Later runs take
+seconds. When it prints `BUILD SUCCESSFUL`, the app is on your device.
+
+---
+
+### Step 5 — Play
+
+Find the **Pop & Grow** icon in the phone's app drawer and tap it. Or launch it
+from the terminal:
+
+```bash
+adb shell am start -n com.meetpatel.popgrow.debug/com.meetpatel.popgrow.MainActivity
+```
+
+Tap **1 Player** or **2 Players** and start popping.
+
+To leave a game, **press and hold** the small house button in the top-left
+corner for about a second — a ring fills up as you hold. A quick tap does
+nothing, which is the point: a toddler cannot get out by accident.
+
+---
+
+### If something goes wrong
+
+| Message | Meaning | Fix |
+|---|---|---|
+| `No connected devices!` | Nothing to install onto | Do Step 3 |
+| `adb server version (41) doesn't match this client (39)` | Two adb versions installed | Re-run Step 2; on Ubuntu also `sudo apt remove android-tools-adb` |
+| `invalid source release: 17` | Wrong Java | Re-run Step 2 and check it prints 17 |
+| `SDK location not found` | Gradle cannot find the SDK | Re-run Step 2, or `echo "sdk.dir=$HOME/Android/Sdk" > local.properties` |
+| `cd: PopAndGrow: No such file or directory` | You are already inside the folder | Skip the `cd`, or use the full path |
+| `INSTALL_PARSE_FAILED_NO_CERTIFICATES` | You used the release APK, which is unsigned | Use `installDebug`, or set up [signing](#signing-a-release-build) |
+
+More in [Troubleshooting](#troubleshooting).
 
 ---
 
@@ -104,12 +299,15 @@ minSdk                 24
 From inside the project directory, with a phone connected and USB debugging on:
 
 ```bash
-source env.sh                 # sets JAVA_HOME, ANDROID_HOME and fixes the adb on PATH
-./gradlew installDebug
+source env.sh                 # Windows: env.bat  — sets JAVA_HOME, ANDROID_HOME, PATH
+./gradlew installDebug        # Windows: gradlew.bat installDebug
 adb shell am start -n com.meetpatel.popgrow.debug/com.meetpatel.popgrow.MainActivity
 ```
 
 That is it. The app is now running on your phone.
+
+New to this? Use [How to run it — simple steps](#how-to-run-it--simple-steps)
+instead, which walks through installing the tools and connecting a phone.
 
 **No device connected?** `installDebug` fails with `No connected devices!`.
 See [I have no Android device](#i-have-no-android-device) for the three ways to
@@ -450,6 +648,8 @@ PopAndGrow/
 │       │   └── res/                  Icon, strings, theme — no bitmaps
 │       └── test/                     13 JVM unit tests
 ├── .github/workflows/build.yml       CI: test, lint, build, release
+├── env.sh                            Linux/macOS: sets JAVA_HOME, ANDROID_HOME, PATH
+├── env.bat                           Windows: the same
 ├── gradle/libs.versions.toml         Every dependency version
 ├── PRIVACY.md
 ├── LICENSE                           MIT
