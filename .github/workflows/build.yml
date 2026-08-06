@@ -15,6 +15,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # The secrets context cannot be used in a step-level `if`, so surface
+    # "do we have signing secrets?" as a job-level env instead.
+    env:
+      HAS_KEYSTORE: ${{ secrets.KEYSTORE_BASE64 != '' }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -43,7 +48,7 @@ jobs:
       # builds are signed and installable; without them the workflow still runs
       # green and just publishes the debug APK.
       - name: Decode keystore
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        if: env.HAS_KEYSTORE == 'true'
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
