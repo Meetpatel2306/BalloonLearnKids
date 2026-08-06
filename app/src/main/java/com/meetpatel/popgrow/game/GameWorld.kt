@@ -24,6 +24,10 @@ class GameWorld(
     val twoPlayer: Boolean,
     private val density: Float,
     val mode: GameMode = GameMode.FREE_PLAY,
+    /** Grown-up settings: how fast balloons rise, and how large they are. Size
+     * only ever scales up, so the minimum touch target stays safe. */
+    private val speedScale: Float = 1f,
+    private val sizeScale: Float = 1f,
     private val random: Random = Random.Default,
 ) {
 
@@ -278,8 +282,9 @@ class GameWorld(
     private val targetBubbles: Int get() = if (twoPlayer) 6 else 9
 
     private fun spawn(lane: Int) {
-        val minR = dp(MIN_RADIUS_DP)
-        val maxR = dp(if (twoPlayer) MAX_RADIUS_DUO_DP else MAX_RADIUS_SOLO_DP)
+        val grow = sizeScale.coerceAtLeast(1f)
+        val minR = dp(MIN_RADIUS_DP) * grow
+        val maxR = dp(if (twoPlayer) MAX_RADIUS_DUO_DP else MAX_RADIUS_SOLO_DP) * grow
         val radius = minR + random.nextFloat() * (maxR - minR)
 
         val start = laneStart(lane) + radius + dp(4f)
@@ -336,7 +341,7 @@ class GameWorld(
 
         // Free-play balloons are lighter than air and rise faster; learning
         // balloons keep a calm, easy-to-tap pace.
-        val baseRise = dp(RISE_MIN_DP) + random.nextFloat() * dp(RISE_RANGE_DP)
+        val baseRise = (dp(RISE_MIN_DP) + random.nextFloat() * dp(RISE_RANGE_DP)) * speedScale
         val riseSpeed = if (kind == BubbleKind.BALLOON && !isLearning) baseRise * 1.5f else baseRise
 
         bubbles += Bubble(

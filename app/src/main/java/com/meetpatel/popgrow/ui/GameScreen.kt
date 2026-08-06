@@ -88,7 +88,16 @@ fun GameScreen(
     val density = LocalDensity.current.density
     // Bumping runKey starts a fresh round of the same mode ("Play Again").
     var runKey by remember { mutableIntStateOf(0) }
-    val world = remember(mode, runKey) { GameWorld(twoPlayer = false, density = density, mode = mode) }
+    val world = remember(mode, runKey) {
+        GameWorld(
+            twoPlayer = false,
+            density = density,
+            mode = mode,
+            speedScale = prefs.speed,
+            sizeScale = prefs.size,
+        )
+    }
+    val highContrast = remember(runKey) { prefs.highContrast }
     val measurer = rememberTextMeasurer()
     val frame = remember { mutableLongStateOf(0L) }
     val currentExit by rememberUpdatedState(onExit)
@@ -199,7 +208,7 @@ fun GameScreen(
     // Soft wind and the odd bird, only while a game is on screen and only if the
     // grown-up has left sound on. Leaving the game stops it.
     DisposableEffect(Unit) {
-        if (prefs.soundEnabled) ambience.start()
+        if (prefs.musicEnabled) ambience.start()
         onDispose { ambience.stop() }
     }
 
@@ -330,7 +339,9 @@ fun GameScreen(
                     }
                 }
         ) {
-            if (frame.longValue >= 0L && world.width > 0f) drawWorld(world, density, measurer)
+            if (frame.longValue >= 0L && world.width > 0f) {
+                drawWorld(world, density, measurer, highContrast)
+            }
         }
 
         if (world.isLearning) {

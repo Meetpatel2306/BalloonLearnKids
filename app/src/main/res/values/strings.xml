@@ -17,8 +17,17 @@
     <string name="find">Find</string>
 
     <string name="settings">Settings</string>
-    <string name="sound">Sound</string>
+    <string name="sound">Sounds</string>
+    <string name="music">Background</string>
     <string name="haptics">Vibration</string>
+    <string name="high_contrast">High Contrast</string>
+    <string name="speed">Speed</string>
+    <string name="size">Size</string>
+    <string name="show_hints">Show hints again</string>
+    <string name="hints_on">Hints will show ✓</string>
+    <string name="privacy">Privacy</string>
+    <string name="privacy_body">This app is completely offline. It collects nothing, sends nothing and shows no ads. It has no internet permission at all. The only things saved on this device are these settings.</string>
+    <string name="settings_note">Speed and Size apply the next time a game starts.</string>
     <string name="close">Close</string>
 
     <string name="grownups_only">Grown-ups</string>

@@ -13,9 +13,12 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -30,14 +33,20 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +60,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
@@ -59,9 +69,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.meetpatel.popgrow.Haptics
 import com.meetpatel.popgrow.Prefs
 import com.meetpatel.popgrow.R
@@ -248,28 +261,7 @@ fun HomeScreen(
     }
 
     if (showSettings) {
-        AlertDialog(
-            onDismissRequest = { showSettings = false },
-            title = { Text(stringResource(R.string.settings), fontWeight = FontWeight.Bold) },
-            text = {
-                Column {
-                    SettingRow(stringResource(R.string.sound), sound) {
-                        sound = it
-                        prefs.soundEnabled = it
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    SettingRow(stringResource(R.string.haptics), haptic) {
-                        haptic = it
-                        prefs.hapticsEnabled = it
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showSettings = false }) {
-                    Text(stringResource(R.string.close))
-                }
-            }
-        )
+        SettingsPanel(prefs) { showSettings = false }
     }
 }
 
@@ -514,16 +506,201 @@ private fun ModeButton(
     }
 }
 
+/**
+ * The grown-ups' panel: a big friendly card of switches and sliders. Every
+ * control changes the game for real — nothing here is decoration.
+ */
 @Composable
-private fun SettingRow(label: String, checked: Boolean, onChange: (Boolean) -> Unit) {
+private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
+    var sound by remember { mutableStateOf(prefs.soundEnabled) }
+    var music by remember { mutableStateOf(prefs.musicEnabled) }
+    var haptic by remember { mutableStateOf(prefs.hapticsEnabled) }
+    var contrast by remember { mutableStateOf(prefs.highContrast) }
+    var speed by remember { mutableFloatStateOf(prefs.speed) }
+    var balloonSize by remember { mutableFloatStateOf(prefs.size) }
+    var showPrivacy by remember { mutableStateOf(false) }
+    var hintsReset by remember { mutableStateOf(false) }
+
+    Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Box(
+            Modifier
+                .fillMaxWidth(0.94f)
+                .widthIn(max = 560.dp)
+                .padding(top = 16.dp, end = 16.dp)
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF5BC0F0), RoundedCornerShape(26.dp))
+                    .border(3.dp, Color.White, RoundedCornerShape(26.dp))
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 22.dp, vertical = 18.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.settings),
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    style = TextStyle(shadow = Shadow(Palette.Ink.copy(alpha = 0.45f), Offset(0f, 3f), 6f)),
+                )
+                Spacer(Modifier.height(14.dp))
+
+                ToggleRow(stringResource(R.string.music), music) { music = it; prefs.musicEnabled = it }
+                ToggleRow(stringResource(R.string.sound), sound) { sound = it; prefs.soundEnabled = it }
+                ToggleRow(stringResource(R.string.haptics), haptic) { haptic = it; prefs.hapticsEnabled = it }
+                ToggleRow(stringResource(R.string.high_contrast), contrast) { contrast = it; prefs.highContrast = it }
+
+                Spacer(Modifier.height(10.dp))
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(18.dp),
+                ) {
+                    SliderColumn(
+                        label = stringResource(R.string.speed),
+                        value = speed,
+                        range = Prefs.SPEED_MIN..Prefs.SPEED_MAX,
+                        modifier = Modifier.weight(1f),
+                    ) { speed = it; prefs.speed = it }
+                    SliderColumn(
+                        label = stringResource(R.string.size),
+                        value = balloonSize,
+                        range = Prefs.SIZE_MIN..Prefs.SIZE_MAX,
+                        modifier = Modifier.weight(1f),
+                    ) { balloonSize = it; prefs.size = it }
+                }
+
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    PanelButton(
+                        if (hintsReset) stringResource(R.string.hints_on) else stringResource(R.string.show_hints),
+                        Modifier.weight(1f),
+                    ) {
+                        prefs.resetTutorials()
+                        hintsReset = true
+                    }
+                    PanelButton(stringResource(R.string.privacy), Modifier.weight(1f)) { showPrivacy = true }
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.settings_note),
+                    fontSize = 11.sp,
+                    color = Color.White.copy(alpha = 0.9f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                )
+            }
+
+            // The round close button, sitting on the panel's corner.
+            Box(
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .size(46.dp)
+                    .background(Color(0xFFE53935), CircleShape)
+                    .border(3.dp, Color.White, CircleShape)
+                    .clickable(onClick = onClose),
+                contentAlignment = Alignment.Center,
+            ) {
+                Canvas(Modifier.size(18.dp)) {
+                    val w = size.width
+                    drawLine(Color.White, Offset(0f, 0f), Offset(w, w), 4.5f * density, StrokeCap.Round)
+                    drawLine(Color.White, Offset(w, 0f), Offset(0f, w), 4.5f * density, StrokeCap.Round)
+                }
+            }
+        }
+    }
+
+    if (showPrivacy) {
+        AlertDialog(
+            onDismissRequest = { showPrivacy = false },
+            title = { Text(stringResource(R.string.privacy), fontWeight = FontWeight.Bold) },
+            text = { Text(stringResource(R.string.privacy_body), fontSize = 15.sp) },
+            confirmButton = {
+                TextButton(onClick = { showPrivacy = false }) { Text(stringResource(R.string.close)) }
+            }
+        )
+    }
+}
+
+/** A label on the left, a chunky switch on the right. */
+@Composable
+private fun ToggleRow(label: String, checked: Boolean, onChange: (Boolean) -> Unit) {
     Row(
-        Modifier,
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(label, fontSize = 16.sp)
-        Spacer(Modifier.width(24.dp))
-        Switch(checked = checked, onCheckedChange = onChange)
+        Text(
+            text = label,
+            fontSize = 19.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            style = TextStyle(shadow = Shadow(Palette.Ink.copy(alpha = 0.35f), Offset(0f, 2f), 4f)),
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        Spacer(Modifier.width(16.dp))
+        Switch(
+            checked = checked,
+            onCheckedChange = onChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = Color(0xFF43C463),
+                uncheckedThumbColor = Color.White,
+                uncheckedTrackColor = Color(0xFF9AA6B2),
+                uncheckedBorderColor = Color.White.copy(alpha = 0.7f),
+                checkedBorderColor = Color.White.copy(alpha = 0.7f),
+            ),
+        )
+    }
+}
+
+/** A titled slider — used for balloon speed and balloon size. */
+@Composable
+private fun SliderColumn(
+    label: String,
+    value: Float,
+    range: ClosedFloatingPointRange<Float>,
+    modifier: Modifier = Modifier,
+    onChange: (Float) -> Unit,
+) {
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = label,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            style = TextStyle(shadow = Shadow(Palette.Ink.copy(alpha = 0.35f), Offset(0f, 2f), 4f)),
+        )
+        Slider(
+            value = value,
+            onValueChange = onChange,
+            valueRange = range,
+            colors = SliderDefaults.colors(
+                thumbColor = Color.White,
+                activeTrackColor = Color(0xFFFFD54A),
+                inactiveTrackColor = Color.White.copy(alpha = 0.45f),
+            ),
+        )
+    }
+}
+
+/** A white pill button along the bottom of the panel. */
+@Composable
+private fun PanelButton(label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Box(
+        modifier
+            .background(Color.White, RoundedCornerShape(14.dp))
+            .border(2.dp, Palette.Ink.copy(alpha = 0.35f), RoundedCornerShape(14.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(label, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Palette.Ink, textAlign = TextAlign.Center)
     }
 }
 

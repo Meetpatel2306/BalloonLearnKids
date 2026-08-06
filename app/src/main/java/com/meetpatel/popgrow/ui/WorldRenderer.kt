@@ -72,8 +72,16 @@ fun DrawScope.drawScenery(world: GameWorld, dpUnit: Float) {
     world.floaters.forEach { drawFloater(it, dpUnit) }
 }
 
-fun DrawScope.drawWorld(world: GameWorld, dpUnit: Float, measurer: TextMeasurer? = null) {
+fun DrawScope.drawWorld(
+    world: GameWorld,
+    dpUnit: Float,
+    measurer: TextMeasurer? = null,
+    highContrast: Boolean = false,
+) {
     drawScenery(world, dpUnit)
+    // High contrast: calm the busy scenery down so the balloons stand out. Real
+    // help for low-vision players, and in bright sunlight.
+    if (highContrast) drawRect(Color.Black.copy(alpha = 0.42f))
     if (world.twoPlayer) drawDivider(world, dpUnit)
     world.flowers.forEach { drawFlower(it, world, dpUnit) }
     world.groundCritters.forEach { drawGroundCritter(it, dpUnit) }
@@ -88,6 +96,11 @@ fun DrawScope.drawWorld(world: GameWorld, dpUnit: Float, measurer: TextMeasurer?
             }
         } else {
             drawBubble(b, world.time, dpUnit, measurer, highlight)
+        }
+        // A bold dark ring makes every balloon's edge unmistakable.
+        if (highContrast) {
+            drawCircle(Palette.Ink, b.radius * 1.02f, Offset(b.x, b.y), style = Stroke(width = 5f * dpUnit))
+            drawCircle(Color.White, b.radius * 1.02f, Offset(b.x, b.y), style = Stroke(width = 1.5f * dpUnit))
         }
     }
     world.ripples.forEach { drawRipple(it, dpUnit) }
