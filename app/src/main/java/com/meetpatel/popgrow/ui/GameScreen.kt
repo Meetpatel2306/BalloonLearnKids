@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.sp
 import com.meetpatel.popgrow.Haptics
 import com.meetpatel.popgrow.Prefs
 import com.meetpatel.popgrow.audio.Ambience
+import com.meetpatel.popgrow.audio.AnimalVoices
 import com.meetpatel.popgrow.audio.Speaker
 import com.meetpatel.popgrow.audio.ToneEngine
 import com.meetpatel.popgrow.game.BubbleKind
@@ -82,6 +83,7 @@ fun GameScreen(
     tones: ToneEngine,
     ambience: Ambience,
     speaker: Speaker,
+    animals: AnimalVoices,
     haptics: Haptics,
     prefs: Prefs,
     onExit: () -> Unit,
@@ -340,6 +342,10 @@ fun GameScreen(
                                         // Learning modes: say the value, cheer a match.
                                         if (pop.correct) {
                                             if (!pop.leveledUp) tones.playFanfare(0.7f)
+                                            // The animal calls out, then we say its name.
+                                            if (mode == GameMode.ANIMALS && pop.rewardWord != null) {
+                                                animals.play(pop.rewardWord)
+                                            }
                                             if (pop.spokenReward != null) speaker.say(pop.spokenReward, flush = true)
                                         } else if (pop.spoken != null) {
                                             speaker.say(pop.spoken)

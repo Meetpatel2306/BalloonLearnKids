@@ -17,6 +17,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.meetpatel.popgrow.audio.Ambience
+import com.meetpatel.popgrow.audio.AnimalVoices
 import com.meetpatel.popgrow.audio.Speaker
 import com.meetpatel.popgrow.audio.ToneEngine
 import com.meetpatel.popgrow.game.GameMode
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var tones: ToneEngine
     private lateinit var ambience: Ambience
     private lateinit var speaker: Speaker
+    private lateinit var animals: AnimalVoices
     private lateinit var haptics: Haptics
     private lateinit var prefs: Prefs
 
@@ -44,6 +46,7 @@ class MainActivity : ComponentActivity() {
         tones = ToneEngine(applicationContext)
         ambience = Ambience(applicationContext)
         speaker = Speaker(applicationContext)
+        animals = AnimalVoices(applicationContext)
         haptics = Haptics(applicationContext)
         prefs = Prefs(applicationContext)
 
@@ -80,6 +83,7 @@ class MainActivity : ComponentActivity() {
                             tones = tones,
                             ambience = ambience,
                             speaker = speaker,
+                            animals = animals,
                             haptics = haptics,
                             prefs = prefs,
                             onExit = { screen = Screen.Home },
@@ -111,6 +115,7 @@ class MainActivity : ComponentActivity() {
         tones.release()
         ambience.release()
         speaker.shutdown()
+        animals.release()
         super.onDestroy()
     }
 

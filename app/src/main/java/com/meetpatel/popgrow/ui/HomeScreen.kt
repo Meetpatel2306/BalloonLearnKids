@@ -154,7 +154,7 @@ fun HomeScreen(
                         .height(screenH * 0.34f),
                 )
                 Spacer(Modifier.height(16.dp))
-                ModeGrid(onStart)
+                ModeGrid(prefs, tones, haptics, onStart)
             }
         } else {
             Row(
@@ -176,7 +176,7 @@ fun HomeScreen(
                         color = Color.White.copy(alpha = 0.95f),
                     )
                     Spacer(Modifier.height(14.dp))
-                    ModeGrid(onStart)
+                    ModeGrid(prefs, tones, haptics, onStart)
                 }
                 RainbowArch(
                     prefs, tones, haptics,
@@ -202,13 +202,16 @@ fun HomeScreen(
                 color = Palette.Ink.copy(alpha = 0.55f),
             )
             Spacer(Modifier.width(8.dp))
+            // A clear dark gear on a light disc, so a grown-up can always find it.
             Box(
                 Modifier
-                    .size(44.dp)
+                    .size(48.dp)
+                    .background(Color.White.copy(alpha = 0.9f), CircleShape)
+                    .border(2.dp, Palette.Ink.copy(alpha = 0.5f), CircleShape)
                     .clickable { gate = makeGateQuestion() },
                 contentAlignment = Alignment.Center,
             ) {
-                Canvas(Modifier.size(20.dp)) { drawGearGlyph(Palette.InkSoft) }
+                Text("⚙️", fontSize = 24.sp)
             }
         }
     }
@@ -418,39 +421,133 @@ private fun PoppableBalloon(
     }
 }
 
-/** The five game buttons, each wearing a little balloon, springing in one by one. */
+/** The six games, each its own balloon. Tap one: it bursts, then the game opens. */
 @Composable
-private fun ModeGrid(onStart: (GameMode) -> Unit) {
+private fun ModeGrid(prefs: Prefs, tones: ToneEngine, haptics: Haptics, onStart: (GameMode) -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            ModeButton(stringResource(R.string.mode_play), SolidColor(Color(0xFFFF5252)), Color(0xFFFF5252), appearDelay = 0L) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            ModeBalloon(stringResource(R.string.mode_play), Color(0xFFFF5252), 0L, prefs, tones, haptics) {
                 onStart(GameMode.FREE_PLAY)
             }
-            ModeButton(
-                stringResource(R.string.mode_colors),
-                Brush.horizontalGradient(Palette.Rainbow + Palette.Warm[3]),
-                Color.White,
-                rainbow = true,
-                appearDelay = 90L,
-            ) { onStart(GameMode.COLORS) }
-        }
-        Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            ModeButton(stringResource(R.string.mode_az), SolidColor(Color(0xFF35C978)), Color(0xFF35C978), appearDelay = 180L) {
+            ModeBalloon(stringResource(R.string.mode_colors), Color.White, 90L, prefs, tones, haptics, rainbow = true) {
+                onStart(GameMode.COLORS)
+            }
+            ModeBalloon(stringResource(R.string.mode_az), Color(0xFF35C978), 180L, prefs, tones, haptics) {
                 onStart(GameMode.LETTERS)
             }
-            ModeButton(stringResource(R.string.mode_120), SolidColor(Color(0xFF4D9BFF)), Color(0xFF4D9BFF), appearDelay = 270L) {
+        }
+        Spacer(Modifier.height(6.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            ModeBalloon(stringResource(R.string.mode_120), Color(0xFF4D9BFF), 270L, prefs, tones, haptics) {
                 onStart(GameMode.NUMBERS)
             }
-        }
-        Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            ModeButton(stringResource(R.string.mode_shapes), SolidColor(Color(0xFFA98BF0)), Color(0xFFA98BF0), appearDelay = 360L) {
+            ModeBalloon(stringResource(R.string.mode_shapes), Color(0xFFA98BF0), 360L, prefs, tones, haptics) {
                 onStart(GameMode.SHAPES)
             }
-            ModeButton(stringResource(R.string.mode_animals), SolidColor(Color(0xFFFF9F43)), Color(0xFFFF9F43), appearDelay = 450L) {
+            ModeBalloon(stringResource(R.string.mode_animals), Color(0xFFFF9F43), 450L, prefs, tones, haptics) {
                 onStart(GameMode.ANIMALS)
             }
+        }
+    }
+}
+
+/**
+ * A game's balloon on the menu. It floats in on arrival, bobs on its string,
+ * and when tapped it bursts into confetti with a pop before the game opens —
+ * so choosing a game is itself a little balloon-popping moment.
+ */
+@Composable
+private fun ModeBalloon(
+    label: String,
+    color: Color,
+    appearDelay: Long,
+    prefs: Prefs,
+    tones: ToneEngine,
+    haptics: Haptics,
+    rainbow: Boolean = false,
+    onStart: () -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    val enter = remember { Animatable(0f) }
+    val burst = remember { Animatable(0f) }
+    var popped by remember { mutableStateOf(false) }
+    val interaction = remember { MutableInteractionSource() }
+
+    val t = rememberInfiniteTransition(label = label)
+    val bob by t.animateFloat(
+        0f, 1f,
+        infiniteRepeatable(tween(2600, easing = LinearEasing), RepeatMode.Restart),
+        label = "bob"
+    )
+    val phase = appearDelay / 900f
+
+    LaunchedEffect(Unit) {
+        delay(appearDelay)
+        enter.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow))
+    }
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Canvas(
+            Modifier
+                .size(width = 92.dp, height = 116.dp)
+                .graphicsLayer {
+                    translationY = sin((bob + phase) * 6.2832f) * 5.dp.toPx() +
+                        (1f - enter.value) * 40.dp.toPx()
+                    val s = (0.2f + 0.8f * enter.value) * (1f - burst.value * 0.35f)
+                    scaleX = s
+                    scaleY = s
+                    rotationZ = sin((bob + phase) * 6.2832f + 1.2f) * 2.5f
+                    alpha = 1f - burst.value
+                }
+                .clickable(interactionSource = interaction, indication = null) {
+                    if (popped) return@clickable
+                    popped = true
+                    if (prefs.soundEnabled) {
+                        tones.playPop(0.75f)
+                        tones.playBoing(0.5f)
+                    }
+                    if (prefs.hapticsEnabled) haptics.tick(false)
+                    scope.launch {
+                        burst.animateTo(1f, tween(260, easing = LinearEasing))
+                        onStart()
+                    }
+                }
+        ) {
+            drawCuteBalloon(
+                c = Offset(size.width / 2f, size.height * 0.42f),
+                r = size.width * 0.40f,
+                color = color,
+                dpUnit = density,
+                wiggle = bob + phase,
+                rainbow = rainbow,
+            )
+            // Confetti flying out as the balloon gives way.
+            val p = burst.value
+            if (p > 0f) {
+                val c = Offset(size.width / 2f, size.height * 0.42f)
+                drawCircle(
+                    Color.White.copy(alpha = (1f - p) * 0.7f),
+                    p * size.width * 0.6f, c,
+                    style = Stroke(width = (3f * (1f - p) + 1f) * density)
+                )
+                for (k in 0 until 10) {
+                    val a = k * 0.6283f
+                    val d = p * size.width * 0.62f
+                    drawCircle(
+                        if (k % 2 == 0) color else Color.White,
+                        (3f + (k % 3)) * density * (1f - p * 0.5f),
+                        Offset(c.x + cos(a) * d, c.y + sin(a) * d),
+                        alpha = 1f - p,
+                    )
+                }
+            }
+        }
+        Box(
+            Modifier
+                .background(Color.White.copy(alpha = 0.92f), RoundedCornerShape(50))
+                .padding(horizontal = 10.dp, vertical = 4.dp)
+        ) {
+            Text(label, fontSize = 13.sp, fontWeight = FontWeight.Black, color = Palette.Ink)
         }
     }
 }
@@ -526,7 +623,6 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
     var balloonSize by remember { mutableFloatStateOf(prefs.size) }
     var showPrivacy by remember { mutableStateOf(false) }
     var showProgress by remember { mutableStateOf(false) }
-    var hintsReset by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Box(
@@ -582,13 +678,6 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    PanelButton(
-                        if (hintsReset) stringResource(R.string.hints_on) else stringResource(R.string.show_hints),
-                        Modifier.weight(1f),
-                    ) {
-                        prefs.resetTutorials()
-                        hintsReset = true
-                    }
                     PanelButton(stringResource(R.string.progress), Modifier.weight(1f)) { showProgress = true }
                     PanelButton(stringResource(R.string.privacy), Modifier.weight(1f)) { showPrivacy = true }
                 }
