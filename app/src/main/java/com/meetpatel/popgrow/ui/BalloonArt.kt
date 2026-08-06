@@ -177,6 +177,76 @@ fun DrawScope.drawCuteBalloon(
 }
 
 /**
+ * The first-run hint: a cartoon hand that taps at [target] over and over, with
+ * expanding rings where the fingertip lands. [phase] is a free-running 0..1
+ * value; the hand dips in on the first half of each cycle and lifts on the rest.
+ *
+ * Shown only for a child's very first taps in a mode — see Prefs.tutorialSeen.
+ */
+fun DrawScope.drawTapHand(target: Offset, phase: Float, dpUnit: Float) {
+    val t = ((phase % 1f) + 1f) % 1f
+    // Ease in to the tap, then ease back out.
+    val press = if (t < 0.45f) {
+        val k = t / 0.45f
+        k * k * (3f - 2f * k)
+    } else {
+        val k = (t - 0.45f) / 0.55f
+        1f - k * k * (3f - 2f * k)
+    }
+
+    // Two rings pulse outward from the fingertip at the moment of contact.
+    for (i in 0 until 2) {
+        val rp = ((t * 1.6f) - i * 0.22f).coerceIn(0f, 1f)
+        if (rp > 0f && rp < 1f) {
+            drawCircle(
+                Color.White.copy(alpha = (1f - rp) * 0.55f * press),
+                (16f + 34f * rp) * dpUnit,
+                target,
+                style = Stroke(width = 3f * dpUnit)
+            )
+        }
+    }
+
+    // The hand hovers below-right of the balloon and dips towards it.
+    val lift = (1f - press) * 26f * dpUnit
+    val hx = target.x + 26f * dpUnit
+    val hy = target.y + 40f * dpUnit + lift
+    val s = dpUnit
+
+    val skin = Color(0xFFFFD9B5)
+    val outline = Palette.Ink.copy(alpha = 0.75f)
+
+    // Palm.
+    drawOval(
+        skin,
+        topLeft = Offset(hx - 15f * s, hy - 4f * s),
+        size = Size(30f * s, 34f * s)
+    )
+    drawOval(
+        outline,
+        topLeft = Offset(hx - 15f * s, hy - 4f * s),
+        size = Size(30f * s, 34f * s),
+        style = Stroke(width = 2f * s)
+    )
+    // Curled fingers, hinted with two soft lines.
+    for (k in 0 until 2) {
+        drawLine(
+            outline.copy(alpha = 0.35f),
+            Offset(hx - 8f * s + k * 9f * s, hy + 6f * s),
+            Offset(hx - 8f * s + k * 9f * s, hy + 20f * s),
+            1.6f * s, StrokeCap.Round
+        )
+    }
+    // The pointing index finger, aimed up-left at the balloon.
+    val tipX = target.x + 5f * s
+    val tipY = hy - 26f * s
+    drawLine(skin, Offset(hx - 6f * s, hy + 4f * s), Offset(tipX, tipY), 13f * s, StrokeCap.Round)
+    drawLine(outline, Offset(hx - 6f * s, hy + 4f * s), Offset(tipX, tipY), 2f * s, StrokeCap.Round)
+    drawCircle(skin, 6.5f * s, Offset(tipX, tipY))
+    drawCircle(outline, 6.5f * s, Offset(tipX, tipY), style = Stroke(width = 2f * s))
+}
+
+/**
  * The app title with every letter bouncing in a gentle wave — the whole word
  * feels alive without being distracting.
  */

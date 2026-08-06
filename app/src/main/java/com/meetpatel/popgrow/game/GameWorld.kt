@@ -509,6 +509,15 @@ class GameWorld(
         )
     }
 
+    /**
+     * The balloon a first-time player should be shown: the answer in a learning
+     * mode, or simply the biggest one in free play. Null when there is nothing
+     * on screen yet to point at.
+     */
+    fun hintBubble(): Bubble? =
+        if (isLearning) bubbles.firstOrNull { it.matchKey.isNotEmpty() && it.matchKey == target }
+        else bubbles.maxByOrNull { it.radius }
+
     /** A soft sparkle at the star meter as it fills, so progress feels physical. */
     private fun starPing() {
         val stars = 5

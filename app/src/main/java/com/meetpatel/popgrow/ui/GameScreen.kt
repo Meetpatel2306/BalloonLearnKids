@@ -129,6 +129,13 @@ fun GameScreen(
     var combo by remember { mutableIntStateOf(0) }
     var lastPopT by remember { mutableStateOf(0f) }
 
+    // First visit to this mode: a hand points at the balloon to tap, for the
+    // first three taps only. After that it is remembered as seen, forever.
+    val modeKey = remember(mode) { mode.name }
+    var hintsLeft by remember(mode) {
+        mutableIntStateOf(if (prefs.tutorialSeen(modeKey)) 0 else TUTORIAL_HINTS)
+    }
+
     // Say the game's name once on entry, then the first target follows.
     LaunchedEffect(mode, runKey) {
         if (world.isLearning && prefs.soundEnabled) {
@@ -245,6 +252,12 @@ fun GameScreen(
                                 if (completeGuard) continue
                                 val pop = world.popAt(change.position.x, change.position.y)
                                 if (pop != null) {
+                                    // The hand has done its job once the child
+                                    // has tapped a few times; remember that.
+                                    if (hintsLeft > 0 && (!world.isLearning || pop.correct)) {
+                                        hintsLeft--
+                                        if (hintsLeft == 0) prefs.markTutorialSeen(modeKey)
+                                    }
                                     // Rewards show even when sound is off.
                                     if (pop.correct) {
                                         rewardWord = pop.rewardWord
@@ -373,6 +386,18 @@ fun GameScreen(
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                 )
+            }
+        }
+
+        // First-run hand: points at the balloon to tap and mimes the tap, for
+        // the first few taps of a child's first visit to this mode.
+        if (hintsLeft > 0) {
+            Canvas(Modifier.fillMaxSize()) {
+                if (frame.longValue >= 0L) {
+                    world.hintBubble()?.let { b ->
+                        drawTapHand(Offset(b.x, b.y), world.time * 0.75f, density)
+                    }
+                }
             }
         }
 
@@ -617,6 +642,9 @@ private fun ProgressStrip(
         }
     }
 }
+
+/** How many taps the first-run pointing hand accompanies, per mode. */
+private const val TUTORIAL_HINTS = 3
 
 /** One value in flight from a popped balloon to its slot in the strip. */
 private class Flyer(
