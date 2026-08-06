@@ -102,4 +102,23 @@ object LearningContent {
     )
 
     fun animalFor(name: String): String = animals.firstOrNull { it.name == name }?.glyph ?: name
+
+    /** The noise each animal makes, spoken aloud: "Cow says moo." Words, not
+     * imitations — clear, correct, and exactly how the sounds are taught. */
+    val animalSounds = mapOf(
+        "Cat" to "meow",
+        "Dog" to "woof",
+        "Cow" to "moo",
+        "Pig" to "oink",
+        "Duck" to "quack",
+        "Rabbit" to "hop hop",
+        "Bear" to "grrr",
+        "Lion" to "roar",
+        "Monkey" to "ooh ooh",
+        "Elephant" to "toot",
+        "Frog" to "ribbit",
+        "Fish" to "blub blub",
+        "Bird" to "tweet tweet",
+        "Horse" to "neigh",
+    )
 }

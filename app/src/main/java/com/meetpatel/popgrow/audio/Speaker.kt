@@ -20,10 +20,11 @@ class Speaker(context: Context) {
             TextToSpeech(context.applicationContext) { status ->
                 if (status == TextToSpeech.SUCCESS) {
                     runCatching { tts?.language = Locale.US }
-                    // Slightly slower and a touch higher — clearer and friendlier
-                    // for a small child.
-                    runCatching { tts?.setSpeechRate(0.9f) }
-                    runCatching { tts?.setPitch(1.15f) }
+                    // Well below normal talking speed: a two-year-old needs time
+                    // to hear each word. The slightly raised pitch keeps it warm
+                    // rather than robotic.
+                    runCatching { tts?.setSpeechRate(0.68f) }
+                    runCatching { tts?.setPitch(1.12f) }
                     ready = true
                 }
             }
