@@ -22,4 +22,6 @@
     <string name="close">Close</string>
 
     <string name="grownups_only">Grown-ups</string>
+    <string name="gate_title">Grown-ups only</string>
+    <string name="gate_hint">Answer to open Settings</string>
 </resources>

@@ -87,6 +87,8 @@ fun HomeScreen(
     var showSettings by remember { mutableStateOf(false) }
     var sound by remember { mutableStateOf(prefs.soundEnabled) }
     var haptic by remember { mutableStateOf(prefs.hapticsEnabled) }
+    // The maths parental gate; non-null while the question box is open.
+    var gate by remember { mutableStateOf<GateQuestion?>(null) }
 
     LaunchedEffect(Unit) {
         var last = 0L
@@ -172,7 +174,8 @@ fun HomeScreen(
             }
         }
 
-        // Parental corner: hold to open, so a child cannot open Settings.
+        // Parental corner: a simple tap opens a little maths question — easy
+        // for a grown-up, a wall for a toddler. Wrong answer just closes it.
         Row(
             Modifier
                 .align(Alignment.BottomEnd)
@@ -185,15 +188,63 @@ fun HomeScreen(
                 color = Palette.Ink.copy(alpha = 0.55f),
             )
             Spacer(Modifier.width(8.dp))
-            HoldToConfirm(
-                diameter = 44.dp,
-                holdMillis = 900,
-                ringColor = Palette.Ink,
-                onConfirmed = { showSettings = true },
+            Box(
+                Modifier
+                    .size(44.dp)
+                    .clickable { gate = makeGateQuestion() },
+                contentAlignment = Alignment.Center,
             ) {
                 Canvas(Modifier.size(20.dp)) { drawGearGlyph(Palette.InkSoft) }
             }
         }
+    }
+
+    // The parental gate: one small sum, four answers. Only the right answer
+    // opens Settings; any wrong tap simply closes the box.
+    gate?.let { q ->
+        AlertDialog(
+            onDismissRequest = { gate = null },
+            title = { Text(stringResource(R.string.gate_title), fontWeight = FontWeight.Bold) },
+            text = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(R.string.gate_hint),
+                        fontSize = 14.sp,
+                        color = Palette.InkSoft,
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = q.text,
+                        fontSize = 36.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Palette.Ink,
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        q.options.forEach { opt ->
+                            Box(
+                                Modifier
+                                    .background(Color(0xFF4D9BFF), RoundedCornerShape(50))
+                                    .clickable {
+                                        val right = opt == q.answer
+                                        gate = null
+                                        if (right) showSettings = true
+                                    }
+                                    .padding(horizontal = 18.dp, vertical = 12.dp)
+                            ) {
+                                Text(
+                                    text = opt.toString(),
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = Color.White,
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {}
+        )
     }
 
     if (showSettings) {
@@ -474,6 +525,33 @@ private fun SettingRow(label: String, checked: Boolean, onChange: (Boolean) -> U
         Spacer(Modifier.width(24.dp))
         Switch(checked = checked, onCheckedChange = onChange)
     }
+}
+
+/** One little sum for the parental gate: the question, its answer, and four
+ * choices (the answer plus three near-misses, shuffled). */
+private class GateQuestion(val text: String, val answer: Int, val options: List<Int>)
+
+private fun makeGateQuestion(): GateQuestion {
+    val rnd = kotlin.random.Random.Default
+    val a = rnd.nextInt(1, 10)
+    val b = rnd.nextInt(1, 10)
+    return if (rnd.nextBoolean()) {
+        GateQuestion("$a + $b = ?", a + b, gateOptions(a + b))
+    } else {
+        val big = maxOf(a, b)
+        val small = minOf(a, b)
+        GateQuestion("$big - $small = ?", big - small, gateOptions(big - small))
+    }
+}
+
+private fun gateOptions(answer: Int): List<Int> {
+    val rnd = kotlin.random.Random.Default
+    val set = linkedSetOf(answer)
+    while (set.size < 4) {
+        val candidate = answer + rnd.nextInt(-3, 4)
+        if (candidate >= 0) set.add(candidate)
+    }
+    return set.shuffled()
 }
 
 private fun DrawScope.drawGearGlyph(color: Color) {
