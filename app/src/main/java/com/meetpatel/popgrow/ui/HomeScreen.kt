@@ -141,7 +141,7 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                BouncyTitle(fontSize = if (screenW < 380.dp) 22 else 27)
+                BouncyTitle(fontSize = if (screenW < 380.dp) 36 else 44)
                 Text(
                     text = stringResource(R.string.subtitle),
                     fontSize = 14.sp,
@@ -173,7 +173,7 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    BouncyTitle(fontSize = 24)
+                    BouncyTitle(fontSize = 34)
                     Text(
                         text = stringResource(R.string.subtitle),
                         fontSize = 13.sp,

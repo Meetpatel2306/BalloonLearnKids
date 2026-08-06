@@ -1,4 +1,4 @@
-﻿# Balloon Pop & Learn 🫧🌼
+﻿# Bubble Learn 🫧🌼
 
 A bubble-popping music toy for children aged roughly **2 to 5**. Pop a bubble,
 hear a note, grow a flower. That is the entire game.
@@ -198,7 +198,7 @@ seconds. When it prints `BUILD SUCCESSFUL`, the app is on your device.
 
 ### Step 5 — Play
 
-Find the **Balloon Pop & Learn** icon in the phone's app drawer and tap it. Or launch it
+Find the **Bubble Learn** icon in the phone's app drawer and tap it. Or launch it
 from the terminal:
 
 ```bash

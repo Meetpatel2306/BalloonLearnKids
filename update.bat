@@ -23,7 +23,7 @@ if "%ANDROID_HOME%"=="" set "ANDROID_HOME=%LOCALAPPDATA%\Android\Sdk"
 set "PATH=%JAVA_HOME%\bin;%ANDROID_HOME%\platform-tools;%PATH%"
 
 echo.
-echo === Balloon Pop ^& Learn updater ===
+echo === Bubble Learn updater ===
 echo JDK: %JAVA_HOME%
 echo SDK: %ANDROID_HOME%
 echo.

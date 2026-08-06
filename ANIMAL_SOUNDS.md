@@ -1,4 +1,4 @@
-# Adding real animal sounds
+﻿# Adding real animal sounds
 
 The Animals game already teaches every animal by speaking it clearly — *"Cow.
 The cow says moo."* — using the phone's own voice. That works offline and needs

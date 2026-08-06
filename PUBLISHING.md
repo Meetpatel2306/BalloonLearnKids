@@ -1,4 +1,4 @@
-﻿# Publishing Balloon Pop & Learn on the Google Play Store
+﻿# Publishing Bubble Learn on the Google Play Store
 
 A complete, beginner-friendly walkthrough — from a signing key to a live store
 listing. Follow the phases in order. Steps you do once ever are marked
@@ -113,7 +113,7 @@ Any other public URL (Google Sites, your own site) works equally well.
 1. Go to <https://play.google.com/console> → pay the $25 → complete identity
    verification.
 2. **Create app**:
-   - App name: **Balloon Pop & Learn**
+   - App name: **Bubble Learn**
    - Default language: English (United States)
    - App or game: **Game**
    - Free or paid: **Free** (a free app can never be made paid later — fine here)
@@ -147,25 +147,26 @@ Any other public URL (Google Sites, your own site) works equally well.
 ### Text (copy-paste, edit as you like)
 
 - **App name** (max 30 chars):
-  `Balloon Pop & Learn` (19 chars — room to add e.g. `: ABC 123` if you like)
+  `Bubble Learn: ABC 123 Kids` (26 chars — the extra words are search terms;
+  plain `Bubble Learn` is 12 chars if you prefer it clean)
 
 - **Short description** (max 80 chars):
-  `Pop balloons, learn ABC, 123, colors & shapes. Calm, offline, ad‑free. 2–5.`
+  `Pop and learn ABC, 123, colors, shapes, animals. Offline, ad-free. Ages 2-5.`
 
 - **Full description** (max 4000 chars):
 
   ```
-  Balloon Pop & Learn is a calm, cheerful balloon-popping playground for toddlers and
+  Bubble Learn is a calm, cheerful balloon-popping playground for toddlers and
   preschoolers (ages 2–5). Tap friendly balloons with smiling faces to pop
   them into confetti, grow a flower garden, meet butterflies, bees, puppies
   and bunnies — and gently learn along the way.
 
-  FIVE WAYS TO PLAY
-  🎈 Play — pure popping fun: musical notes, confetti, gardens and fireworks
-  🌈 Colors — find and pop the balloon of the spoken color
+  FIVE WAYS TO LEARN
   🔤 A–Z — pop letters in order and hear “A for Apple” with a picture
   🔢 1–20 — find each number, watch it fly into place
+  🌈 Colors — find and pop the balloon of the spoken color
   ⭐ Shapes — circle, square, triangle, star and heart
+  🐶 Animals — meet fourteen animals and the sounds they make
 
   MADE FOR LITTLE HANDS
   • Tap is the only gesture — no drags, no menus in the way

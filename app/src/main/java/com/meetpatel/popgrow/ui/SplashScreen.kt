@@ -93,7 +93,7 @@ fun SplashScreen(onDone: () -> Unit, tones: ToneEngine, soundEnabled: Boolean) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            BouncyTitle(fontSize = 30)
+            BouncyTitle(fontSize = 46)
             Spacer(Modifier.height(8.dp))
             Text(
                 text = "Pop the balloons!",

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Balloon Pop &amp; Learn</string>
+    <string name="app_name">Bubble Learn</string>
 
-    <string name="title">Balloon Pop &amp; Learn</string>
-    <string name="subtitle">Pop balloons. Learn ABC, 123 &amp; more!</string>
+    <string name="title">Bubble Learn</string>
+    <string name="subtitle">Pop and learn ABC, 123 &amp; more!</string>
 
     <string name="mode_solo">1 Player</string>
     <string name="mode_duo">2 Players</string>
