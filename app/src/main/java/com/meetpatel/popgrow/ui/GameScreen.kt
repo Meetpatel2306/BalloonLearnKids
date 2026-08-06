@@ -395,7 +395,7 @@ fun GameScreen(
             Canvas(Modifier.fillMaxSize()) {
                 if (frame.longValue >= 0L) {
                     world.hintBubble()?.let { b ->
-                        drawTapHand(Offset(b.x, b.y), world.time * 0.75f, density)
+                        drawTapHand(Offset(b.x, b.y), world.time * 0.75f, density, measurer)
                     }
                 }
             }

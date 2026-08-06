@@ -24,10 +24,11 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -184,7 +185,7 @@ fun DrawScope.drawCuteBalloon(
  *
  * Shown only for a child's very first taps in a mode — see Prefs.tutorialSeen.
  */
-fun DrawScope.drawTapHand(target: Offset, phase: Float, dpUnit: Float) {
+fun DrawScope.drawTapHand(target: Offset, phase: Float, dpUnit: Float, measurer: TextMeasurer) {
     val t = ((phase % 1f) + 1f) % 1f
     // Ease in to the tap, then ease back out.
     val press = if (t < 0.45f) {
@@ -195,104 +196,34 @@ fun DrawScope.drawTapHand(target: Offset, phase: Float, dpUnit: Float) {
         1f - k * k * (3f - 2f * k)
     }
 
-    // Where the fingertip lands, and where the hand rests between taps.
-    val tip = Offset(target.x + 7f * dpUnit, target.y + 9f * dpUnit)
-    val rest = Offset(tip.x + 17f * dpUnit, tip.y + 33f * dpUnit)
-    val now = Offset(
-        rest.x + (tip.x - rest.x) * press,
-        rest.y + (tip.y - rest.y) * press,
-    )
-
-    // Rings pulse out from the point of contact.
+    // Rings pulse out from the balloon at the moment of contact.
     for (i in 0 until 2) {
         val rp = ((t * 1.7f) - i * 0.20f).coerceIn(0f, 1f)
         if (rp > 0f && rp < 1f) {
             drawCircle(
                 Color.White.copy(alpha = (1f - rp) * 0.6f * press),
                 (14f + 32f * rp) * dpUnit,
-                tip,
+                target,
                 style = Stroke(width = 3f * dpUnit)
             )
         }
     }
 
-    // The hand itself, tilted so the finger aims up at the balloon.
-    rotate(degrees = -18f, pivot = now) {
-        drawPointingHand(now, 9.5f * dpUnit, dpUnit)
-    }
-}
-
-/**
- * A cartoon pointing hand: index finger up, the other three fingers folded into
- * a fist with knuckle creases, thumb tucked along the side, and a sleeve cuff.
- * [tip] is the fingertip; [u] scales the whole hand.
- */
-private fun DrawScope.drawPointingHand(tip: Offset, u: Float, dpUnit: Float) {
-    val skin = Color(0xFFFFD9AE)
-    val skinDark = Color(0xFFE9B98C)
-    val outline = Palette.Ink.copy(alpha = 0.8f)
-    fun p(x: Float, y: Float) = Offset(tip.x + x * u, tip.y + y * u)
-
-    // Sleeve cuff behind the wrist.
-    val cuff = Path().apply {
-        moveTo(p(-1.75f, 4.35f).x, p(-1.75f, 4.35f).y)
-        lineTo(p(1.75f, 4.35f).x, p(1.75f, 4.35f).y)
-        quadraticTo(p(1.95f, 5.55f).x, p(1.95f, 5.55f).y, p(1.55f, 5.75f).x, p(1.55f, 5.75f).y)
-        lineTo(p(-1.55f, 5.75f).x, p(-1.55f, 5.75f).y)
-        quadraticTo(p(-1.95f, 5.55f).x, p(-1.95f, 5.55f).y, p(-1.75f, 4.35f).x, p(-1.75f, 4.35f).y)
-        close()
-    }
-    drawPath(cuff, Color(0xFF4D9BFF))
-    drawPath(cuff, outline, style = Stroke(width = 2f * dpUnit))
-
-    // The hand silhouette: one finger up, three folded, thumb at the left.
-    val hand = Path().apply {
-        moveTo(p(-0.42f, 0.60f).x, p(-0.42f, 0.60f).y)
-        // Rounded fingertip.
-        quadraticTo(p(-0.42f, 0f).x, p(-0.42f, 0f).y, p(0f, 0f).x, p(0f, 0f).y)
-        quadraticTo(p(0.42f, 0f).x, p(0.42f, 0f).y, p(0.42f, 0.60f).x, p(0.42f, 0.60f).y)
-        // Down the right side of the index finger.
-        lineTo(p(0.42f, 1.75f).x, p(0.42f, 1.75f).y)
-        // Over the folded middle finger.
-        quadraticTo(p(0.95f, 1.80f).x, p(0.95f, 1.80f).y, p(1.68f, 2.10f).x, p(1.68f, 2.10f).y)
-        // Three knuckle bumps down the right edge.
-        quadraticTo(p(2.00f, 2.55f).x, p(2.00f, 2.55f).y, p(1.62f, 2.95f).x, p(1.62f, 2.95f).y)
-        quadraticTo(p(2.00f, 3.25f).x, p(2.00f, 3.25f).y, p(1.62f, 3.60f).x, p(1.62f, 3.60f).y)
-        quadraticTo(p(1.92f, 3.95f).x, p(1.92f, 3.95f).y, p(1.55f, 4.40f).x, p(1.55f, 4.40f).y)
-        // Wrist.
-        lineTo(p(-1.55f, 4.40f).x, p(-1.55f, 4.40f).y)
-        // Thumb tucked along the left.
-        quadraticTo(p(-1.95f, 4.05f).x, p(-1.95f, 4.05f).y, p(-2.10f, 3.45f).x, p(-2.10f, 3.45f).y)
-        quadraticTo(p(-2.35f, 2.80f).x, p(-2.35f, 2.80f).y, p(-1.85f, 2.55f).x, p(-1.85f, 2.55f).y)
-        quadraticTo(p(-1.45f, 2.40f).x, p(-1.45f, 2.40f).y, p(-1.30f, 2.75f).x, p(-1.30f, 2.75f).y)
-        // Back up the palm to the base of the finger.
-        quadraticTo(p(-1.15f, 2.15f).x, p(-1.15f, 2.15f).y, p(-0.90f, 1.95f).x, p(-0.90f, 1.95f).y)
-        quadraticTo(p(-0.60f, 1.85f).x, p(-0.60f, 1.85f).y, p(-0.42f, 1.75f).x, p(-0.42f, 1.75f).y)
-        close()
-    }
-    drawPath(hand, skin)
-    drawPath(hand, outline, style = Stroke(width = 2.2f * dpUnit))
-
-    // Creases where the three folded fingers meet the palm.
-    for (k in 0 until 3) {
-        val y = 2.45f + k * 0.62f
-        drawLine(
-            skinDark,
-            p(0.55f, y), p(1.35f, y + 0.06f),
-            strokeWidth = 1.8f * dpUnit, cap = StrokeCap.Round
-        )
-    }
-    // Thumb crease.
-    drawLine(
-        skinDark,
-        p(-1.28f, 2.95f), p(-0.75f, 3.30f),
-        strokeWidth = 1.8f * dpUnit, cap = StrokeCap.Round
+    // The hand is the platform's own pointing-hand emoji — a professionally
+    // drawn glyph every phone ships with, so it looks right on every device
+    // and costs the APK nothing. It dips onto the balloon, then lifts away.
+    val layout = measurer.measure(
+        text = "👆",
+        style = TextStyle(fontSize = 52.sp)
     )
-    // The knuckle line at the base of the pointing finger.
-    drawLine(
-        skinDark,
-        p(-0.35f, 1.85f), p(0.35f, 1.85f),
-        strokeWidth = 1.6f * dpUnit, cap = StrokeCap.Round
+    val lift = (1f - press) * 30f * dpUnit
+    // The glyph's fingertip sits at its top, slightly left of centre.
+    drawText(
+        layout,
+        topLeft = Offset(
+            target.x - layout.size.width * 0.34f,
+            target.y - 4f * dpUnit + lift,
+        )
     )
 }
 
