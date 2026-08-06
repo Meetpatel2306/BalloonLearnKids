@@ -327,13 +327,13 @@ fun GameScreen(
                                         // Learning modes: say the value, cheer a match.
                                         if (pop.correct) {
                                             if (!pop.leveledUp) tones.playFanfare(0.7f)
-                                            // A real recording if one has been added,
-                                            // otherwise the spoken name and sound.
-                                            val played = mode == GameMode.ANIMALS &&
-                                                pop.rewardWord != null &&
+                                            // The animal calls out first, then we
+                                            // name it once the call has finished.
+                                            if (mode == GameMode.ANIMALS && pop.rewardWord != null) {
                                                 animals.play(pop.rewardWord)
+                                            }
                                             if (pop.spokenReward != null) {
-                                                speaker.say(pop.spokenReward, flush = !played)
+                                                speaker.say(pop.spokenReward, flush = true)
                                             }
                                         } else if (pop.spoken != null) {
                                             speaker.say(pop.spoken)
