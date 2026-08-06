@@ -56,6 +56,43 @@ class Prefs(context: Context) {
         sp.all.keys.filter { it.startsWith(KEY_TUTORIAL) }.forEach { remove(it) }
     }
 
+    // ------------------------------------------------------------------ scores
+
+    /**
+     * One score per play, per mode, kept as a short list of numbers. It is
+     * written the moment a child earns a point — not at the end of a game — so
+     * a grown-up looking at the progress page always sees the truth, even mid
+     * play. Only the last [MAX_SESSIONS] plays are kept, and there is nothing
+     * in here but small numbers.
+     */
+    fun scores(mode: String): List<Int> =
+        sp.getString("$KEY_SCORES$mode", "").orEmpty()
+            .split(',')
+            .mapNotNull { it.trim().toIntOrNull() }
+
+    /** Begin a new play of [mode] — starts a fresh score at zero. */
+    fun sessionStart(mode: String) {
+        val list = scores(mode).toMutableList()
+        list.add(0)
+        while (list.size > MAX_SESSIONS) list.removeAt(0)
+        writeScores(mode, list)
+    }
+
+    /** Add a point to the play in progress, saved straight away. */
+    fun sessionAdd(mode: String, points: Int = 1) {
+        val list = scores(mode).toMutableList()
+        if (list.isEmpty()) list.add(0)
+        list[list.lastIndex] = list.last() + points
+        writeScores(mode, list)
+    }
+
+    fun clearScores() = sp.edit {
+        sp.all.keys.filter { it.startsWith(KEY_SCORES) }.forEach { remove(it) }
+    }
+
+    private fun writeScores(mode: String, list: List<Int>) =
+        sp.edit { putString("$KEY_SCORES$mode", list.joinToString(",")) }
+
     companion object {
         const val SPEED_MIN = 0.5f
         const val SPEED_MAX = 1.5f
@@ -69,5 +106,7 @@ class Prefs(context: Context) {
         private const val KEY_SPEED = "speed"
         private const val KEY_SIZE = "size"
         private const val KEY_TUTORIAL = "tutorial_"
+        private const val KEY_SCORES = "scores_"
+        private const val MAX_SESSIONS = 50
     }
 }

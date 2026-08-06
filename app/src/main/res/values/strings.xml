@@ -14,6 +14,15 @@
     <string name="mode_az">A – Z</string>
     <string name="mode_120">1 – 20</string>
     <string name="mode_shapes">Shapes</string>
+    <string name="mode_animals">Animals</string>
+    <string name="progress">Progress</string>
+    <string name="progress_none">No games played yet.</string>
+    <string name="col_plays">Plays</string>
+    <string name="col_best">Best</string>
+    <string name="col_avg">Avg</string>
+    <string name="col_low">Low</string>
+    <string name="reset_scores">Clear scores</string>
+    <string name="progress_note">Scores are saved on this device as each point is earned.</string>
     <string name="find">Find</string>
 
     <string name="settings">Settings</string>

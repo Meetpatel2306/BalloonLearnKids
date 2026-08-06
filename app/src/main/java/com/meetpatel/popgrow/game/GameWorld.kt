@@ -93,6 +93,7 @@ class GameWorld(
             GameMode.NUMBERS -> LearningContent.numbers
             GameMode.LETTERS -> LearningContent.letters
             GameMode.SHAPES -> LearningContent.shapes.map { it.name }
+            GameMode.ANIMALS -> LearningContent.animals.map { it.name }
             GameMode.FREE_PLAY -> emptyList()
         }
 
@@ -127,6 +128,10 @@ class GameWorld(
             GameMode.SHAPES -> {
                 targetIndex = (targetIndex + 1) % LearningContent.shapes.size
                 target = LearningContent.shapes[targetIndex].name
+            }
+            GameMode.ANIMALS -> {
+                targetIndex = (targetIndex + 1) % LearningContent.animals.size
+                target = LearningContent.animals[targetIndex].name
             }
             GameMode.FREE_PLAY -> {}
         }
@@ -326,12 +331,16 @@ class GameWorld(
                     matchKey = value
                     bubbleColor = LearningContent.colors.first { it.name == value }.color
                 }
-                GameMode.NUMBERS, GameMode.LETTERS, GameMode.SHAPES -> {
+                GameMode.NUMBERS, GameMode.LETTERS, GameMode.SHAPES, GameMode.ANIMALS -> {
                     // Keep exactly one target balloon around; it stays the same
                     // value until the child finds it. Everything else is a plain,
                     // friendly balloon that's just fun to pop.
                     if (bubbles.none { it.matchKey == target }) {
-                        label = if (mode == GameMode.SHAPES) LearningContent.glyphFor(target) else target
+                        label = when (mode) {
+                            GameMode.SHAPES -> LearningContent.glyphFor(target)
+                            GameMode.ANIMALS -> LearningContent.animalFor(target)
+                            else -> target
+                        }
                         matchKey = target
                     }
                 }
@@ -434,7 +443,7 @@ class GameWorld(
         if (isLearning) {
             // Shapes and colours speak their name, letters/numbers their label.
             val value = when (mode) {
-                GameMode.COLORS, GameMode.SHAPES -> bubble.matchKey
+                GameMode.COLORS, GameMode.SHAPES, GameMode.ANIMALS -> bubble.matchKey
                 else -> bubble.label
             }
             spoken = value.ifEmpty { null }   // plain balloons say nothing
@@ -464,6 +473,11 @@ class GameWorld(
                     GameMode.SHAPES -> {
                         rewardWord = bubble.matchKey
                         rewardEmoji = LearningContent.glyphFor(bubble.matchKey)
+                        spokenReward = bubble.matchKey
+                    }
+                    GameMode.ANIMALS -> {
+                        rewardWord = bubble.matchKey
+                        rewardEmoji = LearningContent.animalFor(bubble.matchKey)
                         spokenReward = bubble.matchKey
                     }
                     GameMode.FREE_PLAY -> {}

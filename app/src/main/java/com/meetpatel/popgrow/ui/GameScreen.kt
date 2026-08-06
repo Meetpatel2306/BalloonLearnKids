@@ -132,7 +132,11 @@ fun GameScreen(
     // their glyphs in the strip, everything else its own text.
     var indexShown by remember { mutableIntStateOf(-1) }
     val stripLabels = remember(mode) {
-        if (mode == GameMode.SHAPES) LearningContent.shapes.map { it.glyph } else world.sequence
+        when (mode) {
+            GameMode.SHAPES -> LearningContent.shapes.map { it.glyph }
+            GameMode.ANIMALS -> LearningContent.animals.map { it.glyph }
+            else -> world.sequence
+        }
     }
     // Fast-pop streak in free play: five quick pops earn a sparkle bonus.
     var combo by remember { mutableIntStateOf(0) }
@@ -145,6 +149,10 @@ fun GameScreen(
         mutableIntStateOf(if (prefs.tutorialSeen(modeKey)) 0 else TUTORIAL_HINTS)
     }
 
+    // Start a fresh score for this play, so the grown-ups' progress page can
+    // follow along live rather than only after the game ends.
+    LaunchedEffect(mode, runKey) { prefs.sessionStart(mode.name) }
+
     // Say the game's name once on entry, then the first target follows.
     LaunchedEffect(mode, runKey) {
         if (world.isLearning && prefs.soundEnabled) {
@@ -153,6 +161,7 @@ fun GameScreen(
                 GameMode.NUMBERS -> "Numbers"
                 GameMode.COLORS -> "Colors"
                 GameMode.SHAPES -> "Shapes"
+                GameMode.ANIMALS -> "Animals"
                 else -> ""
             }
             if (name.isNotEmpty()) speaker.say(name, flush = true)
@@ -261,6 +270,11 @@ fun GameScreen(
                                 if (completeGuard) continue
                                 val pop = world.popAt(change.position.x, change.position.y)
                                 if (pop != null) {
+                                    // Record the point straight away: a right
+                                    // answer when learning, any pop in free play.
+                                    if (!world.isLearning || pop.correct) {
+                                        prefs.sessionAdd(mode.name)
+                                    }
                                     // The hand has done its job once the child
                                     // has tapped a few times; remember that.
                                     if (hintsLeft > 0 && (!world.isLearning || pop.correct)) {
@@ -371,9 +385,10 @@ fun GameScreen(
                     Box(Modifier.size(26.dp).background(world.targetColor, CircleShape))
                     Spacer(Modifier.width(12.dp))
                     Text(targetShown, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
-                } else if (mode == GameMode.SHAPES) {
+                } else if (mode == GameMode.SHAPES || mode == GameMode.ANIMALS) {
                     Text(
-                        LearningContent.glyphFor(targetShown),
+                        if (mode == GameMode.ANIMALS) LearningContent.animalFor(targetShown)
+                        else LearningContent.glyphFor(targetShown),
                         color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Black,
                     )
                     Spacer(Modifier.width(10.dp))

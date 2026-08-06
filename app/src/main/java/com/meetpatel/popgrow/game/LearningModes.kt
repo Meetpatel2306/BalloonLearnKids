@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.Color
  * popping any bubble simply says its name aloud, and matching the asked-for one
  * earns a little celebration.
  */
-enum class GameMode { FREE_PLAY, COLORS, NUMBERS, LETTERS, SHAPES }
+enum class GameMode { FREE_PLAY, COLORS, NUMBERS, LETTERS, SHAPES, ANIMALS }
 
 /** The words and colours each learning mode teaches. */
 object LearningContent {
@@ -81,4 +81,25 @@ object LearningContent {
     )
 
     fun glyphFor(name: String): String = shapes.firstOrNull { it.name == name }?.glyph ?: name
+
+    /** Friendly animals a small child already recognises, each with the picture
+     * from the phone's own emoji font — no image files, still fully offline. */
+    val animals = listOf(
+        Shape("Cat", "🐱"),
+        Shape("Dog", "🐶"),
+        Shape("Cow", "🐮"),
+        Shape("Pig", "🐷"),
+        Shape("Duck", "🦆"),
+        Shape("Rabbit", "🐰"),
+        Shape("Bear", "🐻"),
+        Shape("Lion", "🦁"),
+        Shape("Monkey", "🐵"),
+        Shape("Elephant", "🐘"),
+        Shape("Frog", "🐸"),
+        Shape("Fish", "🐟"),
+        Shape("Bird", "🐦"),
+        Shape("Horse", "🐴"),
+    )
+
+    fun animalFor(name: String): String = animals.firstOrNull { it.name == name }?.glyph ?: name
 }

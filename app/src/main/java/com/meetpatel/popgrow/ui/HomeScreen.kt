@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -443,8 +444,13 @@ private fun ModeGrid(onStart: (GameMode) -> Unit) {
             }
         }
         Spacer(Modifier.height(10.dp))
-        ModeButton(stringResource(R.string.mode_shapes), SolidColor(Color(0xFFA98BF0)), Color(0xFFA98BF0), appearDelay = 360L) {
-            onStart(GameMode.SHAPES)
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            ModeButton(stringResource(R.string.mode_shapes), SolidColor(Color(0xFFA98BF0)), Color(0xFFA98BF0), appearDelay = 360L) {
+                onStart(GameMode.SHAPES)
+            }
+            ModeButton(stringResource(R.string.mode_animals), SolidColor(Color(0xFFFF9F43)), Color(0xFFFF9F43), appearDelay = 450L) {
+                onStart(GameMode.ANIMALS)
+            }
         }
     }
 }
@@ -519,6 +525,7 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
     var speed by remember { mutableFloatStateOf(prefs.speed) }
     var balloonSize by remember { mutableFloatStateOf(prefs.size) }
     var showPrivacy by remember { mutableStateOf(false) }
+    var showProgress by remember { mutableStateOf(false) }
     var hintsReset by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
@@ -582,6 +589,7 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
                         prefs.resetTutorials()
                         hintsReset = true
                     }
+                    PanelButton(stringResource(R.string.progress), Modifier.weight(1f)) { showProgress = true }
                     PanelButton(stringResource(R.string.privacy), Modifier.weight(1f)) { showPrivacy = true }
                 }
                 Spacer(Modifier.height(4.dp))
@@ -613,6 +621,10 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
         }
     }
 
+    if (showProgress) {
+        ProgressPanel(prefs) { showProgress = false }
+    }
+
     if (showPrivacy) {
         AlertDialog(
             onDismissRequest = { showPrivacy = false },
@@ -623,6 +635,149 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
             }
         )
     }
+}
+
+/**
+ * The grown-ups' progress page: for every game, how many times it was played
+ * and the best, average and lowest score. Scores are written as each point is
+ * earned, so a game in progress already shows up here.
+ */
+@Composable
+private fun ProgressPanel(prefs: Prefs, onClose: () -> Unit) {
+    val rows = remember {
+        listOf(
+            GameMode.FREE_PLAY to "Play",
+            GameMode.COLORS to "Colors",
+            GameMode.LETTERS to "A – Z",
+            GameMode.NUMBERS to "1 – 20",
+            GameMode.SHAPES to "Shapes",
+            GameMode.ANIMALS to "Animals",
+        ).map { (mode, label) -> label to prefs.scores(mode.name) }
+    }
+    var cleared by remember { mutableStateOf(false) }
+    val played = rows.filter { it.second.isNotEmpty() }
+
+    Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Box(
+            Modifier
+                .fillMaxWidth(0.94f)
+                .widthIn(max = 560.dp)
+                .padding(top = 16.dp, end = 16.dp)
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF5BC0F0), RoundedCornerShape(26.dp))
+                    .border(3.dp, Color.White, RoundedCornerShape(26.dp))
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 18.dp, vertical = 18.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.progress),
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    style = TextStyle(shadow = Shadow(Palette.Ink.copy(alpha = 0.45f), Offset(0f, 3f), 6f)),
+                )
+                Spacer(Modifier.height(12.dp))
+
+                if (cleared || played.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.progress_none),
+                        fontSize = 16.sp,
+                        color = Color.White,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(vertical = 18.dp),
+                    )
+                } else {
+                    // Column headings.
+                    Row(Modifier.fillMaxWidth().padding(bottom = 6.dp)) {
+                        Spacer(Modifier.weight(1.5f))
+                        StatHead(stringResource(R.string.col_plays))
+                        StatHead(stringResource(R.string.col_best))
+                        StatHead(stringResource(R.string.col_avg))
+                        StatHead(stringResource(R.string.col_low))
+                    }
+                    played.forEach { (label, scores) ->
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = label,
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                modifier = Modifier.weight(1.5f),
+                                style = TextStyle(shadow = Shadow(Palette.Ink.copy(alpha = 0.3f), Offset(0f, 2f), 3f)),
+                            )
+                            StatCell(scores.size.toString())
+                            StatCell(scores.max().toString())
+                            StatCell((scores.sum() / scores.size).toString())
+                            StatCell(scores.min().toString())
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(14.dp))
+                PanelButton(stringResource(R.string.reset_scores), Modifier.fillMaxWidth()) {
+                    prefs.clearScores()
+                    cleared = true
+                }
+                Text(
+                    text = stringResource(R.string.progress_note),
+                    fontSize = 11.sp,
+                    color = Color.White.copy(alpha = 0.9f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                )
+            }
+
+            Box(
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .size(46.dp)
+                    .background(Color(0xFFE53935), CircleShape)
+                    .border(3.dp, Color.White, CircleShape)
+                    .clickable(onClick = onClose),
+                contentAlignment = Alignment.Center,
+            ) {
+                Canvas(Modifier.size(18.dp)) {
+                    val w = size.width
+                    drawLine(Color.White, Offset(0f, 0f), Offset(w, w), 4.5f * density, StrokeCap.Round)
+                    drawLine(Color.White, Offset(w, 0f), Offset(0f, w), 4.5f * density, StrokeCap.Round)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RowScope.StatHead(text: String) {
+    Text(
+        text = text,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.White.copy(alpha = 0.85f),
+        textAlign = TextAlign.Center,
+        modifier = Modifier.weight(1f),
+    )
+}
+
+@Composable
+private fun RowScope.StatCell(text: String) {
+    Text(
+        text = text,
+        fontSize = 17.sp,
+        fontWeight = FontWeight.Black,
+        color = Color.White,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.weight(1f),
+    )
 }
 
 /** A label on the left, a chunky switch on the right. */
