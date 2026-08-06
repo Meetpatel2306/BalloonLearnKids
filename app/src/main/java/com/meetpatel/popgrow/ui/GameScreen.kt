@@ -12,6 +12,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -545,25 +546,30 @@ fun GameScreen(
         // Finished the whole set! The party has already played out — now the
         // well-done and two big choices, straight over the live scene.
         if (showComplete) {
-            Column(
-                Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Text("🎉", fontSize = 84.sp)
-                Text(
-                    text = "Great job!",
-                    fontSize = 42.sp,
-                    fontWeight = FontWeight.Black,
-                    color = Color.White,
-                    style = TextStyle(
-                        shadow = Shadow(Palette.Ink.copy(alpha = 0.5f), Offset(0f, 5f), 10f)
-                    ),
-                )
-                Spacer(Modifier.height(22.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-                    CompleteButton("Play Again", Color(0xFF35C978)) { showComplete = false; runKey++ }
-                    CompleteButton("Menu", Color(0xFF4D9BFF)) { currentExit() }
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                // One tidy card holds the whole well-done moment.
+                Column(
+                    Modifier
+                        .background(Color(0xFF5BC0F0), RoundedCornerShape(28.dp))
+                        .border(3.dp, Color.White, RoundedCornerShape(28.dp))
+                        .padding(horizontal = 34.dp, vertical = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text("🎉", fontSize = 64.sp)
+                    Text(
+                        text = "Great job!",
+                        fontSize = 34.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.White,
+                        style = TextStyle(
+                            shadow = Shadow(Palette.Ink.copy(alpha = 0.5f), Offset(0f, 4f), 8f)
+                        ),
+                    )
+                    Spacer(Modifier.height(18.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                        CompleteButton("Play Again", Color(0xFF35C978)) { showComplete = false; runKey++ }
+                        CompleteButton("Menu", Color(0xFF4D9BFF)) { currentExit() }
+                    }
                 }
             }
         }

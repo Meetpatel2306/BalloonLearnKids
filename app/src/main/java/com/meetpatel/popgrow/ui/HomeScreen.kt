@@ -541,24 +541,24 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
                     .background(Color(0xFF5BC0F0), RoundedCornerShape(26.dp))
                     .border(3.dp, Color.White, RoundedCornerShape(26.dp))
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 22.dp, vertical = 18.dp),
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
             ) {
                 Text(
                     text = stringResource(R.string.settings),
-                    fontSize = 30.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Black,
                     color = Color.White,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = TextStyle(shadow = Shadow(Palette.Ink.copy(alpha = 0.45f), Offset(0f, 3f), 6f)),
                 )
-                Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(6.dp))
 
                 ToggleRow(stringResource(R.string.music), music) { music = it; prefs.musicEnabled = it }
                 ToggleRow(stringResource(R.string.sound), sound) { sound = it; prefs.soundEnabled = it }
                 ToggleRow(stringResource(R.string.haptics), haptic) { haptic = it; prefs.hapticsEnabled = it }
                 ToggleRow(stringResource(R.string.high_contrast), contrast) { contrast = it; prefs.highContrast = it }
 
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(2.dp))
                 Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(18.dp),
@@ -577,10 +577,10 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
                     ) { balloonSize = it; prefs.size = it }
                 }
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(6.dp))
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     PanelButton(
                         if (hintsReset) stringResource(R.string.hints_on) else stringResource(R.string.show_hints),
@@ -592,13 +592,12 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
                     PanelButton(stringResource(R.string.progress), Modifier.weight(1f)) { showProgress = true }
                     PanelButton(stringResource(R.string.privacy), Modifier.weight(1f)) { showPrivacy = true }
                 }
-                Spacer(Modifier.height(4.dp))
                 Text(
                     text = stringResource(R.string.settings_note),
-                    fontSize = 11.sp,
+                    fontSize = 10.sp,
                     color = Color.White.copy(alpha = 0.9f),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
                 )
             }
 
@@ -786,13 +785,13 @@ private fun ToggleRow(label: String, checked: Boolean, onChange: (Boolean) -> Un
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp),
+            .padding(vertical = 1.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = label,
-            fontSize = 19.sp,
+            fontSize = 17.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
             style = TextStyle(shadow = Shadow(Palette.Ink.copy(alpha = 0.35f), Offset(0f, 2f), 4f)),
@@ -826,7 +825,7 @@ private fun SliderColumn(
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = label,
-            fontSize = 16.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
             style = TextStyle(shadow = Shadow(Palette.Ink.copy(alpha = 0.35f), Offset(0f, 2f), 4f)),
@@ -852,10 +851,10 @@ private fun PanelButton(label: String, modifier: Modifier = Modifier, onClick: (
             .background(Color.White, RoundedCornerShape(14.dp))
             .border(2.dp, Palette.Ink.copy(alpha = 0.35f), RoundedCornerShape(14.dp))
             .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
+            .padding(horizontal = 4.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(label, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Palette.Ink, textAlign = TextAlign.Center)
+        Text(label, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Palette.Ink, textAlign = TextAlign.Center)
     }
 }
 

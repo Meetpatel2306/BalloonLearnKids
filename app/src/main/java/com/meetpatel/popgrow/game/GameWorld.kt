@@ -102,6 +102,14 @@ class GameWorld(
     var missStreak: Int = 0
         private set
 
+    /**
+     * Set once the whole set is finished. The balloons stop rising and no new
+     * ones arrive, so the game cannot quietly start itself over behind the
+     * well-done screen; only the celebration keeps animating.
+     */
+    var frozen: Boolean = false
+        private set
+
     init {
         if (isLearning) chooseNewTarget()
     }
@@ -243,17 +251,19 @@ class GameWorld(
         val dt = dtRaw.coerceIn(0f, MAX_STEP)
         time += dt
 
-        bubbles.forEach { it.advance(dt, time) }
-        // A bubble that floats off the top is never a loss. A balloon, though,
-        // gives a cheerful little puff and pop as it sails away.
-        val escaped = bubbles.filter { it.y + it.radius < 0f }
-        for (b in escaped) {
-            if (b.kind == BubbleKind.BALLOON) {
-                puff(b.x, 0f, b.color)
-                pendingSounds += GameSound.BALLOON_AWAY
+        if (!frozen) {
+            bubbles.forEach { it.advance(dt, time) }
+            // A bubble that floats off the top is never a loss. A balloon, though,
+            // gives a cheerful little puff and pop as it sails away.
+            val escaped = bubbles.filter { it.y + it.radius < 0f }
+            for (b in escaped) {
+                if (b.kind == BubbleKind.BALLOON) {
+                    puff(b.x, 0f, b.color)
+                    pendingSounds += GameSound.BALLOON_AWAY
+                }
             }
+            bubbles.removeAll { it.y + it.radius < 0f }
         }
-        bubbles.removeAll { it.y + it.radius < 0f }
 
         particles.forEach { it.advance(dt, dp(GRAVITY_DP)) }
         particles.removeAll { !it.alive }
@@ -274,12 +284,14 @@ class GameWorld(
 
         flowers.removeAll { it.expired(time) }
 
-        for (lane in 0 until laneCount) {
-            spawnCooldown[lane] -= dt
-            val inLane = bubbles.count { it.lane == lane }
-            if (inLane < targetBubbles && spawnCooldown[lane] <= 0f) {
-                spawn(lane)
-                spawnCooldown[lane] = SPAWN_MIN + random.nextFloat() * SPAWN_JITTER
+        if (!frozen) {
+            for (lane in 0 until laneCount) {
+                spawnCooldown[lane] -= dt
+                val inLane = bubbles.count { it.lane == lane }
+                if (inLane < targetBubbles && spawnCooldown[lane] <= 0f) {
+                    spawn(lane)
+                    spawnCooldown[lane] = SPAWN_MIN + random.nextFloat() * SPAWN_JITTER
+                }
             }
         }
     }
@@ -483,7 +495,9 @@ class GameWorld(
                     GameMode.FREE_PLAY -> {}
                 }
                 celebrateLevelUp()
-                chooseNewTarget()
+                // The very last one ends the round: hold the target where it is
+                // and stop the world, rather than silently starting over.
+                if (completedSet) frozen = true else chooseNewTarget()
             }
             missStreak = if (correct) 0 else missStreak + 1
         }
