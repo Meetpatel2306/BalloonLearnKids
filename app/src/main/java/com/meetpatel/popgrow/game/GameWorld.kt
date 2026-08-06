@@ -506,10 +506,11 @@ class GameWorld(
                     GameMode.ANIMALS -> {
                         rewardWord = bubble.matchKey
                         rewardEmoji = LearningContent.animalFor(bubble.matchKey)
-                        // "Cow. The cow says moo." — the name, then its sound.
+                        // "Cow. Moo. Moo." — the name, then its sound twice, so
+                        // a child hears it clearly and can join in.
                         val noise = LearningContent.animalSounds[bubble.matchKey]
                         spokenReward = if (noise != null) {
-                            "${bubble.matchKey}. The ${bubble.matchKey.lowercase()} says $noise."
+                            "${bubble.matchKey}. $noise. $noise."
                         } else bubble.matchKey
                     }
                 }
