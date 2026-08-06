@@ -141,10 +141,6 @@ fun GameScreen(
             else -> world.sequence
         }
     }
-    // Fast-pop streak in free play: five quick pops earn a sparkle bonus.
-    var combo by remember { mutableIntStateOf(0) }
-    var lastPopT by remember { mutableStateOf(0f) }
-
     // First visit to this mode: a hand points at the balloon to tap, for the
     // first three taps only. After that it is remembered as seen, forever.
     val modeKey = remember(mode) { mode.name }
@@ -313,17 +309,6 @@ fun GameScreen(
                                         }
                                     }
                                     if (pop.completedSet && !completePending) completePending = true
-                                    // Free play: five pops in quick succession
-                                    // earn a bonus sparkle burst.
-                                    if (mode == GameMode.FREE_PLAY) {
-                                        val tNow = world.time
-                                        combo = if (tNow - lastPopT < 1.0f) combo + 1 else 1
-                                        lastPopT = tNow
-                                        if (combo % 5 == 0) {
-                                            world.sparkleBurst(pop.x, pop.y)
-                                            if (prefs.soundEnabled) tones.playSparkle(0.55f)
-                                        }
-                                    }
                                     if (prefs.soundEnabled) {
                                         tones.playPop(pop.loudness * 0.6f)
                                         // Each kind of bubble has its own voice.
@@ -365,7 +350,7 @@ fun GameScreen(
             }
         }
 
-        if (world.isLearning) {
+        run {
             // The whole A–Z / 1–20 across the top: done ones bright, the current
             // one boxed, the rest faded — so a child sees the journey and what's next.
             ProgressStrip(
@@ -403,22 +388,6 @@ fun GameScreen(
                 } else {
                     Text(targetShown, color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Black)
                 }
-            }
-        } else {
-            // Free play: a clear "Level N" badge near the star meter.
-            Box(
-                Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 56.dp)
-                    .background(Color.Black.copy(alpha = 0.16f), RoundedCornerShape(50))
-                    .padding(horizontal = 14.dp, vertical = 4.dp)
-            ) {
-                Text(
-                    text = "Level ${levelShown + 1}",
-                    color = Color.White,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                )
             }
         }
 

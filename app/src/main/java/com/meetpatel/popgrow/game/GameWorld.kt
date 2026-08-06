@@ -23,7 +23,7 @@ enum class GameSound { BALLOON_AWAY }
 class GameWorld(
     val twoPlayer: Boolean,
     private val density: Float,
-    val mode: GameMode = GameMode.FREE_PLAY,
+    val mode: GameMode = GameMode.LETTERS,
     /** Grown-up settings: how fast balloons rise, and how large they are. Size
      * only ever scales up, so the minimum touch target stays safe. */
     private val speedScale: Float = 1f,
@@ -38,7 +38,8 @@ class GameWorld(
     var time: Float = 0f
         private set
 
-    val isLearning: Boolean get() = mode != GameMode.FREE_PLAY
+    /** Every game teaches something now; kept for readability at call sites. */
+    val isLearning: Boolean get() = true
 
     /** The value the child is currently asked to find (a number, letter or colour
      * name). Empty in free play. */
@@ -94,7 +95,6 @@ class GameWorld(
             GameMode.LETTERS -> LearningContent.letters
             GameMode.SHAPES -> LearningContent.shapes.map { it.name }
             GameMode.ANIMALS -> LearningContent.animals.map { it.name }
-            GameMode.FREE_PLAY -> emptyList()
         }
 
     /** Wrong taps since the last right answer — lets the UI make the target
@@ -141,7 +141,6 @@ class GameWorld(
                 targetIndex = (targetIndex + 1) % LearningContent.animals.size
                 target = LearningContent.animals[targetIndex].name
             }
-            GameMode.FREE_PLAY -> {}
         }
     }
 
@@ -296,7 +295,8 @@ class GameWorld(
         }
     }
 
-    private val targetBubbles: Int get() = if (twoPlayer) 6 else 9
+    /** Deliberately few, so the answer balloon is never buried under others. */
+    private val targetBubbles: Int get() = if (twoPlayer) 4 else 5
 
     private fun spawn(lane: Int) {
         val grow = sizeScale.coerceAtLeast(1f)
@@ -306,7 +306,24 @@ class GameWorld(
 
         val start = laneStart(lane) + radius + dp(4f)
         val end = laneEnd(lane) - radius - dp(4f)
-        val baseX = if (end <= start) (start + end) / 2f else start + random.nextFloat() * (end - start)
+        // Try a handful of columns and take the one furthest from the balloons
+        // already rising, so a new one never launches on top of another.
+        val baseX = if (end <= start) {
+            (start + end) / 2f
+        } else {
+            var bestX = start + random.nextFloat() * (end - start)
+            var bestGap = -1f
+            repeat(8) {
+                val candidate = start + random.nextFloat() * (end - start)
+                val gap = bubbles.filter { it.lane == lane }
+                    .minOfOrNull { abs(it.baseX - candidate) } ?: Float.MAX_VALUE
+                if (gap > bestGap) {
+                    bestGap = gap
+                    bestX = candidate
+                }
+            }
+            bestX
+        }
 
         val swayAmp = minOf(dp(10f) + random.nextFloat() * dp(18f), (end - start).coerceAtLeast(0f) / 2f)
 
@@ -356,7 +373,6 @@ class GameWorld(
                         matchKey = target
                     }
                 }
-                GameMode.FREE_PLAY -> {}
             }
         }
 
@@ -492,7 +508,6 @@ class GameWorld(
                         rewardEmoji = LearningContent.animalFor(bubble.matchKey)
                         spokenReward = bubble.matchKey
                     }
-                    GameMode.FREE_PLAY -> {}
                 }
                 celebrateLevelUp()
                 // The very last one ends the round: hold the target where it is

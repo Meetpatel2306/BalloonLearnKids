@@ -32,15 +32,16 @@ class GameWorldTest {
     fun `bubbles spawn up to the target count`() {
         val w = world()
         w.settle()
-        assertEquals(9, w.bubbles.size)
+        // Deliberately few on screen, so the answer is never buried.
+        assertEquals(5, w.bubbles.size)
     }
 
     @Test
     fun `two player mode fills both lanes`() {
         val w = world(twoPlayer = true)
         w.settle()
-        assertEquals(6, w.bubbles.count { it.lane == 0 })
-        assertEquals(6, w.bubbles.count { it.lane == 1 })
+        assertEquals(4, w.bubbles.count { it.lane == 0 })
+        assertEquals(4, w.bubbles.count { it.lane == 1 })
     }
 
     @Test
@@ -137,7 +138,7 @@ class GameWorldTest {
         w.update(1f / 60f)
         assertTrue(w.bubbles.none { it.id == escapee.id })
         w.settle(4f)
-        assertEquals("the sky must refill itself", 9, w.bubbles.size)
+        assertEquals("the sky must refill itself", 5, w.bubbles.size)
     }
 
     @Test

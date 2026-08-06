@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.Color
  * popping any bubble simply says its name aloud, and matching the asked-for one
  * earns a little celebration.
  */
-enum class GameMode { FREE_PLAY, COLORS, NUMBERS, LETTERS, SHAPES, ANIMALS }
+enum class GameMode { COLORS, NUMBERS, LETTERS, SHAPES, ANIMALS }
 
 /** The words and colours each learning mode teaches. */
 object LearningContent {

@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -231,6 +232,12 @@ fun DrawScope.drawTapHand(target: Offset, phase: Float, dpUnit: Float, measurer:
  * The app title with every letter bouncing in a gentle wave — the whole word
  * feels alive without being distracting.
  */
+/** Storybook colours for the title letters. */
+private val TITLE_COLORS = listOf(
+    Color(0xFFFF5252), Color(0xFFFF9F43), Color(0xFFFFD32A),
+    Color(0xFF35C978), Color(0xFF4D9BFF), Color(0xFFA98BF0), Color(0xFFFF7FB6),
+)
+
 @Composable
 fun BouncyTitle(text: String = "Balloon Pop & Learn", fontSize: Int = 46) {
     val t = rememberInfiniteTransition(label = "title")
@@ -244,16 +251,20 @@ fun BouncyTitle(text: String = "Balloon Pop & Learn", fontSize: Int = 46) {
             if (ch == ' ') {
                 Spacer(Modifier.width(10.dp))
             } else {
+                // Every letter takes a colour from the rainbow and rides the
+                // wave — playful and storybook-ish rather than plain and flat.
                 Text(
                     text = ch.toString(),
                     fontSize = fontSize.sp,
                     fontWeight = FontWeight.Black,
-                    color = Color.White,
+                    fontFamily = FontFamily.Cursive,
+                    color = TITLE_COLORS[i % TITLE_COLORS.size],
                     style = TextStyle(
-                        shadow = Shadow(Palette.Ink.copy(alpha = 0.4f), Offset(0f, 5f), 8f)
+                        shadow = Shadow(Palette.Ink.copy(alpha = 0.55f), Offset(0f, 4f), 7f)
                     ),
                     modifier = Modifier.graphicsLayer {
-                        translationY = sin(v * 6.2832f + i * 0.55f) * -5.dp.toPx()
+                        translationY = sin(v * 6.2832f + i * 0.55f) * -6.dp.toPx()
+                        rotationZ = sin(v * 6.2832f + i * 0.55f) * 5f
                     }
                 )
             }

@@ -88,8 +88,10 @@ fun DrawScope.drawWorld(
     // If the child seems stuck (a few wrong taps), the target balloon waves for
     // attention — never a penalty, just a friendlier hint.
     val urgent = world.missStreak >= 3
-    world.bubbles.forEach { b ->
-        val highlight = world.isLearning && b.matchKey.isNotEmpty() && b.matchKey == world.target
+    // The answer balloon is drawn last so nothing can ever cover it up.
+    val ordered = world.bubbles.sortedBy { if (it.matchKey.isNotEmpty() && it.matchKey == world.target) 1 else 0 }
+    ordered.forEach { b ->
+        val highlight = b.matchKey.isNotEmpty() && b.matchKey == world.target
         if (highlight && urgent) {
             rotate(sin(world.time * 8f) * 6f, Offset(b.x, b.y)) {
                 drawBubble(b, world.time, dpUnit, measurer, highlight = true, urgent = true)
@@ -108,7 +110,6 @@ fun DrawScope.drawWorld(
     world.particles.forEach { drawParticle(it) }
     // Free play shows the star meter; learning modes show the A–Z / 1–20 strip
     // (drawn by the UI layer) instead.
-    if (!world.isLearning) drawLevelMeter(world, dpUnit)
 }
 
 /** A tiny row of stars at the top that fills as the child pops, then empties on

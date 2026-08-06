@@ -69,7 +69,9 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -146,6 +148,9 @@ fun HomeScreen(
                     fontWeight = FontWeight.Medium,
                     color = Color.White.copy(alpha = 0.95f),
                 )
+                // A little parade of friends, so the top of the screen is warm
+                // and inviting rather than just words.
+                Text("🐶 🐱 🐰 🐻 🦁", fontSize = 18.sp)
                 Spacer(Modifier.height(6.dp))
                 RainbowArch(
                     prefs, tones, haptics,
@@ -425,26 +430,24 @@ private fun PoppableBalloon(
 @Composable
 private fun ModeGrid(prefs: Prefs, tones: ToneEngine, haptics: Haptics, onStart: (GameMode) -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        // Each balloon wears the thing it teaches: A, 1, a shape, an animal.
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            ModeBalloon(stringResource(R.string.mode_play), Color(0xFFFF5252), 0L, prefs, tones, haptics) {
-                onStart(GameMode.FREE_PLAY)
-            }
-            ModeBalloon(stringResource(R.string.mode_colors), Color.White, 90L, prefs, tones, haptics, rainbow = true) {
-                onStart(GameMode.COLORS)
-            }
-            ModeBalloon(stringResource(R.string.mode_az), Color(0xFF35C978), 180L, prefs, tones, haptics) {
+            ModeBalloon(stringResource(R.string.mode_az), Color(0xFF35C978), 0L, prefs, tones, haptics, symbol = "A") {
                 onStart(GameMode.LETTERS)
+            }
+            ModeBalloon(stringResource(R.string.mode_120), Color(0xFF4D9BFF), 90L, prefs, tones, haptics, symbol = "1") {
+                onStart(GameMode.NUMBERS)
+            }
+            ModeBalloon(stringResource(R.string.mode_colors), Color.White, 180L, prefs, tones, haptics, rainbow = true) {
+                onStart(GameMode.COLORS)
             }
         }
         Spacer(Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            ModeBalloon(stringResource(R.string.mode_120), Color(0xFF4D9BFF), 270L, prefs, tones, haptics) {
-                onStart(GameMode.NUMBERS)
-            }
-            ModeBalloon(stringResource(R.string.mode_shapes), Color(0xFFA98BF0), 360L, prefs, tones, haptics) {
+            ModeBalloon(stringResource(R.string.mode_shapes), Color(0xFFA98BF0), 270L, prefs, tones, haptics, symbol = "★") {
                 onStart(GameMode.SHAPES)
             }
-            ModeBalloon(stringResource(R.string.mode_animals), Color(0xFFFF9F43), 450L, prefs, tones, haptics) {
+            ModeBalloon(stringResource(R.string.mode_animals), Color(0xFFFF9F43), 360L, prefs, tones, haptics, symbol = "🐶") {
                 onStart(GameMode.ANIMALS)
             }
         }
@@ -465,8 +468,10 @@ private fun ModeBalloon(
     tones: ToneEngine,
     haptics: Haptics,
     rainbow: Boolean = false,
+    symbol: String? = null,
     onStart: () -> Unit,
 ) {
+    val measurer = rememberTextMeasurer()
     val scope = rememberCoroutineScope()
     val enter = remember { Animatable(0f) }
     val burst = remember { Animatable(0f) }
@@ -513,14 +518,35 @@ private fun ModeBalloon(
                     }
                 }
         ) {
+            val centre = Offset(size.width / 2f, size.height * 0.42f)
+            val radius = size.width * 0.40f
             drawCuteBalloon(
-                c = Offset(size.width / 2f, size.height * 0.42f),
-                r = size.width * 0.40f,
+                c = centre,
+                r = radius,
                 color = color,
                 dpUnit = density,
                 wiggle = bob + phase,
                 rainbow = rainbow,
+                // A balloon carrying a symbol shows it instead of a face.
+                face = symbol == null,
             )
+            symbol?.let { s ->
+                val layout = measurer.measure(
+                    text = s,
+                    style = TextStyle(
+                        fontSize = (radius * 1.05f / density).sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.White,
+                    )
+                )
+                drawText(
+                    layout,
+                    topLeft = Offset(
+                        centre.x - layout.size.width / 2f,
+                        centre.y - layout.size.height / 2f,
+                    )
+                )
+            }
             // Confetti flying out as the balloon gives way.
             val p = burst.value
             if (p > 0f) {
@@ -734,7 +760,6 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
 private fun ProgressPanel(prefs: Prefs, onClose: () -> Unit) {
     val rows = remember {
         listOf(
-            GameMode.FREE_PLAY to "Play",
             GameMode.COLORS to "Colors",
             GameMode.LETTERS to "A – Z",
             GameMode.NUMBERS to "1 – 20",
