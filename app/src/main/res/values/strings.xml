@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Pop &amp; Grow</string>
+    <string name="app_name">Balloon Pop &amp; Learn</string>
 
-    <string name="title">Pop &amp; Grow</string>
-    <string name="subtitle">Pop the bubbles. Grow a garden.</string>
+    <string name="title">Balloon Pop &amp; Learn</string>
+    <string name="subtitle">Pop balloons. Learn ABC, 123 &amp; more!</string>
 
     <string name="mode_solo">1 Player</string>
     <string name="mode_duo">2 Players</string>
+    <string name="mode_play">Play</string>
+    <string name="mode_colors">Colors</string>
+    <string name="mode_numbers">Numbers</string>
+    <string name="mode_letters">Letters</string>
+    <string name="mode_az">A – Z</string>
+    <string name="mode_120">1 – 20</string>
+    <string name="mode_shapes">Shapes</string>
+    <string name="find">Find</string>
 
     <string name="settings">Settings</string>
     <string name="sound">Sound</string>
     <string name="haptics">Vibration</string>
     <string name="close">Close</string>
 
-    <string name="grownups_only">Grown-ups: hold the button</string>
+    <string name="grownups_only">Grown-ups</string>
 </resources>

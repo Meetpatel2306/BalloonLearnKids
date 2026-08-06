@@ -1,6 +1,7 @@
 # Build output (matches app/build, build, etc. at any depth)
 build/
 .gradle/
+.kotlin/
 /captures
 .externalNativeBuild
 .cxx

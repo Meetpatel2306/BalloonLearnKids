@@ -16,18 +16,25 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.meetpatel.popgrow.audio.Ambience
+import com.meetpatel.popgrow.audio.Speaker
 import com.meetpatel.popgrow.audio.ToneEngine
+import com.meetpatel.popgrow.game.GameMode
 import com.meetpatel.popgrow.ui.GameScreen
 import com.meetpatel.popgrow.ui.HomeScreen
+import com.meetpatel.popgrow.ui.SplashScreen
 
 private sealed interface Screen {
+    data object Splash : Screen
     data object Home : Screen
-    data class Play(val twoPlayer: Boolean) : Screen
+    data class Play(val mode: GameMode) : Screen
 }
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var tones: ToneEngine
+    private lateinit var ambience: Ambience
+    private lateinit var speaker: Speaker
     private lateinit var haptics: Haptics
     private lateinit var prefs: Prefs
 
@@ -35,6 +42,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         tones = ToneEngine(applicationContext)
+        ambience = Ambience(applicationContext)
+        speaker = Speaker(applicationContext)
         haptics = Haptics(applicationContext)
         prefs = Prefs(applicationContext)
 
@@ -44,23 +53,33 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MaterialTheme {
-                var screen: Screen by remember { mutableStateOf(Screen.Home) }
+                var screen: Screen by remember { mutableStateOf<Screen>(Screen.Splash) }
 
                 // The system back gesture leaves a game but never leaves the app
                 // from the menu, so a stray swipe cannot dump a child onto the
                 // home screen mid-play.
-                BackHandler(enabled = screen != Screen.Home) { screen = Screen.Home }
+                BackHandler(enabled = screen is Screen.Play) { screen = Screen.Home }
 
                 Surface(Modifier.fillMaxSize()) {
                     when (val s = screen) {
+                        is Screen.Splash -> SplashScreen(
+                            onDone = { screen = Screen.Home },
+                            tones = tones,
+                            soundEnabled = prefs.soundEnabled,
+                        )
+
                         is Screen.Home -> HomeScreen(
                             prefs = prefs,
-                            onStart = { twoPlayer -> screen = Screen.Play(twoPlayer) },
+                            tones = tones,
+                            haptics = haptics,
+                            onStart = { mode -> screen = Screen.Play(mode) },
                         )
 
                         is Screen.Play -> GameScreen(
-                            twoPlayer = s.twoPlayer,
+                            mode = s.mode,
                             tones = tones,
+                            ambience = ambience,
+                            speaker = speaker,
                             haptics = haptics,
                             prefs = prefs,
                             onExit = { screen = Screen.Home },
@@ -76,8 +95,22 @@ class MainActivity : ComponentActivity() {
         if (hasFocus) goImmersive()
     }
 
+    // Silence the background soundscape whenever the app is not on screen, and
+    // bring it back (only if a game still wants it) when the app returns.
+    override fun onStop() {
+        ambience.pause()
+        super.onStop()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        ambience.resume()
+    }
+
     override fun onDestroy() {
         tones.release()
+        ambience.release()
+        speaker.shutdown()
         super.onDestroy()
     }
 

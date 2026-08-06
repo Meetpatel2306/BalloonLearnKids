@@ -1,45 +1,200 @@
 package com.meetpatel.popgrow.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.meetpatel.popgrow.Haptics
 import com.meetpatel.popgrow.Prefs
+import com.meetpatel.popgrow.audio.Ambience
+import com.meetpatel.popgrow.audio.Speaker
 import com.meetpatel.popgrow.audio.ToneEngine
+import com.meetpatel.popgrow.game.BubbleKind
+import com.meetpatel.popgrow.game.GameMode
+import com.meetpatel.popgrow.game.GameSound
 import com.meetpatel.popgrow.game.GameWorld
+import com.meetpatel.popgrow.game.LearningContent
 
 @Composable
 fun GameScreen(
-    twoPlayer: Boolean,
+    mode: GameMode,
     tones: ToneEngine,
+    ambience: Ambience,
+    speaker: Speaker,
     haptics: Haptics,
     prefs: Prefs,
     onExit: () -> Unit,
 ) {
     val density = LocalDensity.current.density
-    val world = remember(twoPlayer) { GameWorld(twoPlayer = twoPlayer, density = density) }
+    // Bumping runKey starts a fresh round of the same mode ("Play Again").
+    var runKey by remember { mutableIntStateOf(0) }
+    val world = remember(mode, runKey) { GameWorld(twoPlayer = false, density = density, mode = mode) }
+    val measurer = rememberTextMeasurer()
     val frame = remember { mutableLongStateOf(0L) }
     val currentExit by rememberUpdatedState(onExit)
+    // The "you finished the whole set!" celebration.
+    var showComplete by remember { mutableStateOf(false) }
+    var completePending by remember { mutableStateOf(false) }
+    val completeGuard by rememberUpdatedState(showComplete)
+
+    // The child finished the whole set: let blasts and fanfares fill the screen
+    // for a few seconds first — they earned a party — then offer the choices.
+    LaunchedEffect(completePending) {
+        if (completePending) {
+            repeat(4) { i ->
+                world.celebrate()
+                if (prefs.soundEnabled) {
+                    if (i % 2 == 0) tones.playFanfare(0.85f) else {
+                        tones.playSparkle(0.6f)
+                        tones.playChord(0, 2, 4, volume = 0.5f)
+                    }
+                }
+                kotlinx.coroutines.delay(1100)
+            }
+            showComplete = true
+            completePending = false
+        }
+    }
+    // Mirrors world.level as Compose state so the "Level N" label updates on change.
+    var levelShown by remember { mutableIntStateOf(0) }
+    // Mirrors world.target so the prompt updates and the new target is spoken.
+    var targetShown by remember { mutableStateOf("") }
+    // Mirrors world.targetIndex so the A–Z / 1–20 strip updates. Shapes show
+    // their glyphs in the strip, everything else its own text.
+    var indexShown by remember { mutableIntStateOf(-1) }
+    val stripLabels = remember(mode) {
+        if (mode == GameMode.SHAPES) LearningContent.shapes.map { it.glyph } else world.sequence
+    }
+    // Fast-pop streak in free play: five quick pops earn a sparkle bonus.
+    var combo by remember { mutableIntStateOf(0) }
+    var lastPopT by remember { mutableStateOf(0f) }
+
+    // Say the game's name once on entry, then the first target follows.
+    LaunchedEffect(mode, runKey) {
+        if (world.isLearning && prefs.soundEnabled) {
+            val name = when (mode) {
+                GameMode.LETTERS -> "Letters"
+                GameMode.NUMBERS -> "Numbers"
+                GameMode.COLORS -> "Colors"
+                GameMode.SHAPES -> "Shapes"
+                else -> ""
+            }
+            if (name.isNotEmpty()) speaker.say(name, flush = true)
+        }
+    }
+    // The "A for Apple" reward card, shown briefly after a correct answer.
+    var rewardWord by remember { mutableStateOf<String?>(null) }
+    var rewardEmoji by remember { mutableStateOf<String?>(null) }
+    var rewardTick by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(rewardTick) {
+        if (rewardTick > 0) {
+            kotlinx.coroutines.delay(1700)
+            rewardWord = null
+            rewardEmoji = null
+        }
+    }
+
+    // The flying value: on a right answer the letter/number/colour lifts off
+    // from the popped balloon and sails into its slot in the strip above.
+    val stripSlots = remember { mutableStateMapOf<Int, Offset>() }
+    var flyer by remember(runKey) { mutableStateOf<Flyer?>(null) }
+    var flyTick by remember { mutableIntStateOf(0) }
+    val flyProg = remember { Animatable(0f) }
+    var pulseIndex by remember(runKey) { mutableIntStateOf(-1) }
+    val pulseScale = remember { Animatable(1f) }
+
+    LaunchedEffect(flyTick) {
+        val f = flyer ?: return@LaunchedEffect
+        flyProg.snapTo(0f)
+        flyProg.animateTo(1f, tween(650, easing = FastOutSlowInEasing))
+        // Landed: the slot lights up and gives a happy bounce.
+        pulseIndex = f.toIndex
+        flyer = null
+        pulseScale.snapTo(1.6f)
+        pulseScale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
+    }
+
+    // Colours mode: the whole screen washes with the found colour.
+    var washColor by remember(runKey) { mutableStateOf<Color?>(null) }
+    var washFrom by remember { mutableStateOf(Offset.Zero) }
+    var washTick by remember { mutableIntStateOf(0) }
+    val washProg = remember { Animatable(0f) }
+
+    LaunchedEffect(washTick) {
+        if (washTick > 0 && washColor != null) {
+            washProg.snapTo(0f)
+            washProg.animateTo(1f, tween(1100))
+            washColor = null
+        }
+    }
+
+    // Soft wind and the odd bird, only while a game is on screen and only if the
+    // grown-up has left sound on. Leaving the game stops it.
+    DisposableEffect(Unit) {
+        if (prefs.soundEnabled) ambience.start()
+        onDispose { ambience.stop() }
+    }
 
     LaunchedEffect(world) {
         var last = 0L
@@ -48,6 +203,27 @@ fun GameScreen(
                 if (last != 0L) world.update((now - last) / 1_000_000_000f)
                 last = now
                 frame.longValue = now
+                if (world.level != levelShown) levelShown = world.level
+                if (world.targetIndex != indexShown) indexShown = world.targetIndex
+                // Keep the soundscape matching the sky: birds by day, owls at night.
+                ambience.setNight(Palette.themeAt(world.time).night)
+                // When the asked-for target changes, show it and say it aloud. Use
+                // the queue (not flush) so it follows any "A for Apple" reward.
+                if (world.target != targetShown) {
+                    targetShown = world.target
+                    if (prefs.soundEnabled && targetShown.isNotEmpty()) speaker.say(targetShown, flush = false)
+                }
+                // Non-tap sounds queued during the tick (a balloon floating away).
+                if (world.pendingSounds.isNotEmpty()) {
+                    if (prefs.soundEnabled) {
+                        world.pendingSounds.forEach { s ->
+                            when (s) {
+                                GameSound.BALLOON_AWAY -> tones.playBoing(0.4f)
+                            }
+                        }
+                    }
+                    world.pendingSounds.clear()
+                }
             }
         }
     }
@@ -66,37 +242,389 @@ fun GameScreen(
                             val event = awaitPointerEvent(PointerEventPass.Initial)
                             for (change in event.changes) {
                                 if (!change.changedToDownIgnoreConsumed()) continue
+                                if (completeGuard) continue
                                 val pop = world.popAt(change.position.x, change.position.y)
                                 if (pop != null) {
-                                    if (prefs.soundEnabled) {
-                                        tones.playNote(pop.noteIndex, pop.loudness)
-                                        if (pop.butterfly) tones.playChord(0, 2, 4, volume = 0.5f)
+                                    // Rewards show even when sound is off.
+                                    if (pop.correct) {
+                                        rewardWord = pop.rewardWord
+                                        rewardEmoji = pop.rewardEmoji
+                                        if (pop.rewardWord != null || pop.rewardEmoji != null) rewardTick++
+                                        // Send the found value flying into its slot.
+                                        if (pop.completedIndex >= 0) {
+                                            val itemColor = if (mode == GameMode.COLORS) {
+                                                LearningContent.colors.getOrNull(pop.completedIndex)?.color
+                                                    ?: Color.White
+                                            } else Palette.Gold
+                                            flyer = Flyer(
+                                                label = if (mode == GameMode.COLORS) null
+                                                        else stripLabels.getOrNull(pop.completedIndex),
+                                                color = itemColor,
+                                                from = Offset(pop.x, pop.y),
+                                                toIndex = pop.completedIndex,
+                                            )
+                                            flyTick++
+                                        }
+                                        // Colours: flood the screen with the found colour.
+                                        if (mode == GameMode.COLORS) {
+                                            washColor = LearningContent.colors
+                                                .firstOrNull { it.name == pop.spokenReward }?.color
+                                            washFrom = Offset(pop.x, pop.y)
+                                            washTick++
+                                        }
                                     }
-                                    if (prefs.hapticsEnabled) haptics.tick(pop.butterfly)
+                                    if (pop.completedSet && !completePending) completePending = true
+                                    // Free play: five pops in quick succession
+                                    // earn a bonus sparkle burst.
+                                    if (mode == GameMode.FREE_PLAY) {
+                                        val tNow = world.time
+                                        combo = if (tNow - lastPopT < 1.0f) combo + 1 else 1
+                                        lastPopT = tNow
+                                        if (combo % 5 == 0) {
+                                            world.sparkleBurst(pop.x, pop.y)
+                                            if (prefs.soundEnabled) tones.playSparkle(0.55f)
+                                        }
+                                    }
+                                    if (prefs.soundEnabled) {
+                                        tones.playPop(pop.loudness * 0.6f)
+                                        // Each kind of bubble has its own voice.
+                                        when (pop.kind) {
+                                            BubbleKind.BALLOON -> tones.playBoing(0.7f)
+                                            BubbleKind.STAR -> {
+                                                tones.playNote(pop.noteIndex, pop.loudness)
+                                                tones.playSparkle(0.4f)
+                                            }
+                                            BubbleKind.HEART -> tones.playChord(2, 4, volume = 0.5f)
+                                            else -> tones.playNote(pop.noteIndex, pop.loudness)
+                                        }
+                                        if (pop.special) tones.playSparkle(0.6f)
+                                        if (pop.butterfly) tones.playChord(0, 2, 4, volume = 0.5f)
+                                        if (pop.leveledUp) tones.playFanfare(0.85f)
+                                        // Learning modes: say the value, cheer a match.
+                                        if (pop.correct) {
+                                            if (!pop.leveledUp) tones.playFanfare(0.7f)
+                                            if (pop.spokenReward != null) speaker.say(pop.spokenReward, flush = true)
+                                        } else if (pop.spoken != null) {
+                                            speaker.say(pop.spoken)
+                                        }
+                                    }
+                                    if (prefs.hapticsEnabled) {
+                                        haptics.tick(pop.butterfly || pop.special || pop.leveledUp || pop.correct)
+                                    }
                                 }
                             }
                         }
                     }
                 }
         ) {
-            if (frame.longValue >= 0L && world.width > 0f) drawWorld(world, density)
+            if (frame.longValue >= 0L && world.width > 0f) drawWorld(world, density, measurer)
         }
 
-        // Deliberately small and in a corner: reachable for an adult, awkward for
-        // a child, and it still needs a full hold before it does anything.
-        HoldToConfirm(
-            modifier = Modifier
+        if (world.isLearning) {
+            // The whole A–Z / 1–20 across the top: done ones bright, the current
+            // one boxed, the rest faded — so a child sees the journey and what's next.
+            ProgressStrip(
+                mode = mode,
+                sequence = stripLabels,
+                // While a value is flying to its slot, the strip holds its
+                // breath; it advances when the flyer lands.
+                currentIndex = flyer?.toIndex ?: indexShown,
+                pulseIndex = pulseIndex,
+                pulseScale = pulseScale.value,
+                onSlotPositioned = { i, pos -> stripSlots[i] = pos },
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 6.dp),
+            )
+            // Below it, a bigger "find this" prompt.
+            Row(
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 44.dp)
+                    .background(Color.Black.copy(alpha = 0.22f), RoundedCornerShape(50))
+                    .padding(horizontal = 20.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (mode == GameMode.COLORS) {
+                    Box(Modifier.size(26.dp).background(world.targetColor, CircleShape))
+                    Spacer(Modifier.width(12.dp))
+                    Text(targetShown, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                } else if (mode == GameMode.SHAPES) {
+                    Text(
+                        LearningContent.glyphFor(targetShown),
+                        color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Black,
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Text(targetShown, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                } else {
+                    Text(targetShown, color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Black)
+                }
+            }
+        } else {
+            // Free play: a clear "Level N" badge near the star meter.
+            Box(
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 56.dp)
+                    .background(Color.Black.copy(alpha = 0.16f), RoundedCornerShape(50))
+                    .padding(horizontal = 14.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = "Level ${levelShown + 1}",
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        }
+
+        // Colours mode: a wave of the found colour floods out from the popped
+        // balloon and fills the whole screen, then melts away.
+        washColor?.let { wc ->
+            Canvas(Modifier.fillMaxSize()) {
+                val p = washProg.value
+                if (p > 0f && p < 1f) {
+                    val maxDim = kotlin.math.max(size.width, size.height)
+                    val radius = maxDim * 1.35f * (p * 1.6f).coerceAtMost(1f)
+                    val alpha = if (p < 0.55f) 0.92f else 0.92f * (1f - (p - 0.55f) / 0.45f)
+                    drawCircle(wc.copy(alpha = alpha.coerceIn(0f, 1f)), radius, washFrom)
+                }
+            }
+        }
+
+        // The found value flying up into its slot in the strip, along a little
+        // arc — leaving a trail of fading golden sparkles behind it.
+        flyer?.let { f ->
+            Canvas(Modifier.fillMaxSize()) {
+                val target = stripSlots[f.toIndex] ?: f.from
+                val arcLift = 70.dp.toPx()
+                for (k in 1..6) {
+                    val pk = flyProg.value - k * 0.055f
+                    if (pk <= 0f) continue
+                    val tx = f.from.x + (target.x - f.from.x) * pk
+                    val ty = f.from.y + (target.y - f.from.y) * pk -
+                        kotlin.math.sin(pk * 3.1416f) * arcLift
+                    drawCircle(
+                        Palette.Gold.copy(alpha = (1f - k / 7f) * 0.6f),
+                        (5f - k * 0.5f) * density,
+                        Offset(tx, ty),
+                    )
+                }
+            }
+            Box(
+                Modifier.graphicsLayer {
+                    val target = stripSlots[f.toIndex] ?: f.from
+                    val p = flyProg.value
+                    val x = f.from.x + (target.x - f.from.x) * p
+                    val y = f.from.y + (target.y - f.from.y) * p -
+                        kotlin.math.sin(p * 3.1416f) * 70.dp.toPx()
+                    translationX = x - 27.dp.toPx()
+                    translationY = y - 27.dp.toPx()
+                    val sc = 1.6f - 1.1f * p
+                    scaleX = sc
+                    scaleY = sc
+                }
+            ) {
+                if (f.label != null) {
+                    Text(
+                        text = f.label,
+                        fontSize = 34.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(
+                            shadow = Shadow(Palette.Ink.copy(alpha = 0.6f), Offset(0f, 4f), 7f)
+                        ),
+                        modifier = Modifier.size(54.dp),
+                    )
+                } else {
+                    Canvas(Modifier.size(54.dp)) {
+                        drawCircle(f.color, size.minDimension * 0.32f, Offset(size.width / 2f, size.height / 2f))
+                        drawCircle(
+                            Color.White,
+                            size.minDimension * 0.32f,
+                            Offset(size.width / 2f, size.height / 2f),
+                            style = Stroke(width = 2.5f * density),
+                        )
+                    }
+                }
+            }
+        }
+
+        // The reward: a huge picture and word that spring straight onto the
+        // scene after a right answer — no card behind them, like the balloon
+        // burst itself turned into the word.
+        AnimatedVisibility(
+            visible = rewardEmoji != null || rewardWord != null,
+            enter = fadeIn() + scaleIn(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMediumLow,
+                ),
+                initialScale = 0.25f,
+            ),
+            exit = fadeOut() + scaleOut(targetScale = 1.2f),
+            modifier = Modifier.align(Alignment.Center),
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.widthIn(max = 320.dp),
+            ) {
+                rewardEmoji?.let {
+                    Text(
+                        text = it,
+                        fontSize = if (it.length > 6) 34.sp else 100.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                rewardWord?.let {
+                    Text(
+                        text = it,
+                        // In numbers mode the number itself is the whole show.
+                        fontSize = if (mode == GameMode.NUMBERS) 110.sp else 40.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(
+                            shadow = Shadow(Palette.Ink.copy(alpha = 0.55f), Offset(0f, 5f), 10f)
+                        ),
+                    )
+                }
+            }
+        }
+
+        // Finished the whole set! The party has already played out — now the
+        // well-done and two big choices, straight over the live scene.
+        if (showComplete) {
+            Column(
+                Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text("🎉", fontSize = 84.sp)
+                Text(
+                    text = "Great job!",
+                    fontSize = 42.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White,
+                    style = TextStyle(
+                        shadow = Shadow(Palette.Ink.copy(alpha = 0.5f), Offset(0f, 5f), 10f)
+                    ),
+                )
+                Spacer(Modifier.height(22.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+                    CompleteButton("Play Again", Color(0xFF35C978)) { showComplete = false; runKey++ }
+                    CompleteButton("Menu", Color(0xFF4D9BFF)) { currentExit() }
+                }
+            }
+        }
+
+        // A simple tap now leaves the game (per request). It is small and in the
+        // corner so it is still out of a toddler's usual reach.
+        Box(
+            Modifier
                 .align(Alignment.TopStart)
-                .padding(12.dp),
-            diameter = 48.dp,
-            holdMillis = 800,
-            ringColor = Palette.Ink,
-            onConfirmed = currentExit,
+                .padding(12.dp)
+                .size(48.dp)
+                .background(Color.White.copy(alpha = 0.45f), CircleShape)
+                .clickable(onClick = currentExit),
+            contentAlignment = Alignment.Center,
         ) {
             Canvas(Modifier.size(20.dp)) { drawHouseGlyph() }
         }
     }
 }
+
+/** A big, friendly button for the well-done screen. */
+@Composable
+private fun CompleteButton(label: String, color: Color, onClick: () -> Unit) {
+    Box(
+        Modifier
+            .background(color, RoundedCornerShape(50))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 30.dp, vertical = 15.dp)
+    ) {
+        Text(
+            label,
+            color = Color.White,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Black,
+            style = TextStyle(
+                shadow = Shadow(Palette.Ink.copy(alpha = 0.35f), Offset(0f, 3f), 5f)
+            ),
+        )
+    }
+}
+
+/**
+ * The alphabet or number line across the top. Popped answers stay gold, the one
+ * being asked for is boxed and bright, and the rest are faded — so a child can
+ * see how far they've come and what comes next.
+ */
+@Composable
+private fun ProgressStrip(
+    mode: GameMode,
+    sequence: List<String>,
+    currentIndex: Int,
+    pulseIndex: Int,
+    pulseScale: Float,
+    onSlotPositioned: (Int, Offset) -> Unit,
+    modifier: Modifier,
+) {
+    Row(
+        modifier
+            .background(Color.Black.copy(alpha = 0.16f), RoundedCornerShape(50))
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 10.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
+        sequence.forEachIndexed { i, label ->
+            val done = i < currentIndex
+            val current = i == currentIndex
+            // Each slot reports where it is, so a popped value can fly to it;
+            // the slot that just received one gives a springy bounce.
+            var slotMod = Modifier.onGloballyPositioned { onSlotPositioned(i, it.boundsInRoot().center) }
+            if (i == pulseIndex) {
+                slotMod = slotMod.graphicsLayer {
+                    scaleX = pulseScale
+                    scaleY = pulseScale
+                }
+            }
+            if (mode == GameMode.COLORS) {
+                val col = LearningContent.colors[i].color
+                val alpha = if (current || done) 1f else 0.3f
+                Box(
+                    slotMod
+                        .size(if (current) 24.dp else 16.dp)
+                        .background(col.copy(alpha = alpha), CircleShape)
+                )
+            } else {
+                Text(
+                    text = label,
+                    color = when {
+                        current -> Color.White
+                        done -> Palette.Gold
+                        else -> Color.White.copy(alpha = 0.4f)
+                    },
+                    fontSize = if (current) 20.sp else 14.sp,
+                    fontWeight = if (current) FontWeight.Black else FontWeight.Bold,
+                    modifier = if (current) {
+                        slotMod
+                            .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                            .padding(horizontal = 5.dp, vertical = 1.dp)
+                    } else slotMod,
+                )
+            }
+        }
+    }
+}
+
+/** One value in flight from a popped balloon to its slot in the strip. */
+private class Flyer(
+    val label: String?,
+    val color: Color,
+    val from: Offset,
+    val toIndex: Int,
+)
 
 private fun DrawScope.drawHouseGlyph() {
     val w = size.width

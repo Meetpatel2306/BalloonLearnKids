@@ -1,10 +1,10 @@
-# Privacy Policy — Pop & Grow
+﻿# Privacy Policy — Balloon Pop & Learn
 
 _Last updated: 5 August 2026_
 
 ## Short version
 
-Pop & Grow collects nothing, sends nothing and stores nothing about you or your
+Balloon Pop & Learn collects nothing, sends nothing and stores nothing about you or your
 child. It has no internet access.
 
 ## The long version
