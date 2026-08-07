@@ -403,23 +403,32 @@ private fun DrawScope.drawBubble(bubble: Bubble, time: Float, dpUnit: Float, mea
         )
     }
 
-    // Soft drop shadow gives every kind some weight without an outline.
-    drawCircle(Color.Black.copy(alpha = 0.07f), r, Offset(c.x + 2f * dpUnit, c.y + 4f * dpUnit))
+    // Balloons hang from their string and swing like a slow pendulum, which is
+    // what makes the motion read as real rather than as a drifting sprite.
+    val tilt = sin(time * 0.85f + bubble.swayPhase) * 3.5f
 
     // Learning bubbles that carry a number or letter: a real balloon with the
     // character printed on it, instead of a face.
     if (bubble.label.isNotEmpty() && measurer != null) {
-        drawBalloonBody(c, r, bubble.color, dpUnit)
-        drawBubbleLabel(bubble.label, c, bubble.radius, dpUnit, measurer)
+        rotate(tilt, c) {
+            drawCuteBalloon(
+                c = c, r = r, color = bubble.color, dpUnit = dpUnit,
+                wiggle = time * 0.28f + bubble.swayPhase, face = false,
+            )
+            drawBubbleLabel(bubble.label, c, bubble.radius, dpUnit, measurer)
+        }
         return
     }
 
     // Balloons blink every few seconds, each on its own rhythm.
     val blink = blinkOf(time, bubble.swayPhase)
     when (bubble.kind) {
-        BubbleKind.BALLOON -> {
-            drawBalloonBody(c, r, bubble.color, dpUnit)
-            drawFace(c, r * 0.88f, bubble.face, dpUnit, blink)
+        BubbleKind.BALLOON -> rotate(tilt, c) {
+            drawCuteBalloon(
+                c = c, r = r, color = bubble.color, dpUnit = dpUnit,
+                wiggle = time * 0.28f + bubble.swayPhase,
+                face = true, faceStyle = bubble.face % 4,
+            )
         }
         BubbleKind.STAR -> {
             drawStarBody(c, r, bubble.color, time, dpUnit)

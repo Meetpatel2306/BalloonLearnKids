@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.TextMeasurer
@@ -55,10 +56,13 @@ fun DrawScope.drawCuteBalloon(
     faceStyle: Int = 0,
 ) {
     val rx = r
-    val ry = r * 1.16f
+    val ry = r * 1.18f
     val top = Offset(c.x - rx, c.y - ry)
     val bodySize = Size(rx * 2f, ry * 2f)
     val knotY = c.y + ry
+
+    // A real balloon is a teardrop: round on top, tapering to the neck.
+    val body = balloonPath(c, rx, ry)
 
     // Wavy string first, so the balloon sits on top of it.
     val sway = sin(wiggle * 6.2832f) * r * 0.22f
@@ -73,50 +77,96 @@ fun DrawScope.drawCuteBalloon(
     drawPath(string, Color(0xFF8E99AB), style = Stroke(width = 2.2f * dpUnit, cap = StrokeCap.Round))
 
     // Soft shadow behind the body.
-    drawOval(Color.Black.copy(alpha = 0.10f), Offset(top.x + 3f * dpUnit, top.y + 5f * dpUnit), bodySize)
+    translate(3f * dpUnit, 5f * dpUnit) {
+        drawPath(body, Color.Black.copy(alpha = 0.10f))
+    }
 
-    if (rainbow) {
-        // Seven vertical rainbow stripes clipped to the balloon.
-        val body = Path().apply {
-            addOval(Rect(top.x, top.y, top.x + bodySize.width, top.y + bodySize.height))
-        }
-        clipPath(body) {
+    clipPath(body) {
+        if (rainbow) {
             val bands = Palette.Rainbow + Palette.Warm[3]
             val bw = bodySize.width / bands.size
             bands.forEachIndexed { i, col ->
                 drawRect(col, Offset(top.x + i * bw, top.y), Size(bw + 1f, bodySize.height))
             }
-            drawOval(
+        } else {
+            // Base colour, lit from the upper left.
+            drawRect(
                 Brush.radialGradient(
-                    listOf(Color.White.copy(alpha = 0.45f), Color.Transparent),
-                    center = Offset(c.x - rx * 0.35f, c.y - ry * 0.40f),
-                    radius = r * 1.3f
+                    colors = listOf(
+                        lerp(color, Color.White, 0.52f),
+                        lerp(color, Color.White, 0.12f),
+                        color,
+                    ),
+                    center = Offset(c.x - rx * 0.34f, c.y - ry * 0.42f),
+                    radius = ry * 1.45f,
                 ),
-                top, bodySize
+                topLeft = top, size = bodySize,
             )
         }
-    } else {
+        // The underside falls into shadow, which is what gives it volume.
+        drawRect(
+            Brush.verticalGradient(
+                colors = listOf(Color.Transparent, lerp(color, Color.Black, 0.34f).copy(alpha = 0.55f)),
+                startY = c.y + ry * 0.05f,
+                endY = c.y + ry,
+            ),
+            topLeft = top, size = bodySize,
+        )
+        // Light bouncing back up the lower-right edge — the rim light.
+        drawPath(
+            body,
+            Brush.linearGradient(
+                colors = listOf(Color.Transparent, Color.White.copy(alpha = 0.55f)),
+                start = Offset(c.x, c.y),
+                end = Offset(c.x + rx, c.y + ry * 0.75f),
+            ),
+            style = Stroke(width = 3.2f * dpUnit),
+        )
+        // A broad, soft sheen down the left shoulder.
         drawOval(
             Brush.radialGradient(
-                listOf(lerp(color, Color.White, 0.45f), color, lerp(color, Color.Black, 0.15f)),
-                center = Offset(c.x - rx * 0.35f, c.y - ry * 0.40f),
-                radius = ry * 1.35f
+                listOf(Color.White.copy(alpha = 0.34f), Color.Transparent),
+                center = Offset(c.x - rx * 0.40f, c.y - ry * 0.30f),
+                radius = rx * 0.78f,
             ),
-            topLeft = top, size = bodySize
+            topLeft = Offset(c.x - rx * 0.95f, c.y - ry * 0.85f),
+            size = Size(rx * 1.05f, ry * 1.15f),
         )
     }
 
-    // Knot.
-    val knot = Path().apply {
-        moveTo(c.x, knotY - 1.5f * dpUnit)
-        lineTo(c.x - r * 0.15f, knotY + r * 0.13f)
-        lineTo(c.x + r * 0.15f, knotY + r * 0.13f)
-        close()
-    }
-    drawPath(knot, if (rainbow) Color(0xFFE84D8A) else lerp(color, Color.Black, 0.18f))
+    // The neck, then the knot on top of it.
+    val neck = lerp(color, Color.Black, 0.22f)
+    drawPath(
+        Path().apply {
+            moveTo(c.x - rx * 0.11f, knotY - ry * 0.02f)
+            lineTo(c.x + rx * 0.11f, knotY - ry * 0.02f)
+            lineTo(c.x + rx * 0.15f, knotY + r * 0.13f)
+            lineTo(c.x - rx * 0.15f, knotY + r * 0.13f)
+            close()
+        },
+        if (rainbow) Color(0xFFE84D8A) else neck,
+    )
+    drawOval(
+        if (rainbow) Color(0xFFD8437C) else lerp(color, Color.Black, 0.3f),
+        topLeft = Offset(c.x - r * 0.10f, knotY + r * 0.06f),
+        size = Size(r * 0.20f, r * 0.13f),
+    )
 
-    // Gloss.
-    drawOval(Color.White.copy(alpha = 0.55f), Offset(c.x - rx * 0.68f, c.y - ry * 0.72f), Size(rx * 0.52f, ry * 0.36f))
+    // Highlights last: a soft one, then the sharp catch-light.
+    drawOval(
+        Brush.radialGradient(
+            listOf(Color.White.copy(alpha = 0.85f), Color.White.copy(alpha = 0.0f)),
+            center = Offset(c.x - rx * 0.42f, c.y - ry * 0.50f),
+            radius = rx * 0.34f,
+        ),
+        topLeft = Offset(c.x - rx * 0.74f, c.y - ry * 0.80f),
+        size = Size(rx * 0.62f, ry * 0.46f),
+    )
+    drawOval(
+        Color.White.copy(alpha = 0.92f),
+        topLeft = Offset(c.x - rx * 0.52f, c.y - ry * 0.60f),
+        size = Size(rx * 0.20f, ry * 0.13f),
+    )
 
     if (face) {
         // Every so often the eyes close for a moment — a blink.
@@ -232,6 +282,40 @@ fun DrawScope.drawTapHand(target: Offset, phase: Float, dpUnit: Float, measurer:
  * The app title with every letter bouncing in a gentle wave — the whole word
  * feels alive without being distracting.
  */
+/**
+ * The outline of a real balloon: a full round top that narrows through the
+ * shoulders and pinches in to a small neck. Everything else — the shading, the
+ * rim light, the knot — is drawn against this shape.
+ */
+fun balloonPath(c: Offset, rx: Float, ry: Float): Path = Path().apply {
+    moveTo(c.x, c.y - ry)
+    // Right shoulder, down to the widest point.
+    cubicTo(
+        c.x + rx * 0.60f, c.y - ry,
+        c.x + rx, c.y - ry * 0.52f,
+        c.x + rx, c.y - ry * 0.02f,
+    )
+    // Right side tapering in towards the neck.
+    cubicTo(
+        c.x + rx, c.y + ry * 0.50f,
+        c.x + rx * 0.46f, c.y + ry * 0.82f,
+        c.x + rx * 0.12f, c.y + ry * 0.99f,
+    )
+    lineTo(c.x - rx * 0.12f, c.y + ry * 0.99f)
+    // Mirror back up the left side.
+    cubicTo(
+        c.x - rx * 0.46f, c.y + ry * 0.82f,
+        c.x - rx, c.y + ry * 0.50f,
+        c.x - rx, c.y - ry * 0.02f,
+    )
+    cubicTo(
+        c.x - rx, c.y - ry * 0.52f,
+        c.x - rx * 0.60f, c.y - ry,
+        c.x, c.y - ry,
+    )
+    close()
+}
+
 /** Storybook colours for the title letters. */
 private val TITLE_COLORS = listOf(
     Color(0xFFFF5252), Color(0xFFFF9F43), Color(0xFFFFD32A),
