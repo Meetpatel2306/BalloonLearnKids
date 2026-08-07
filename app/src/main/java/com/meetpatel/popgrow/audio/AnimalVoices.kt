@@ -67,6 +67,9 @@ class AnimalVoices(context: Context) {
 
     private val ids = HashMap<String, Int>()
     private val ready = HashSet<Int>()
+    /** How long each call actually lasts, already capped at [MAX_MS]. */
+    private val lengths = HashMap<String, Int>()
+    private val handler = android.os.Handler(android.os.Looper.getMainLooper())
     private val rnd = Random()
     private var released = false
 
@@ -84,27 +87,60 @@ class AnimalVoices(context: Context) {
             }.getOrDefault(0)
             if (rawId != 0) {
                 runCatching { ids[name] = pool.load(context, rawId, 1) }
+                // Read the clip's real length so we know when it has finished —
+                // and never let one run longer than two seconds.
+                // MediaMetadataRetriever is only AutoCloseable from API 29, so
+                // it is released by hand to keep working back to Android 7.
+                val ms = runCatching {
+                    val mmr = android.media.MediaMetadataRetriever()
+                    try {
+                        context.resources.openRawResourceFd(rawId).use { fd ->
+                            mmr.setDataSource(fd.fileDescriptor, fd.startOffset, fd.length)
+                            mmr.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_DURATION)
+                                ?.toIntOrNull() ?: MAX_MS
+                        }
+                    } finally {
+                        runCatching { mmr.release() }
+                    }
+                }.getOrDefault(MAX_MS)
+                lengths[name] = ms.coerceIn(200, MAX_MS)
                 return@forEach
             }
             val f = File(dir, "${name.lowercase()}_v$CACHE_VERSION.wav")
             if (!f.exists() || f.length() < MIN_VALID_BYTES) runCatching { render(f, voice) }
-            if (f.exists()) ids[name] = pool.load(f.absolutePath, 1)
+            if (f.exists()) {
+                ids[name] = pool.load(f.absolutePath, 1)
+                val synthMs = ((voice.dur + voice.gap) * voice.repeats * 1000f).toInt()
+                lengths[name] = synthMs.coerceIn(200, MAX_MS)
+            }
         }
     }
 
-    /** True if the call started playing. */
+    /** True if the call started playing. It is cut off after [MAX_MS] so no
+     * clip ever drags on, however long the original recording was. */
     fun play(name: String, volume: Float = 0.95f): Boolean {
         if (released) return false
         val id = ids[name] ?: return false
         synchronized(ready) { if (id !in ready) return false }
         val v = volume.coerceIn(0f, 1f)
-        // A little pitch variation so repeat plays never sound mechanical.
-        return pool.play(id, v, v, 1, 0, 0.96f + rnd.nextFloat() * 0.08f) != 0
+        // Recordings play as they are; synthesised calls get a little pitch
+        // variation so repeat plays never sound mechanical.
+        val rate = if (lengths.containsKey(name)) 1f else 0.96f + rnd.nextFloat() * 0.08f
+        val stream = pool.play(id, v, v, 1, 0, rate)
+        if (stream == 0) return false
+        val cap = (lengths[name] ?: MAX_MS).coerceAtMost(MAX_MS)
+        handler.postDelayed({ runCatching { pool.stop(stream) } }, cap.toLong())
+        return true
     }
+
+    /** How long the call runs, so the name can be spoken once it has finished. */
+    fun durationMs(name: String): Long =
+        (lengths[name] ?: MAX_MS).coerceAtMost(MAX_MS).toLong()
 
     fun release() {
         if (released) return
         released = true
+        handler.removeCallbacksAndMessages(null)
         pool.release()
     }
 
@@ -210,6 +246,9 @@ class AnimalVoices(context: Context) {
     private companion object {
         const val SAMPLE_RATE = 22050
         const val MIN_VALID_BYTES = 1024L
+
+        /** No animal call ever plays for longer than this. */
+        const val MAX_MS = 2000
 
         /** Bump to regenerate the cached calls after changing the voices. */
         const val CACHE_VERSION = 3

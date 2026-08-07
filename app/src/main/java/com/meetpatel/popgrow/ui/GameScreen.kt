@@ -141,6 +141,18 @@ fun GameScreen(
             else -> world.sequence
         }
     }
+    // Animals: play the call, wait for it to finish, then say the name.
+    var pendingAnimal by remember { mutableStateOf<String?>(null) }
+    var animalTick by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(animalTick) {
+        val name = pendingAnimal ?: return@LaunchedEffect
+        if (!prefs.soundEnabled) return@LaunchedEffect
+        val played = animals.play(name)
+        if (played) kotlinx.coroutines.delay(animals.durationMs(name) + 180L)
+        speaker.say(name, flush = true)
+    }
+
     // First visit to this mode: a hand points at the balloon to tap, for the
     // first three taps only. After that it is remembered as seen, forever.
     val modeKey = remember(mode) { mode.name }
@@ -327,12 +339,13 @@ fun GameScreen(
                                         // Learning modes: say the value, cheer a match.
                                         if (pop.correct) {
                                             if (!pop.leveledUp) tones.playFanfare(0.7f)
-                                            // The animal calls out first, then we
-                                            // name it once the call has finished.
+                                            // The animal calls out first; its name
+                                            // follows only once the call is done,
+                                            // so the two never talk over each other.
                                             if (mode == GameMode.ANIMALS && pop.rewardWord != null) {
-                                                animals.play(pop.rewardWord)
-                                            }
-                                            if (pop.spokenReward != null) {
+                                                pendingAnimal = pop.rewardWord
+                                                animalTick++
+                                            } else if (pop.spokenReward != null) {
                                                 speaker.say(pop.spokenReward, flush = true)
                                             }
                                         } else if (pop.spoken != null) {

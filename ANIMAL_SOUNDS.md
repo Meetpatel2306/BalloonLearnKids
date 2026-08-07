@@ -65,9 +65,33 @@ Before publishing, list where each sound came from — either in this file or a
 `CREDITS.md`. CC0 needs no attribution, but a record protects you if anyone
 ever asks.
 
-| File | Source | Licence |
+### Sounds currently shipping
+
+These fourteen were downloaded from **Pixabay** (their file names carry the
+uploader and the Pixabay ID). Pixabay's Content Licence allows commercial use
+with no attribution required — but **verify each one on pixabay.com before you
+publish**, since a contributor can change or withdraw a file.
+
+| Animal | File | Uploader / Pixabay ID |
 |---|---|---|
-| _(example)_ animal_cow.ogg | freesound.org/s/123456 | CC0 |
+| Cat | animal_cat.mp3 | dragon-studio — 401729 |
+| Dog | animal_dog.mp3 | dragon-studio — 419014 |
+| Cow | animal_cow.mp3 | u_jd81cxyq22 — 343423 |
+| Pig | animal_pig.mp3 | freesound_community — 40664 |
+| Duck | animal_duck.mp3 | freesound_community — 96140 |
+| Rabbit | animal_rabbit.mp3 | freesound_community — 39519 |
+| Bear | animal_bear.mp3 | universfield — 191995 |
+| Lion | animal_lion.mp3 | ribhavagrawal — 293295 |
+| Monkey | animal_monkey.mp3 | koiroylers — 351933 |
+| Elephant | animal_elephant.mp3 | u_tococonino969 — 225994 |
+| Frog | animal_frog.mp3 | dragon-studio — 322956 |
+| Fish | animal_fish.mp3 | dragon-studio — 406647 (bubbles) |
+| Bird | animal_bird.mp3 | yuliana-yurukova — 343624 |
+| Horse | animal_horse.mp3 | dragon-studio — 390297 |
+
+> Playback is capped at **2 seconds** in code (`AnimalVoices.MAX_MS`), so long
+> clips like the bird chirps are cut short automatically — the files themselves
+> are untouched.
 
 ---
 
