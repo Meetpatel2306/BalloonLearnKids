@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bubble Learn — Legal &amp; Money Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 16mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Calibri, Arial, sans-serif;
+    font-size: 10.4pt; line-height: 1.55; color: #1f2733; margin: 0;
+  }
+  h1, h2, h3, h4 { color: #12324f; margin: 0 0 .35em; line-height: 1.25; }
+  h1 { font-size: 22pt; }
+  h2 {
+    font-size: 15pt; margin-top: 1.5em; padding-bottom: .25em;
+    border-bottom: 2.5px solid #2f8fd0; page-break-after: avoid;
+  }
+  h3 { font-size: 11.6pt; margin-top: 1.15em; color: #17557f; page-break-after: avoid; }
+  h4 { font-size: 10.6pt; margin-top: .9em; color: #33495e; page-break-after: avoid; }
+  p, li { orphans: 3; widows: 3; }
+  ul, ol { margin: .35em 0 .7em; padding-left: 1.25em; }
+  li { margin: .18em 0; }
+  code {
+    font-family: Consolas, "Courier New", monospace; font-size: 9.2pt;
+    background: #eef3f8; padding: 1px 4px; border-radius: 3px;
+  }
+  table { width: 100%; border-collapse: collapse; margin: .55em 0 .9em; font-size: 9.4pt; }
+  th, td { border: 1px solid #c6d4e1; padding: 5px 7px; text-align: left; vertical-align: top; }
+  th { background: #e8f1f8; color: #12324f; font-weight: 600; }
+  tr { page-break-inside: avoid; }
+  .cover {
+    height: 250mm; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    page-break-after: always;
+  }
+  .cover .badge { font-size: 46pt; margin-bottom: 8mm; }
+  .cover h1 { font-size: 30pt; border: 0; }
+  .cover .sub { font-size: 13pt; color: #46607a; margin-top: 3mm; }
+  .cover .meta { margin-top: 18mm; font-size: 10pt; color: #62788d; }
+  .box {
+    border: 1px solid #bcd3e6; background: #f3f9fd;
+    border-radius: 5px; padding: 8px 11px; margin: .6em 0; page-break-inside: avoid;
+  }
+  .warn { border-color: #e8c39a; background: #fdf6ec; }
+  .good { border-color: #a9d8b3; background: #f1faf3; }
+  .doc {
+    border: 1px solid #cfd8e0; background: #fbfcfd; border-radius: 5px;
+    padding: 10px 13px; margin: .6em 0; font-size: 9.5pt;
+  }
+  .doc h4 { margin-top: .75em; }
+  .doc p:first-child { margin-top: 0; }
+  .page-break { page-break-before: always; }
+  .toc li { margin: .3em 0; }
+  .small { font-size: 9pt; color: #5a7186; }
+  .tag {
+    display: inline-block; font-size: 8.2pt; font-weight: 700; letter-spacing: .04em;
+    padding: 1px 7px; border-radius: 9px; vertical-align: middle; margin-left: 5px;
+  }
+  .req { background: #fde2e2; color: #9b2020; }
+  .opt { background: #e6efdc; color: #4a6b28; }
+  footer.note { margin-top: 2em; padding-top: .6em; border-top: 1px solid #d6e0ea; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="badge">🎈</div>
+  <h1>Bubble Learn</h1>
+  <div class="sub">Legal Documents, Monetisation &amp; Marketing<br>A practical handbook for publishing a children's app</div>
+  <div class="meta">
+    Covers: Privacy Policy · Terms of Use · Play Store compliance<br>
+    Advertising · Earning money · Zero-budget marketing<br><br>
+    Prepared for the Bubble Learn Android app
+  </div>
+</div>
+
+<h2>What this guide is</h2>
+<p>
+  Everything you need to legally publish <strong>Bubble Learn</strong> and earn from it,
+  written for someone who is not a lawyer and does not want to spend money.
+  It contains ready-to-use document text you can copy, the exact free places to host it,
+  and an honest account of how money actually works in children's apps.
+</p>
+
+<div class="box warn">
+  <strong>Not legal advice.</strong> This is practical guidance and a set of starting templates.
+  It is written for a free, offline app that collects no data. If you later add adverts,
+  purchases, accounts or analytics, or you trade as a registered company,
+  have a qualified lawyer review your documents. Laws differ by country.
+</div>
+
+<h3>Contents</h3>
+<ol class="toc">
+  <li><strong>Part 1 — The legal documents.</strong> What each one is, which you actually need, and how they differ.</li>
+  <li><strong>Part 2 — Ready-to-use templates.</strong> Copy-and-fill text for a Privacy Policy and Terms of Use.</li>
+  <li><strong>Part 3 — Publishing them free.</strong> Hosting that lasts for years at no cost.</li>
+  <li><strong>Part 4 — Google Play compliance.</strong> The children's rules, and the exact form answers.</li>
+  <li><strong>Part 5 — Making money.</strong> Adverts, one-time unlocks, and the real numbers.</li>
+  <li><strong>Part 6 — Marketing on a zero budget.</strong> What genuinely brings installs.</li>
+  <li><strong>Part 7 — Costs, tools and the launch checklist.</strong></li>
+</ol>
+
+<div class="page-break"></div>
+<h1>Part 1 — The legal documents</h1>
+
+<h2>1.1 The three names, and what they really mean</h2>
+<p>People use these terms loosely. Here is the practical difference.</p>
+
+<table>
+  <tr><th style="width:22%">Document</th><th style="width:38%">What it does</th><th>Do you need it?</th></tr>
+  <tr>
+    <td><strong>Privacy Policy</strong></td>
+    <td>Tells users what personal information you collect, why, who you share it with, and how they can contact you.</td>
+    <td><span class="tag req">REQUIRED</span> Google Play will not publish your app without a working link — no exceptions for children's apps.</td>
+  </tr>
+  <tr>
+    <td><strong>Terms of Use</strong><br><span class="small">(also called Terms &amp; Conditions, T&amp;C, or EULA)</span></td>
+    <td>The rules for using your app: what you allow, what you don't promise, and who owns the software.</td>
+    <td><span class="tag opt">OPTIONAL</span> Google supplies a default licence agreement if you have none. Strongly recommended anyway — see 1.3.</td>
+  </tr>
+  <tr>
+    <td><strong>Terms &amp; Conditions</strong></td>
+    <td>Nothing separate. It is simply another name for Terms of Use. You do <em>not</em> need both.</td>
+    <td><span class="tag opt">SAME THING</span> Write one document and title it "Terms of Use".</td>
+  </tr>
+</table>
+
+<div class="box good">
+  <strong>So you need two documents in total:</strong> a Privacy Policy (required) and a Terms of Use (recommended).
+  Both are already drafted for you in Part 2.
+</div>
+
+<h2>1.2 Why your Privacy Policy is unusually easy</h2>
+<p>
+  Most apps struggle here because they collect data. Bubble Learn does not, which makes your policy
+  short, honest and easy to defend:
+</p>
+<ul>
+  <li>The app does not request the <code>INTERNET</code> permission at all, so it is technically incapable of sending anything anywhere. Anyone can verify this in your manifest.</li>
+  <li>The only permission requested is <code>VIBRATE</code>, for the small buzz when a balloon pops.</li>
+  <li>No advertising library, no analytics library, no crash reporting, no social logins.</li>
+  <li>The only things stored are on the device itself: the sound and vibration switches, speed and size settings, which hints have been seen, and a short list of scores. All of it disappears when the app is uninstalled.</li>
+</ul>
+<p>
+  Your project already contains <code>PRIVACY.md</code> saying exactly this. Part 2 gives you a
+  slightly expanded version formatted for public hosting.
+</p>
+
+<h2>1.3 Why bother with Terms of Use if it is optional?</h2>
+<p>Three practical reasons, none of them about lawsuits:</p>
+<ul>
+  <li><strong>It limits your liability.</strong> It states plainly that the app is provided as-is and that you are not responsible if a device misbehaves. Without it, expectations are undefined.</li>
+  <li><strong>It states who owns the app.</strong> Useful if someone copies your work and you need to point at something.</li>
+  <li><strong>It looks professional.</strong> Parents and reviewers notice. A store listing with both documents linked reads as a serious product.</li>
+</ul>
+
+<h2>1.4 A word on "free policy generator" websites</h2>
+<p>
+  Sites offering instant generated policies are popular, and some are fine. Two cautions:
+</p>
+<ul>
+  <li>Many generate a policy describing data collection your app does not do. Publishing a policy that
+      <em>overstates</em> collection is worse than none — Google compares it against your app's actual
+      behaviour in the Data Safety review, and a mismatch causes rejection.</li>
+  <li>Several offer a free document but then host it on <em>their</em> domain, and start charging later
+      or take the page down. Your Play listing then links to a dead page, which is a policy violation.</li>
+</ul>
+<p><strong>Recommendation:</strong> use the templates in Part 2 and host them yourself (Part 3). They are accurate for your app, cost nothing, and no third party can take them offline.</p>
+
+<div class="page-break"></div>
+<h1>Part 2 — Ready-to-use templates</h1>
+<p class="small">
+  Replace everything in [square brackets]. Keep the plain wording — it is deliberate. Update the date
+  whenever you change the text.
+</p>
+
+<h2>2.1 Privacy Policy</h2>
+<div class="doc">
+  <h3 style="margin-top:0">Privacy Policy for Bubble Learn</h3>
+  <p><strong>Last updated:</strong> [date]</p>
+
+  <h4>Summary</h4>
+  <p>Bubble Learn collects no personal information, sends nothing over the internet, and shows no advertising. It works entirely on your device.</p>
+
+  <h4>Who we are</h4>
+  <p>Bubble Learn is developed by [your name or company name]. If you have any question about this policy, contact us at [your email address].</p>
+
+  <h4>Information we collect</h4>
+  <p>None. The app does not ask for a name, an email address, a date of birth, a photograph, a contact, a location or an account. There is no registration and no user profile. We do not use cookies or advertising identifiers.</p>
+
+  <h4>Information we send</h4>
+  <p>None. The app does not request the Android internet permission, so it cannot transmit data to us or to anyone else. The only permission the app requests is permission to vibrate, used for a short buzz when a balloon is popped.</p>
+
+  <h4>Third-party services</h4>
+  <p>The app contains no advertising network, no analytics service, no crash reporting service and no social media integration.</p>
+
+  <h4>Information stored on your device</h4>
+  <p>The app saves a small amount of information in its own private storage so it can remember your preferences between sessions: whether sound, background sounds and vibration are switched on, the chosen balloon speed and size, whether the high-contrast setting is on, whether the introductory hint has been shown, and a short list of recent scores for each game. This information never leaves the device and is removed when the app is uninstalled. The app also writes small generated sound files to its temporary cache folder; Android may delete these at any time.</p>
+
+  <h4>Children</h4>
+  <p>The app is designed for children aged approximately two to five, and is intended to be used with a parent or carer nearby. Because it collects and transmits no information at all, it does not knowingly process personal information from children under 13 as defined by the United States Children's Online Privacy Protection Act (COPPA), nor personal data of any individual under the General Data Protection Regulation (GDPR) in the United Kingdom and European Union.</p>
+
+  <h4>Purchases and external links</h4>
+  <p>The app contains no in-app purchases, no subscriptions and no advertising. It contains no links that open a web browser or take a child outside the app.</p>
+
+  <h4>Your rights</h4>
+  <p>Because we hold no information about you, there is nothing for us to disclose, correct or delete. To remove everything the app has stored on your device, uninstall the app.</p>
+
+  <h4>Changes to this policy</h4>
+  <p>If the app ever changes in a way that affects this policy, we will update this page and change the date at the top before the new version is released.</p>
+
+  <h4>Contact</h4>
+  <p>[your email address]</p>
+</div>
+
+<div class="box">
+  <strong>Two fields you must fill in:</strong> your name and a real email address you check.
+  Google shows the contact address publicly on your store listing, and reviewers do occasionally write to it.
+  A free dedicated address such as <code>bubblelearn.app@gmail.com</code> keeps it separate from personal mail.
+</div>
+
+<div class="page-break"></div>
+<h2>2.2 Terms of Use</h2>
+<div class="doc">
+  <h3 style="margin-top:0">Terms of Use for Bubble Learn</h3>
+  <p><strong>Last updated:</strong> [date]</p>
+
+  <h4>1. Agreement</h4>
+  <p>By installing or using the Bubble Learn application ("the app"), you agree to these Terms of Use. If you do not agree, please do not install or use the app.</p>
+
+  <h4>2. Licence</h4>
+  <p>We grant you a personal, non-exclusive, non-transferable, revocable licence to install and use the app on devices you own or control, for private, non-commercial purposes. This licence does not transfer ownership of the app to you.</p>
+
+  <h4>3. What you may not do</h4>
+  <p>You may not sell, rent, sublicense or redistribute the app as your own; remove or alter any notices of ownership within it; or use the app for any unlawful purpose.</p>
+
+  <h4>4. Supervision of children</h4>
+  <p>The app is intended for young children and is designed to be used with a parent or carer present. Parents and carers are responsible for supervising use, including deciding how long a child uses a screen and ensuring the device is used safely.</p>
+
+  <h4>5. No charge, no purchases</h4>
+  <p>The app is provided free of charge. It contains no advertising, no in-app purchases and no subscriptions. If this ever changes, the change will be described in the store listing before it is released.</p>
+
+  <h4>6. Availability and updates</h4>
+  <p>We may update, change or withdraw the app at any time, including adding or removing features. We do not promise that the app will always be available or that it will work on every device or every version of Android.</p>
+
+  <h4>7. Provided "as is"</h4>
+  <p>The app is provided as is and as available, without warranties of any kind, whether express or implied, including any implied warranty of merchantability, fitness for a particular purpose, or non-infringement. We do not warrant that the app will be free of errors or interruptions.</p>
+
+  <h4>8. Limitation of liability</h4>
+  <p>To the fullest extent permitted by law, we are not liable for any indirect, incidental, special or consequential loss arising from your use of the app, including loss of data or damage to a device. Nothing in these terms limits liability that cannot lawfully be limited, including liability for death or personal injury caused by negligence.</p>
+
+  <h4>9. Ownership</h4>
+  <p>The app, including its source code, artwork, sounds and name, belongs to [your name or company name] and is protected by copyright, except for components licensed from others, which remain the property of their respective owners.</p>
+
+  <h4>10. Privacy</h4>
+  <p>Use of the app is also covered by our Privacy Policy, available at [your privacy policy link].</p>
+
+  <h4>11. Changes to these terms</h4>
+  <p>We may update these terms. The date at the top shows when they last changed. Continuing to use the app after a change means you accept the updated terms.</p>
+
+  <h4>12. Governing law</h4>
+  <p>These terms are governed by the laws of [your country], without regard to conflict-of-law rules.</p>
+
+  <h4>13. Contact</h4>
+  <p>[your email address]</p>
+</div>
+
+<div class="page-break"></div>
+<h1>Part 3 — Publishing your documents free</h1>
+
+<h2>3.1 What the link has to do</h2>
+<p>Google requires that your privacy policy link:</p>
+<ul>
+  <li>opens directly to the policy — not a home page, a login screen or a file download;</li>
+  <li>is publicly readable with no account required (test it in a private browsing window);</li>
+  <li>keeps working. A dead link after publication can get the app removed.</li>
+</ul>
+
+<h2>3.2 Recommended: GitHub Pages <span class="tag opt">FREE, INDEFINITE</span></h2>
+<p>
+  Your code is already on GitHub. Pages turns a folder in that repository into a website at no cost,
+  with no expiry and no adverts. This is the most durable free option available.
+</p>
+<h4>Steps, once</h4>
+<ol>
+  <li>In your repository create a folder named <code>docs</code>.</li>
+  <li>Put two files in it: <code>privacy.md</code> and <code>terms.md</code>, containing the text from Part 2.</li>
+  <li>Go to <strong>Settings → Pages</strong>. Under "Build and deployment", set Source to <em>Deploy from a branch</em>, branch <code>main</code>, folder <code>/docs</code>. Save.</li>
+  <li>Wait two or three minutes. Your pages appear at:
+    <div class="box" style="margin-top:.4em">
+      <code>https://meetpatel2306.github.io/BalloonPopAndLearn/privacy</code><br>
+      <code>https://meetpatel2306.github.io/BalloonPopAndLearn/terms</code>
+    </div>
+  </li>
+  <li>Paste the privacy link into the Play Console, and both links into your store listing description.</li>
+</ol>
+
+<h4>Simpler alternative, no setup</h4>
+<p>
+  A file already in your repository is publicly viewable straight away, for example
+  <code>https://github.com/Meetpatel2306/BalloonPopAndLearn/blob/main/PRIVACY.md</code>.
+  Google accepts this. It is less tidy than a Pages URL but works immediately and costs nothing.
+</p>
+
+<h2>3.3 Other free options, compared</h2>
+<table>
+  <tr><th style="width:20%">Option</th><th style="width:12%">Cost</th><th style="width:20%">Longevity</th><th>Notes</th></tr>
+  <tr><td><strong>GitHub Pages</strong></td><td>Free</td><td>Excellent</td><td>Best choice. No adverts, no expiry, version-controlled alongside your code.</td></tr>
+  <tr><td>GitHub raw file</td><td>Free</td><td>Excellent</td><td>Zero setup, accepted by Google, looks plainer.</td></tr>
+  <tr><td>Google Sites</td><td>Free</td><td>Very good</td><td>Visual editor, no coding. Good if you also want a small app website.</td></tr>
+  <tr><td>Notion public page</td><td>Free</td><td>Good</td><td>Easy, but the URL is ugly and the service could change its free terms.</td></tr>
+  <tr><td>Your own domain</td><td>≈ $10–12 / year</td><td>Excellent</td><td>Only worth it when you have several apps or want a branded email address.</td></tr>
+  <tr><td>Paid policy services</td><td>$10–100 / year</td><td>Depends on payment</td><td>Not needed for an app that collects nothing.</td></tr>
+</table>
+
+<div class="box good">
+  <strong>Recommendation:</strong> GitHub Pages, free, for as long as the repository exists.
+  Buy a domain later only if the app succeeds and you want a proper website.
+</div>
+
+<div class="page-break"></div>
+<h1>Part 4 — Google Play compliance for a children's app</h1>
+
+<h2>4.1 The extra rules that apply to you</h2>
+<p>
+  Because Bubble Learn targets under-fives, it is reviewed against Google's <strong>Families policy</strong>
+  in addition to the normal rules. In practice that means:
+</p>
+<ul>
+  <li>Your privacy policy link must be present and working.</li>
+  <li>Your <strong>Data Safety</strong> answers must match what the app actually does.</li>
+  <li>Any advertising must come from a certified child-safe network and must be non-personalised.</li>
+  <li>Nothing may take a child out of the app without a parental gate — external links, purchases and settings all count.</li>
+  <li>Content must be appropriate for the declared age band.</li>
+</ul>
+<p>Bubble Learn already satisfies all of these, including the parental gate: the settings panel is protected behind a simple arithmetic question that an adult can answer and a toddler cannot.</p>
+
+<h2>4.2 Exact answers for the Play Console forms</h2>
+<table>
+  <tr><th style="width:34%">Question</th><th>Answer for Bubble Learn</th></tr>
+  <tr><td>Privacy policy URL</td><td>Your GitHub Pages link from Part 3</td></tr>
+  <tr><td>App access</td><td>All functionality available without special access</td></tr>
+  <tr><td>Contains ads?</td><td><strong>No</strong></td></tr>
+  <tr><td>Content rating questionnaire</td><td>Answer honestly; results in <strong>Everyone / PEGI 3</strong></td></tr>
+  <tr><td>Target age group</td><td><strong>5 and under</strong> (you may also tick 6–8)</td></tr>
+  <tr><td>Data collection</td><td><strong>No data collected</strong></td></tr>
+  <tr><td>Data sharing</td><td><strong>No data shared</strong></td></tr>
+  <tr><td>Data encrypted in transit</td><td>Not applicable — no data leaves the device</td></tr>
+  <tr><td>Deletion request mechanism</td><td>Not applicable — nothing is collected; uninstalling removes local settings</td></tr>
+  <tr><td>In-app purchases</td><td><strong>None</strong></td></tr>
+  <tr><td>Government / financial / news app</td><td>No to all</td></tr>
+</table>
+
+<div class="box warn">
+  <strong>The single most common rejection</strong> for small apps is a Data Safety form that does not match
+  the app's real behaviour. Yours is simple because every answer is "no". Keep it that way, and if you ever
+  add an advertising library, change these answers and the privacy policy on the same day.
+</div>
+
+<h2>4.3 Sound and image licences</h2>
+<p>
+  Everything drawn in Bubble Learn is generated by code, so no image licences apply. The fourteen animal
+  recordings came from Pixabay, whose licence permits commercial use without attribution. Keep the record of
+  each file's source in <code>ANIMAL_SOUNDS.md</code>, and confirm each file is still available under that
+  licence before you publish. If a contributor withdraws a file, replace it — the app falls back to the
+  spoken animal name automatically, so nothing breaks.
+</p>
+
+<div class="page-break"></div>
+<h1>Part 5 — Making money</h1>
+
+<h2>5.1 The honest overview</h2>
+<table>
+  <tr><th style="width:30%">Route</th><th style="width:22%">Allowed for children's apps?</th><th style="width:24%">Realistic income</th><th>Effort</th></tr>
+  <tr><td>Advertising</td><td>Yes, but heavily restricted</td><td>Low per user</td><td>Medium, plus compliance care</td></tr>
+  <tr><td>One-time unlock purchase</td><td>Yes, behind a parental gate</td><td>$1–4 per paying parent</td><td>Medium</td></tr>
+  <tr><td>Subscriptions</td><td>Yes, but you ruled these out</td><td>—</td><td>—</td></tr>
+  <tr><td>Donations</td><td>Yes, outside the app</td><td>Small</td><td>Very low</td></tr>
+  <tr><td>More app stores</td><td>Yes</td><td>Indirect — more installs</td><td>Low</td></tr>
+  <tr><td>Portfolio value</td><td>Always</td><td>Often the largest</td><td>None</td></tr>
+</table>
+<p>
+  <strong>The governing equation is simple:</strong> income equals installs multiplied by how well you monetise.
+  At a thousand installs, no monetisation method earns meaningfully. At a hundred thousand, all of them do.
+  This is why Part 6 matters more than this part.
+</p>
+
+<h2>5.2 Advertising, in detail</h2>
+<h3>The rules you cannot break</h3>
+<ol>
+  <li><strong>Certified networks only.</strong> For a child-directed app the practical choice is Google AdMob configured for families. Other certified options include SuperAwesome and Kidoz.</li>
+  <li><strong>Non-personalised only.</strong> Every request must be tagged as child-directed and rated G. No behavioural targeting, no advertising identifier. This restriction is precisely why the income per view is low.</li>
+  <li><strong>Placement.</strong> No advert a child can tap by accident during play, nothing that resembles a game button, nothing that interrupts at a random moment.</li>
+  <li><strong>Consequences for the app.</strong> Adding an advertising library means adding the internet permission, rewriting your privacy policy, and changing your Data Safety answers to declare what the library collects.</li>
+</ol>
+
+<h3>What the money actually looks like</h3>
+<div class="box">
+  Child-directed banner adverts typically earn roughly <strong>$0.50 to $2.00 per thousand views</strong>.<br>
+  A thousand children playing daily produces roughly three to five thousand banner views a day.<br>
+  That is approximately <strong>$2 to $10 per day</strong>, or <strong>$60 to $300 per month</strong> — at a thousand daily players.
+</div>
+<p>Most small children's apps never reach a thousand daily players without deliberate marketing.</p>
+
+<h3>The trade-off worth thinking about</h3>
+<p>
+  The strongest line in your store listing today is that the app is completely offline, collects nothing and
+  shows no adverts — and parents of toddlers search for exactly that. Adding advertising removes your main
+  differentiator and adds review risk, in exchange for modest income. Consider it only once the app is large.
+</p>
+
+<h3>If you decide to do it</h3>
+<ol>
+  <li>Create a free AdMob account and register the app; you receive an App ID.</li>
+  <li>Create a single banner ad unit.</li>
+  <li>In the app: add the ads dependency, put the App ID in the manifest, set the child-directed and G-rating flags globally, and place one banner only on adult-facing screens — never over the play area.</li>
+  <li>Link AdMob to your Play Console and add payment details. Payment arrives monthly once you pass the threshold, typically about $100.</li>
+  <li>Update your privacy policy and Data Safety form the same day the advert goes live.</li>
+</ol>
+
+<h2>5.3 The approach most successful children's apps use</h2>
+<p>Keep the app free of advertising, and earn from parents who choose to pay.</p>
+<h4>A one-time unlock, not a subscription</h4>
+<ul>
+  <li><strong>Free for ever:</strong> Colours, the first ten letters, numbers one to ten.</li>
+  <li><strong>One payment of about $2–3 unlocks:</strong> the full alphabet, numbers to twenty, Shapes, Animals, and any future packs.</li>
+  <li><strong>Placement:</strong> behind the same arithmetic gate that guards settings — this is what the Families policy requires.</li>
+  <li><strong>Realistic conversion:</strong> one to three per cent of engaged parents buy. Ten thousand installs at two per cent and $2.99 is roughly <strong>$600</strong>, and it grows with installs rather than with usage.</li>
+</ul>
+<h4>Supporting routes that cost nothing to set up</h4>
+<ul>
+  <li><strong>Donations:</strong> add a GitHub Sponsors button and a "buy me a coffee" link to your repository and store listing.</li>
+  <li><strong>A supporter edition:</strong> the identical app published a second time at a small price, described honestly as a way to support development. No code changes at all.</li>
+  <li><strong>Other stores:</strong> the same file published to the Amazon Appstore reaches Fire tablets, which are extremely common among young families. Samsung Galaxy Store and Huawei AppGallery cost nothing to join.</li>
+  <li><strong>Licensing:</strong> nurseries and daycare chains occasionally pay a few hundred dollars for a branded version. Your vector artwork makes reskinning quick.</li>
+</ul>
+
+<div class="page-break"></div>
+<h1>Part 6 — Marketing on a zero budget</h1>
+<p>This is where income is actually decided. None of the following costs money.</p>
+
+<h2>6.1 Store listing optimisation — do this first</h2>
+<ul>
+  <li><strong>Title.</strong> "Bubble Learn" is memorable but carries only one search word. Use the full thirty characters: <code>Bubble Learn: ABC 123 Kids</code>.</li>
+  <li><strong>Short description.</strong> Every word is searchable. Lead with what parents type: toddler, ABC, 123, offline, free, no ads.</li>
+  <li><strong>First three lines of the long description</strong> decide most installs. Put the benefits there, not the feature list.</li>
+  <li><strong>Screenshots persuade more than text.</strong> Add a short caption over each one: "Says every letter out loud", "Five learning games", "No adverts, works offline".</li>
+  <li><strong>Translate the listing</strong> — not the app, just the store text — into Hindi, Spanish, Portuguese and German. Each language opens a new search market at zero cost.</li>
+  <li><strong>Reply to every review.</strong> Visible replies improve both ranking and trust.</li>
+</ul>
+
+<h2>6.2 Short video, posted everywhere</h2>
+<p>
+  Record fifteen to thirty seconds of the best moments: the rainbow arch popping, a letter flying into its
+  place, the colour flooding the screen, the fireworks. Post the same clip to YouTube Shorts (marked "made
+  for kids"), Instagram Reels, TikTok, Facebook Reels and Pinterest.
+</p>
+<p>
+  Write captions as a parent, not as a developer: a relatable problem followed by the result. Post three or
+  four times a week. This costs only minutes because the footage is the game itself, and a single clip that
+  travels can produce thousands of installs.
+</p>
+
+<h2>6.3 Communities — helpful, never spammy</h2>
+<ul>
+  <li>Parenting forums and subreddits about toddlers and preschoolers. Read each group's self-promotion rules first, and post as a parent-developer sharing something they made, not as an advertiser.</li>
+  <li>Developer communities respond well to the build story: an offline, no-data, open-source children's app is genuinely interesting to them.</li>
+  <li>Your own family and friends groups. The first fifty reviews move the ranking more than any later fifty.</li>
+</ul>
+
+<h2>6.4 Free press and directories</h2>
+<p>
+  Send a short note to sites that review children's apps, describing what the app is and why it is different —
+  offline, no data collected, no adverts, open source — with two screenshots attached. A single listing on a
+  respected review site brings steady installs for years.
+</p>
+
+<h2>6.5 Local and offline</h2>
+<ul>
+  <li>Ask nearby nurseries, playgroups and paediatric clinics to share the link in their parent groups. A single printed page with a QR code works well and costs pennies.</li>
+  <li>Libraries with parent-and-toddler sessions will often let you demonstrate it.</li>
+</ul>
+
+<h2>6.6 Keeping momentum</h2>
+<ul>
+  <li><strong>Update monthly, even slightly.</strong> Fresh apps rank better, and every update is new material to post.</li>
+  <li><strong>Use the seasons.</strong> Snow in December, pumpkins in October, festival colours — each is a reason for a new video.</li>
+  <li><strong>Ask to be featured.</strong> Google's editorial team does feature polished family apps, and you can nominate your own app in the Play Console. A feature is worth tens of thousands of installs, and your no-adverts, no-data design is exactly the kind of thing they look for.</li>
+</ul>
+
+<div class="box good">
+  <strong>A realistic weekly routine, one to two hours:</strong> post one clip on Monday; answer reviews and
+  join one community conversation on Wednesday; post a second clip and check your statistics on Friday.
+  Ship one small update a month.
+</div>
+
+<div class="page-break"></div>
+<h1>Part 7 — Costs, tools and checklist</h1>
+
+<h2>7.1 What you will actually spend</h2>
+<table>
+  <tr><th style="width:34%">Item</th><th style="width:20%">Cost</th><th>Comment</th></tr>
+  <tr><td>Google Play developer account</td><td><strong>$25 once</strong></td><td>The only compulsory cost. Never renewed.</td></tr>
+  <tr><td>Privacy policy and terms hosting</td><td>Free</td><td>GitHub Pages, indefinitely.</td></tr>
+  <tr><td>Code hosting and automated builds</td><td>Free</td><td>GitHub, already in use.</td></tr>
+  <tr><td>Sound effects</td><td>Free</td><td>Pixabay, commercial use permitted.</td></tr>
+  <tr><td>Artwork</td><td>Free</td><td>Drawn in code — nothing to license.</td></tr>
+  <tr><td>Store graphics</td><td>Free</td><td>Any free design tool, or screenshots from the phone.</td></tr>
+  <tr><td>Marketing</td><td>Free</td><td>Everything in Part 6.</td></tr>
+  <tr><td>Optional: domain name</td><td>$10–12 / year</td><td>Only worth it once the app succeeds.</td></tr>
+</table>
+<p><strong>Total to publish: $25.</strong> Everything else in this guide is free and stays free.</p>
+
+<h2>7.2 Launch checklist</h2>
+<h4>Legal</h4>
+<ul>
+  <li>Privacy Policy written, name and email filled in</li>
+  <li>Terms of Use written, country and owner filled in</li>
+  <li>Both published and opening correctly in a private browsing window</li>
+  <li>Sound licences recorded in <code>ANIMAL_SOUNDS.md</code></li>
+</ul>
+<h4>Store</h4>
+<ul>
+  <li>Developer account created and identity verified ($25)</li>
+  <li>Signing key created and <strong>backed up in two places</strong></li>
+  <li>Data Safety form completed — every answer "no"</li>
+  <li>Target age set to 5 and under; content rating completed</li>
+  <li>Icon (512×512), feature graphic (1024×500), at least two screenshots</li>
+  <li>Title, short description and long description written</li>
+</ul>
+<h4>After launch</h4>
+<ul>
+  <li>Ask friends and family to install and review</li>
+  <li>Begin the weekly posting routine</li>
+  <li>Reply to every review</li>
+  <li>Ship a small update in the first month</li>
+</ul>
+
+<div class="box warn">
+  <strong>The one irreversible mistake:</strong> losing your signing key. Without it you can never update the
+  app again, and there is no appeal. Copy the key file and its passwords to at least two separate places —
+  a USB stick and a password manager — before you upload anything.
+</div>
+
+<footer class="note">
+  <p class="small">
+    Prepared for the Bubble Learn Android application. This document provides practical guidance and starting
+    templates; it is not legal advice, and it assumes an app that is free, offline and collects no data.
+    Review your documents with a qualified professional before publication if your circumstances differ,
+    particularly if you add advertising, purchases or any form of data collection.
+  </p>
+</footer>
+
+</body>
+</html>

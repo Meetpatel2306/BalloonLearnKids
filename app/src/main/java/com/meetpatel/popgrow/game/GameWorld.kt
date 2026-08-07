@@ -110,6 +110,21 @@ class GameWorld(
     var frozen: Boolean = false
         private set
 
+    /**
+     * True while the app is still saying the animal's name and playing its call.
+     * The next animal is held back until [advanceTarget] releases it, so a child
+     * hears "Cow", then the moo, and only then meets the dog.
+     */
+    var awaitingNext: Boolean = false
+        private set
+
+    /** Move on to the next thing to find, once the celebration has been heard. */
+    fun advanceTarget() {
+        if (!awaitingNext || frozen) return
+        awaitingNext = false
+        chooseNewTarget()
+    }
+
     init {
         if (isLearning) chooseNewTarget()
     }
@@ -363,8 +378,9 @@ class GameWorld(
                 GameMode.NUMBERS, GameMode.LETTERS, GameMode.SHAPES, GameMode.ANIMALS -> {
                     // Keep exactly one target balloon around; it stays the same
                     // value until the child finds it. Everything else is a plain,
-                    // friendly balloon that's just fun to pop.
-                    if (bubbles.none { it.matchKey == target }) {
+                    // friendly balloon that's just fun to pop. While the last
+                    // answer is still being celebrated, no target is sent up.
+                    if (!awaitingNext && bubbles.none { it.matchKey == target }) {
                         label = when (mode) {
                             GameMode.SHAPES -> LearningContent.glyphFor(target)
                             GameMode.ANIMALS -> LearningContent.animalFor(target)
@@ -513,7 +529,12 @@ class GameWorld(
                 celebrateLevelUp()
                 // The very last one ends the round: hold the target where it is
                 // and stop the world, rather than silently starting over.
-                if (completedSet) frozen = true else chooseNewTarget()
+                when {
+                    completedSet -> frozen = true
+                    // Animals wait for the name and the call to finish first.
+                    mode == GameMode.ANIMALS -> awaitingNext = true
+                    else -> chooseNewTarget()
+                }
             }
             missStreak = if (correct) 0 else missStreak + 1
         }

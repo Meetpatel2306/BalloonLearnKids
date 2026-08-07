@@ -147,10 +147,21 @@ fun GameScreen(
 
     LaunchedEffect(animalTick) {
         val name = pendingAnimal ?: return@LaunchedEffect
-        if (!prefs.soundEnabled) return@LaunchedEffect
-        val played = animals.play(name)
-        if (played) kotlinx.coroutines.delay(animals.durationMs(name) + 180L)
-        speaker.say(name, flush = true)
+        if (prefs.soundEnabled) {
+            // First the name on its own…
+            val spoke = kotlinx.coroutines.CompletableDeferred<Unit>()
+            val speaking = speaker.say(name, flush = true) { spoke.complete(Unit) }
+            if (speaking) {
+                kotlinx.coroutines.withTimeoutOrNull(2500) { spoke.await() }
+            }
+            kotlinx.coroutines.delay(150)
+            // …then the animal's own call, in full.
+            if (animals.play(name)) {
+                kotlinx.coroutines.delay(animals.durationMs(name) + 250L)
+            }
+        }
+        // Only now does the next animal float up.
+        world.advanceTarget()
     }
 
     // First visit to this mode: a hand points at the balloon to tap, for the
