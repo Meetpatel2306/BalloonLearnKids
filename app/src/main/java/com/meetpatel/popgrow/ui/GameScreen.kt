@@ -141,6 +141,9 @@ fun GameScreen(
             else -> world.sequence
         }
     }
+    // True while a clap of thunder is already sounding, so one flash makes one roll.
+    var thunderRolling by remember { mutableStateOf(false) }
+
     // Animals: play the call, wait for it to finish, then say the name.
     var pendingAnimal by remember { mutableStateOf<String?>(null) }
     var animalTick by remember { mutableIntStateOf(0) }
@@ -253,7 +256,16 @@ fun GameScreen(
                 if (world.level != levelShown) levelShown = world.level
                 if (world.targetIndex != indexShown) indexShown = world.targetIndex
                 // Keep the soundscape matching the sky: birds by day, owls at night.
-                ambience.setNight(Palette.themeAt(world.time).night)
+                val sky = Palette.themeAt(world.time)
+                ambience.setNight(sky.night)
+                // Thunder, timed to the exact frame the sky flashes.
+                val flash = lightningFlash(world.time, sky.storm)
+                if (flash > 0.5f && !thunderRolling) {
+                    thunderRolling = true
+                    if (prefs.soundEnabled) ambience.playThunder()
+                } else if (flash < 0.05f) {
+                    thunderRolling = false
+                }
                 // When the asked-for target changes, show it and say it aloud. Use
                 // the queue (not flush) so it follows any "A for Apple" reward.
                 if (world.target != targetShown) {
@@ -291,6 +303,13 @@ fun GameScreen(
                                 if (!change.changedToDownIgnoreConsumed()) continue
                                 if (completeGuard) continue
                                 val pop = world.popAt(change.position.x, change.position.y)
+                                if (pop == null) {
+                                    // Empty sky: never a mistake, but the world
+                                    // still answers with a sparkle and a chime.
+                                    world.touchSky(change.position.x, change.position.y)
+                                    if (prefs.soundEnabled) tones.playNote(7, 0.22f)
+                                    if (prefs.hapticsEnabled) haptics.tick(false)
+                                }
                                 if (pop != null) {
                                     // Record the point straight away: a right
                                     // answer when learning, any pop in free play.

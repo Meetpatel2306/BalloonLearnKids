@@ -614,6 +614,32 @@ class GameWorld(
         }
     }
 
+    /**
+     * A tap on empty sky. It never scores and never penalises — it simply gives
+     * a little sparkle and ring back, so a child who misses still feels the
+     * world respond to their finger.
+     */
+    fun touchSky(x: Float, y: Float) {
+        if (width <= 0f) return
+        ripples += Ripple(x, y, dp(10f), 0.5f, Color.White)
+        repeat(7) {
+            val a = decoRandom.nextFloat() * 6.283f
+            val sp = dp(40f) + decoRandom.nextFloat() * dp(90f)
+            particles += Particle(
+                x = x, y = y,
+                vx = cos(a) * sp, vy = sin(a) * sp,
+                radius = dp(1.8f) + decoRandom.nextFloat() * dp(2.4f),
+                color = Palette.Sparkle[decoRandom.nextInt(Palette.Sparkle.size)],
+                maxLife = 0.35f + decoRandom.nextFloat() * 0.25f,
+                shape = ParticleShape.SPARKLE,
+                rotation = decoRandom.nextFloat() * 6.28f,
+                spin = (decoRandom.nextFloat() - 0.5f) * 9f,
+                gravityScale = 0.2f,
+                twinkle = true,
+            )
+        }
+    }
+
     /** A bonus burst of golden sparkles, used for fast-pop streaks. */
     fun sparkleBurst(x: Float, y: Float) {
         repeat(10) {

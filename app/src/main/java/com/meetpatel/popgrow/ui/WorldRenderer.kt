@@ -38,6 +38,7 @@ import com.meetpatel.popgrow.game.VisitorKind
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
+import kotlin.math.exp
 import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.sin
@@ -67,9 +68,146 @@ fun DrawScope.drawScenery(world: GameWorld, dpUnit: Float) {
     drawFarBirds(world.time, theme, dpUnit)
     drawHills(world, theme, dpUnit)
     drawGround(world, theme)
+    drawGroundProps(world, theme, dpUnit)
     drawGrassTufts(world, theme, dpUnit)
     drawFireflies(world, theme, dpUnit)
     world.floaters.forEach { drawFloater(it, dpUnit) }
+    // Weather sits over the scenery but under the balloons.
+    drawRain(world.time, theme, dpUnit)
+    drawSnow(world.time, theme, dpUnit)
+    drawLightning(world.time, theme, dpUnit)
+}
+
+/**
+ * How bright the lightning is right now, 0..1. Shared so the game can play the
+ * thunder at the exact moment the sky flashes.
+ */
+fun lightningFlash(time: Float, storm: Float): Float {
+    if (storm < 0.35f) return 0f
+    val p = time % STRIKE_EVERY
+    if (p > 0.55f) return 0f
+    // A sharp double flash that fades away.
+    val a = exp(-9f * p)
+    val b = if (p > 0.16f) exp(-11f * (p - 0.16f)) * 0.7f else 0f
+    return ((a + b) * storm).coerceIn(0f, 1f)
+}
+
+private const val STRIKE_EVERY = 11f
+
+private fun DrawScope.drawRain(time: Float, theme: Palette.SkyTheme, dpUnit: Float) {
+    if (theme.rain <= 0.02f) return
+    val drops = (110 * theme.rain).toInt()
+    val col = Color(0xFFBFD8E8).copy(alpha = 0.55f * theme.rain)
+    val len = 22f * dpUnit
+    for (i in 0 until drops) {
+        val fx = frac(sin(i * 12.9898f) * 43758.55f)
+        val speed = 1.6f + frac(sin(i * 3.77f) * 1873.3f) * 0.9f
+        val y = frac((time * speed) + i * 0.137f) * (size.height + len) - len
+        val x = fx * (size.width + 60f * dpUnit) - 30f * dpUnit + y * 0.16f
+        drawLine(col, Offset(x, y), Offset(x - len * 0.16f, y + len), 1.6f * dpUnit, StrokeCap.Round)
+    }
+}
+
+private fun DrawScope.drawSnow(time: Float, theme: Palette.SkyTheme, dpUnit: Float) {
+    if (theme.snow <= 0.02f) return
+    val flakes = (70 * theme.snow).toInt()
+    for (i in 0 until flakes) {
+        val fx = frac(sin(i * 7.13f) * 991.73f)
+        val speed = 0.10f + frac(sin(i * 4.41f) * 3571.1f) * 0.10f
+        val y = frac((time * speed) + i * 0.191f) * (size.height + 20f * dpUnit) - 10f * dpUnit
+        val drift = sin(time * 0.7f + i) * 16f * dpUnit
+        val r = (1.6f + frac(sin(i * 9.7f) * 421.3f) * 2.4f) * dpUnit
+        drawCircle(Color.White.copy(alpha = 0.85f * theme.snow), r, Offset(fx * size.width + drift, y))
+    }
+}
+
+private fun DrawScope.drawLightning(time: Float, theme: Palette.SkyTheme, dpUnit: Float) {
+    val flash = lightningFlash(time, theme.storm)
+    if (flash <= 0.01f) return
+    // The whole sky lights up…
+    drawRect(Color.White.copy(alpha = 0.55f * flash))
+    // …and a forked bolt comes down through it.
+    val seed = floor(time / STRIKE_EVERY)
+    val x0 = (0.2f + frac(sin(seed * 17.3f) * 5417.7f) * 0.6f) * size.width
+    var x = x0
+    var y = 0f
+    val bolt = Path().apply {
+        moveTo(x, y)
+        for (k in 0 until 6) {
+            val nx = x + (frac(sin((seed * 31f + k) * 5.13f) * 2371.7f) - 0.5f) * 46f * dpUnit
+            val ny = y + size.height * 0.085f
+            lineTo(nx, ny)
+            x = nx
+            y = ny
+        }
+    }
+    drawPath(bolt, Color.White.copy(alpha = flash), style = Stroke(width = 3.5f * dpUnit, cap = StrokeCap.Round))
+    drawPath(bolt, Color(0xFFFFF6C0).copy(alpha = flash * 0.6f), style = Stroke(width = 8f * dpUnit, cap = StrokeCap.Round))
+}
+
+/** Palms, cacti or pines along the ground, depending on the land. */
+private fun DrawScope.drawGroundProps(world: GameWorld, theme: Palette.SkyTheme, dpUnit: Float) {
+    if (theme.props == Palette.Props.NONE) return
+    val g = world.groundY
+    val n = 5
+    for (i in 0 until n) {
+        val x = size.width * (0.08f + i * 0.21f) + sin(i * 2.1f) * 12f * dpUnit
+        val h = (46f + frac(sin(i * 5.5f) * 733.1f) * 26f) * dpUnit
+        when (theme.props) {
+            Palette.Props.PALMS -> {
+                val trunk = Path().apply {
+                    moveTo(x, g)
+                    quadraticTo(x + 8f * dpUnit, g - h * 0.6f, x + 4f * dpUnit, g - h)
+                }
+                drawPath(trunk, Color(0xFF8A6136), style = Stroke(width = 5f * dpUnit, cap = StrokeCap.Round))
+                val top = Offset(x + 4f * dpUnit, g - h)
+                for (k in 0 until 5) {
+                    val a = PI.toFloat() + k * (PI.toFloat() / 4f) + sin(world.time * 0.6f + i) * 0.05f
+                    val frond = Path().apply {
+                        moveTo(top.x, top.y)
+                        quadraticTo(
+                            top.x + cos(a) * 18f * dpUnit, top.y + sin(a) * 14f * dpUnit - 8f * dpUnit,
+                            top.x + cos(a) * 34f * dpUnit, top.y + sin(a) * 22f * dpUnit + 4f * dpUnit,
+                        )
+                    }
+                    drawPath(frond, Color(0xFF2E7D53), style = Stroke(width = 4f * dpUnit, cap = StrokeCap.Round))
+                }
+            }
+            Palette.Props.CACTI -> {
+                val col = Color(0xFF4E9E5B)
+                drawRoundRectCompat(x - 5f * dpUnit, g - h, 10f * dpUnit, h, 5f * dpUnit, col)
+                if (i % 2 == 0) {
+                    drawRoundRectCompat(x + 5f * dpUnit, g - h * 0.66f, 12f * dpUnit, 7f * dpUnit, 3.5f * dpUnit, col)
+                    drawRoundRectCompat(x + 12f * dpUnit, g - h * 0.78f, 7f * dpUnit, h * 0.22f, 3.5f * dpUnit, col)
+                } else {
+                    drawRoundRectCompat(x - 17f * dpUnit, g - h * 0.6f, 12f * dpUnit, 7f * dpUnit, 3.5f * dpUnit, col)
+                    drawRoundRectCompat(x - 17f * dpUnit, g - h * 0.72f, 7f * dpUnit, h * 0.2f, 3.5f * dpUnit, col)
+                }
+            }
+            Palette.Props.PINES -> {
+                drawLine(Color(0xFF6B4B2A), Offset(x, g), Offset(x, g - h * 0.25f), 4f * dpUnit, StrokeCap.Round)
+                for (k in 0 until 3) {
+                    val w = (26f - k * 6f) * dpUnit
+                    val yTop = g - h * (0.25f + 0.25f * (k + 1))
+                    val yBot = g - h * (0.25f + 0.25f * k)
+                    drawPath(
+                        Path().apply {
+                            moveTo(x, yTop); lineTo(x - w, yBot); lineTo(x + w, yBot); close()
+                        },
+                        Color(0xFF2F6B45),
+                    )
+                    drawPath(
+                        Path().apply {
+                            moveTo(x, yTop); lineTo(x - w, yBot); lineTo(x + w, yBot); close()
+                        },
+                        Color.White.copy(alpha = 0.35f),
+                        style = Stroke(width = 2f * dpUnit),
+                    )
+                }
+            }
+            Palette.Props.NONE -> Unit
+        }
+    }
 }
 
 fun DrawScope.drawWorld(

@@ -46,6 +46,7 @@ class Ambience(context: Context) {
     private val rnd = Random()
 
     private var windId = 0
+    private var thunderId = 0
     private val dayIds = mutableListOf<Int>()
     private val nightIds = mutableListOf<Int>()
 
@@ -69,6 +70,7 @@ class Ambience(context: Context) {
         }
         val dir = File(context.cacheDir, "ambience").apply { mkdirs() }
         windId = load(dir, "wind") { writeWind(it) }
+        thunderId = load(dir, "thunder") { writeThunder(it) }
         dayIds += load(dir, "bird1") { writeBird1(it) }
         dayIds += load(dir, "bird2") { writeBird2(it) }
         dayIds += load(dir, "duck") { writeDuck(it) }
@@ -86,6 +88,14 @@ class Ambience(context: Context) {
     private fun isReady(id: Int): Boolean = synchronized(ready) { id in ready }
 
     // --------------------------------------------------------------- lifecycle
+
+    /** A roll of thunder, played the moment the sky flashes. Gentle on purpose —
+     * this is weather for a toddler, not a horror film. */
+    fun playThunder(volume: Float = 0.35f) {
+        if (released || thunderId == 0 || !isReady(thunderId)) return
+        val v = volume.coerceIn(0f, 1f)
+        runCatching { pool.play(thunderId, v, v, 1, 0, 0.92f + rnd.nextFloat() * 0.16f) }
+    }
 
     /** Begin the soundscape and remember that it is wanted (see [resume]). */
     fun start() {
@@ -187,6 +197,24 @@ class Ambience(context: Context) {
             (buf[i] * norm * window * Short.MAX_VALUE).toInt().toShort()
         })
     }
+
+    /** Low rumbling noise that swells and rolls away — distant thunder. */
+    private fun writeThunder(file: File) = writePcm(file, chirps(1.8f) { out ->
+        var lp1 = 0f
+        var lp2 = 0f
+        val n = out.size
+        for (i in 0 until n) {
+            val fr = i / n.toFloat()
+            val white = rnd.nextFloat() * 2f - 1f
+            // Two lazy low-pass stages leave only the deep rumble.
+            lp1 += 0.010f * (white - lp1)
+            lp2 += 0.014f * (lp1 - lp2)
+            // A quick crack that decays into a long roll.
+            val env = (exp(-2.2f * fr * 3f) * 0.7f + exp(-1.1f * fr * 3f) * 0.45f) *
+                (fr / 0.03f).coerceAtMost(1f)
+            out[i] += lp2 * 26f * env
+        }
+    })
 
     private fun writeBird1(file: File) = writePcm(file, chirps(0.6f) { out ->
         // Three quick rising tweets.

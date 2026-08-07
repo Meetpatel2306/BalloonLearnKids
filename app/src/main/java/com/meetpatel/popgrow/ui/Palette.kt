@@ -76,6 +76,9 @@ object Palette {
 
     /** A whole scene palette. Each level wears a different one, so levelling up
      * visibly changes the world — sky, hills and ground all at once. */
+    /** What grows along the ground in a scene. */
+    enum class Props { NONE, PALMS, CACTI, PINES }
+
     data class SkyTheme(
         val skyTop: Color,
         val skyBottom: Color,
@@ -86,16 +89,29 @@ object Palette {
         val night: Boolean = false,
         val sun: Color = Sun,
         val cloudAlpha: Float = 0.82f,
+        /** Weather strength, 0..1. These fade in and out smoothly between scenes. */
+        val rain: Float = 0f,
+        val snow: Float = 0f,
+        val storm: Float = 0f,
+        val props: Props = Props.NONE,
     )
 
-    /** Levels cycle through these in order, then wrap around. */
+    /** The world drifts through these in order, then wraps around. */
     val Themes = listOf(
         // Meadow — the classic bright day.
         SkyTheme(Color(0xFF8ED8F8), Color(0xFFDFF6FF), Color(0xFF7FCF8A), Color(0xFF57BE6B), Color(0xFF3EA855), Color(0xFF2F8E45)),
+        // Jungle — deep green, humid, palms along the floor.
+        SkyTheme(Color(0xFF6FC98F), Color(0xFFCDEFC6), Color(0xFF2E7D53), Color(0xFF246A44), Color(0xFF1F7A3D), Color(0xFF145C2C), props = Props.PALMS),
+        // Storm — grey skies, rain and lightning.
+        SkyTheme(Color(0xFF4C5A6B), Color(0xFF8FA0AE), Color(0xFF44586A), Color(0xFF37485A), Color(0xFF2F7248), Color(0xFF215436), cloudAlpha = 0.55f, rain = 1f, storm = 1f),
         // Sunset — warm golden hour.
         SkyTheme(Color(0xFFFFB067), Color(0xFFFFE2B8), Color(0xFFC58BC0), Color(0xFF9E6FA8), Color(0xFF6E8E5A), Color(0xFF56744A), sun = Color(0xFFFFE0A0)),
+        // Desert — hot sand and cacti.
+        SkyTheme(Color(0xFFF6C77A), Color(0xFFFDEBC6), Color(0xFFE0B876), Color(0xFFD3A05E), Color(0xFFEBCB92), Color(0xFFD9B071), sun = Color(0xFFFFE8A6), cloudAlpha = 0.35f, props = Props.CACTI),
         // Night — deep blue with a moon and stars.
         SkyTheme(Color(0xFF2A2A5E), Color(0xFF4B4B82), Color(0xFF2E3B5E), Color(0xFF283452), Color(0xFF2E7D46), Color(0xFF1F5E33), night = true, cloudAlpha = 0.35f),
+        // Snow — a quiet white winter, pines on the hill.
+        SkyTheme(Color(0xFFA9C6DE), Color(0xFFE8F2F8), Color(0xFFC9DAE6), Color(0xFFB4C9D8), Color(0xFFEDF4F8), Color(0xFFD6E3EC), cloudAlpha = 0.6f, snow = 1f, props = Props.PINES),
         // Candy — pastel pinks.
         SkyTheme(Color(0xFFFFC3E1), Color(0xFFFFE6F3), Color(0xFFF3A6D0), Color(0xFFE87FBE), Color(0xFF8ED6A0), Color(0xFF6FC488)),
         // Ocean — cool water over a sandy floor.
@@ -118,6 +134,12 @@ object Palette {
         night = if (f < 0.5f) a.night else b.night,
         sun = lerp(a.sun, b.sun, f),
         cloudAlpha = a.cloudAlpha + (b.cloudAlpha - a.cloudAlpha) * f,
+        // Weather fades in and out rather than switching on, so a storm rolls
+        // in gradually and the snow settles gently.
+        rain = a.rain + (b.rain - a.rain) * f,
+        snow = a.snow + (b.snow - a.snow) * f,
+        storm = a.storm + (b.storm - a.storm) * f,
+        props = if (f < 0.5f) a.props else b.props,
     )
 
     /** The scene at a given time — the whole world drifts through the themes,
