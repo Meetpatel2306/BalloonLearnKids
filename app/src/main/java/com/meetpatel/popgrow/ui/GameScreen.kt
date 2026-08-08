@@ -76,6 +76,8 @@ import com.meetpatel.popgrow.game.GameMode
 import com.meetpatel.popgrow.game.GameSound
 import com.meetpatel.popgrow.game.GameWorld
 import com.meetpatel.popgrow.game.LearningContent
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Composable
 fun GameScreen(
@@ -411,28 +413,36 @@ fun GameScreen(
                 modifier = Modifier.align(Alignment.TopCenter).padding(top = 6.dp),
             )
             // Below it, a bigger "find this" prompt.
+            // The "find this" card — a bright cloud so the target always pops
+            // out from the sky behind it.
             Row(
                 Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 44.dp)
-                    .background(Color.Black.copy(alpha = 0.22f), RoundedCornerShape(50))
-                    .padding(horizontal = 20.dp, vertical = 6.dp),
+                    .padding(top = 46.dp)
+                    .background(Color.White.copy(alpha = 0.94f), RoundedCornerShape(50))
+                    .border(3.dp, Color(0xFF4D9BFF), RoundedCornerShape(50))
+                    .padding(horizontal = 22.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (mode == GameMode.COLORS) {
-                    Box(Modifier.size(26.dp).background(world.targetColor, CircleShape))
+                    Box(
+                        Modifier
+                            .size(28.dp)
+                            .background(world.targetColor, CircleShape)
+                            .border(2.dp, Palette.Ink.copy(alpha = 0.25f), CircleShape)
+                    )
                     Spacer(Modifier.width(12.dp))
-                    Text(targetShown, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                    Text(targetShown, color = Palette.Ink, fontSize = 21.sp, fontWeight = FontWeight.Black)
                 } else if (mode == GameMode.SHAPES || mode == GameMode.ANIMALS) {
                     Text(
                         if (mode == GameMode.ANIMALS) LearningContent.animalFor(targetShown)
                         else LearningContent.glyphFor(targetShown),
-                        color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Black,
+                        color = Palette.Ink, fontSize = 27.sp, fontWeight = FontWeight.Black,
                     )
                     Spacer(Modifier.width(10.dp))
-                    Text(targetShown, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                    Text(targetShown, color = Palette.Ink, fontSize = 21.sp, fontWeight = FontWeight.Black)
                 } else {
-                    Text(targetShown, color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Black)
+                    Text(targetShown, color = Palette.Ink, fontSize = 28.sp, fontWeight = FontWeight.Black)
                 }
             }
         }
@@ -537,6 +547,26 @@ fun GameScreen(
             exit = fadeOut() + scaleOut(targetScale = 1.2f),
             modifier = Modifier.align(Alignment.Center),
         ) {
+            Box(contentAlignment = Alignment.Center) {
+                // Rays of light spinning behind the word, so the reward feels
+                // like something arriving rather than text appearing.
+                Canvas(Modifier.size(300.dp)) {
+                    val c = Offset(size.width / 2f, size.height / 2f)
+                    val spin = (rewardTick % 8) * 4f
+                    for (k in 0 until 16) {
+                        val a = Math.toRadians((k * 22.5f + spin).toDouble()).toFloat()
+                        val inner = size.minDimension * 0.16f
+                        val outer = size.minDimension * (if (k % 2 == 0) 0.46f else 0.36f)
+                        drawLine(
+                            Color.White.copy(alpha = 0.30f),
+                            Offset(c.x + cos(a) * inner, c.y + sin(a) * inner),
+                            Offset(c.x + cos(a) * outer, c.y + sin(a) * outer),
+                            strokeWidth = 12f,
+                            cap = StrokeCap.Round,
+                        )
+                    }
+                    drawCircle(Color.White.copy(alpha = 0.18f), size.minDimension * 0.22f, c)
+                }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.widthIn(max = 320.dp),
@@ -561,6 +591,7 @@ fun GameScreen(
                         ),
                     )
                 }
+            }
             }
         }
 
@@ -647,11 +678,13 @@ private fun ProgressStrip(
     onSlotPositioned: (Int, Offset) -> Unit,
     modifier: Modifier,
 ) {
+    // A soft white ribbon, so the row stays readable whatever colour the sky is.
     Row(
         modifier
-            .background(Color.Black.copy(alpha = 0.16f), RoundedCornerShape(50))
+            .background(Color.White.copy(alpha = 0.86f), RoundedCornerShape(50))
+            .border(2.dp, Color.White, RoundedCornerShape(50))
             .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 10.dp, vertical = 4.dp),
+            .padding(horizontal = 12.dp, vertical = 5.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(5.dp),
     ) {
@@ -680,15 +713,16 @@ private fun ProgressStrip(
                     text = label,
                     color = when {
                         current -> Color.White
-                        done -> Palette.Gold
-                        else -> Color.White.copy(alpha = 0.4f)
+                        // Found ones stay a warm gold; the rest wait quietly.
+                        done -> Color(0xFFE08900)
+                        else -> Palette.Ink.copy(alpha = 0.32f)
                     },
                     fontSize = if (current) 20.sp else 14.sp,
                     fontWeight = if (current) FontWeight.Black else FontWeight.Bold,
                     modifier = if (current) {
                         slotMod
-                            .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
-                            .padding(horizontal = 5.dp, vertical = 1.dp)
+                            .background(Color(0xFF4D9BFF), RoundedCornerShape(10.dp))
+                            .padding(horizontal = 7.dp, vertical = 1.dp)
                     } else slotMod,
                 )
             }
