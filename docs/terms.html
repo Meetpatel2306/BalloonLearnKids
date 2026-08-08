@@ -1,31 +1,53 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Terms of Use — Bubble Learn Kids</title>
 <style>
-  :root { color-scheme: light; }
-  body {
-    margin: 0; font-family: system-ui, "Segoe UI", Roboto, Arial, sans-serif;
-    color: #1f2733; background: #f6fbfe; line-height: 1.65;
+  :root{ --ink:#14304d; --ink-soft:#5a7186; --line:#d7e7f2; }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:system-ui,"Segoe UI",Roboto,Arial,sans-serif;
+    color:var(--ink); background:#eaf6fd; line-height:1.7;
   }
-  main { max-width: 740px; margin: 0 auto; padding: 34px 20px 60px; }
-  h1 { font-size: 27px; color: #12324f; margin: 0 0 4px; }
-  .updated { color: #5a7186; font-size: 14px; margin: 0 0 22px; }
-  h2 { font-size: 18px; color: #17557f; margin: 26px 0 6px; }
-  a { color: #17557f; }
-  .back { display: inline-block; margin-bottom: 20px; text-decoration: none; font-weight: 600; }
-  footer { color: #5a7186; font-size: 13px; margin-top: 34px; border-top: 1px solid #dbe7f0; padding-top: 14px; }
+  .top{
+    background:linear-gradient(180deg,#6EC9F7 0%,#AFE3FA 100%);
+    padding:34px 20px 26px; text-align:center;
+  }
+  .top .b{font-size:38px;line-height:1}
+  .top h1{margin:8px 0 2px;font-size:clamp(24px,5vw,32px)}
+  .top p{margin:0;color:#1c4763;font-size:14px}
+  main{
+    max-width:760px;margin:-16px auto 0;padding:0 20px 60px;position:relative;
+  }
+  .sheet{
+    background:#fff;border:1px solid var(--line);border-radius:22px;
+    padding:28px 26px;box-shadow:0 8px 26px rgba(20,48,77,.08);
+  }
+  h2{font-size:18px;color:#17557f;margin:26px 0 6px}
+  h2:first-of-type{margin-top:6px}
+  .summary{
+    background:#f2fbf5;border:1px solid #bfe6cd;border-radius:14px;
+    padding:14px 18px;margin:0 0 20px;
+  }
+  a{color:#17557f}
+  .back{
+    display:inline-block;margin:22px 0 0;padding:12px 24px;border-radius:30px;
+    background:#4D9BFF;color:#fff;text-decoration:none;font-weight:800;
+    box-shadow:0 6px 16px rgba(77,155,255,.35);
+  }
+  footer{text-align:center;color:var(--ink-soft);font-size:14px;padding:26px 20px 46px}
 </style>
 </head>
 <body>
-<main>
-  <a class="back" href="index.html">← Bubble Learn Kids</a>
-
+<div class="top">
+  <div class="b">&#127880;</div>
   <h1>Terms of Use</h1>
-  <p class="updated">Last updated: 7 August 2026</p>
-
+  <p>Bubble Learn Kids · Last updated 7 August 2026</p>
+</div>
+<main>
+  <div class="sheet">
   <h2>1. Agreement</h2>
   <p>
     By installing or using the Bubble Learn Kids application ("the app"), you agree
@@ -109,8 +131,11 @@
 
   <h2>13. Contact</h2>
   <p><a href="mailto:bubblelearnkids@gmail.com">bubblelearnkids@gmail.com</a></p>
-
-  <footer>© 2026 Bubble Learn Kids · <a href="privacy.html">Privacy Policy</a></footer>
+  </div>
+  <div style="text-align:center">
+    <a class="back" href="index.html">← Back to Bubble Learn Kids</a>
+  </div>
 </main>
+<footer>© 2026 Bubble Learn Kids · <a href="privacy.html">Privacy Policy</a></footer>
 </body>
 </html>

@@ -3,87 +3,270 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bubble Learn Kids</title>
+<title>Bubble Learn Kids — ABC, 123, Colors, Shapes &amp; Animals for ages 2–5</title>
+<meta name="description" content="A calm, offline, ad-free balloon-popping learning game for toddlers and preschoolers. Learn letters, numbers, colours, shapes and animals.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127880;</text></svg>">
 <style>
-  :root { color-scheme: light; }
-  body {
-    margin: 0; font-family: system-ui, "Segoe UI", Roboto, Arial, sans-serif;
-    color: #1f2733; background: #eaf6fd; line-height: 1.6;
+  :root{
+    --ink:#14304d;
+    --ink-soft:#5a7186;
+    --card:#ffffff;
+    --line:#d7e7f2;
+    --green:#35C978;
+    --blue:#4D9BFF;
+    --pink:#FF7FB6;
+    --purple:#A98BF0;
+    --orange:#FF9F43;
+    --red:#FF5252;
   }
-  header {
-    background: linear-gradient(180deg, #6EC9F7 0%, #D9F3FF 100%);
-    text-align: center; padding: 54px 20px 40px;
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:system-ui,"Segoe UI",Roboto,Arial,sans-serif;
+    color:var(--ink);
+    background:#eaf6fd;
+    line-height:1.65;
+    overflow-x:hidden;
   }
-  header .balloon { font-size: 58px; line-height: 1; }
-  h1 { margin: 10px 0 6px; font-size: 30px; color: #12324f; }
-  header p { margin: 0; color: #24506e; font-size: 16px; }
-  main { max-width: 760px; margin: 0 auto; padding: 26px 20px 60px; }
-  .card {
-    background: #fff; border: 1px solid #cfe3f0; border-radius: 14px;
-    padding: 20px 22px; margin-bottom: 18px;
+
+  /* ---------------------------------------------------------------- sky */
+  .sky{
+    position:relative;
+    background:linear-gradient(180deg,#6EC9F7 0%,#9FDDF9 45%,#DFF4FF 100%);
+    padding:70px 20px 120px;
+    text-align:center;
+    overflow:hidden;
   }
-  h2 { margin: 0 0 10px; font-size: 20px; color: #12324f; }
-  ul { padding-left: 20px; margin: 8px 0; }
-  li { margin: 5px 0; }
-  .links a {
-    display: inline-block; margin: 6px 10px 6px 0; padding: 11px 18px;
-    background: #35C978; color: #fff; text-decoration: none;
-    border-radius: 30px; font-weight: 700;
+  .sky::after{
+    content:"";position:absolute;left:0;right:0;bottom:-1px;height:90px;
+    background:radial-gradient(120% 100% at 50% 0,transparent 60%,#eaf6fd 61%);
   }
-  .links a.alt { background: #4D9BFF; }
-  footer { text-align: center; color: #5a7186; font-size: 14px; padding-bottom: 40px; }
-  a { color: #17557f; }
+  .cloud{
+    position:absolute;background:#fff;border-radius:50%;opacity:.85;
+    animation:drift linear infinite;
+  }
+  .cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+  .c1{width:90px;height:90px;top:8%;left:-15%;animation-duration:48s}
+  .c1::before{width:70px;height:70px;top:22px;left:-45px}
+  .c1::after{width:60px;height:60px;top:28px;left:70px}
+  .c2{width:60px;height:60px;top:26%;left:-20%;animation-duration:66s;animation-delay:-14s;opacity:.7}
+  .c2::before{width:46px;height:46px;top:16px;left:-30px}
+  .c2::after{width:40px;height:40px;top:20px;left:48px}
+  @keyframes drift{to{transform:translateX(135vw)}}
+
+  /* balloons floating up the hero */
+  .float{position:absolute;bottom:-160px;animation:rise linear infinite;opacity:.9}
+  @keyframes rise{
+    0%{transform:translateY(0) rotate(-3deg)}
+    50%{transform:translateY(-55vh) rotate(3deg)}
+    100%{transform:translateY(-115vh) rotate(-3deg)}
+  }
+  .f1{left:6%;animation-duration:19s}
+  .f2{left:22%;animation-duration:26s;animation-delay:-6s}
+  .f3{left:74%;animation-duration:22s;animation-delay:-11s}
+  .f4{left:88%;animation-duration:30s;animation-delay:-3s}
+
+  .hero-icon{
+    width:112px;height:150px;position:relative;z-index:2;margin:0 auto;
+    animation:bob 3.4s ease-in-out infinite;
+    filter:drop-shadow(0 10px 18px rgba(20,48,77,.22));
+  }
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
+
+  h1{
+    position:relative;z-index:2;margin:14px 0 6px;
+    font-size:clamp(30px,7vw,46px);letter-spacing:-.5px;
+  }
+  h1 span{display:inline-block;animation:wave 2.6s ease-in-out infinite}
+  h1 span:nth-child(2){animation-delay:.09s}
+  h1 span:nth-child(3){animation-delay:.18s}
+  @keyframes wave{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  .tag{position:relative;z-index:2;margin:0;font-size:clamp(15px,2.6vw,19px);color:#1c4763;font-weight:600}
+  .ages{
+    position:relative;z-index:2;display:inline-block;margin-top:14px;
+    background:rgba(255,255,255,.85);border-radius:30px;padding:7px 18px;
+    font-weight:700;font-size:14px;color:#1c4763;
+  }
+
+  /* --------------------------------------------------------------- body */
+  main{max-width:940px;margin:0 auto;padding:0 20px 70px;position:relative;z-index:2}
+  section{margin:-46px 0 44px}
+  section+section{margin-top:0}
+  h2{font-size:clamp(21px,3.4vw,27px);margin:0 0 6px;text-align:center}
+  .lead{text-align:center;color:var(--ink-soft);margin:0 auto 24px;max-width:620px}
+
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:22px;box-shadow:0 6px 20px rgba(20,48,77,.06);
+    transition:transform .22s ease,box-shadow .22s ease;
+  }
+  .card:hover{transform:translateY(-5px);box-shadow:0 14px 30px rgba(20,48,77,.13)}
+  .card h3{margin:12px 0 4px;font-size:18px}
+  .card p{margin:0;color:var(--ink-soft);font-size:15px}
+  .pill{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:52px;height:52px;border-radius:16px;font-size:26px;
+  }
+  .p-green{background:#e4f8ed}.p-blue{background:#e6f0ff}.p-pink{background:#ffe9f4}
+  .p-purple{background:#f0eafd}.p-orange{background:#fff0e0}
+
+  .safe{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .safe div{
+    background:#f2fbf5;border:1px solid #bfe6cd;border-radius:14px;
+    padding:13px 16px;font-weight:600;font-size:15px;
+  }
+  .safe div span{font-size:19px;margin-right:7px}
+
+  .cta{text-align:center;margin:36px 0 8px}
+  .btn{
+    display:inline-block;margin:7px 6px;padding:15px 30px;border-radius:40px;
+    text-decoration:none;font-weight:800;font-size:16px;color:#fff;
+    background:var(--green);box-shadow:0 7px 18px rgba(53,201,120,.36);
+    transition:transform .18s ease,box-shadow .18s ease;
+  }
+  .btn:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(53,201,120,.45)}
+  .btn.alt{background:var(--blue);box-shadow:0 7px 18px rgba(77,155,255,.36)}
+  .btn.alt:hover{box-shadow:0 12px 26px rgba(77,155,255,.45)}
+  .btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none}
+  .btn.ghost:hover{border-color:var(--blue);box-shadow:0 8px 18px rgba(20,48,77,.10)}
+  .note{font-size:13px;color:var(--ink-soft);margin-top:10px}
+
+  footer{
+    text-align:center;padding:30px 20px 46px;color:var(--ink-soft);font-size:14px;
+    border-top:1px solid var(--line);background:#e3f2fb;
+  }
+  footer a{color:#17557f}
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="balloon">🎈</div>
-  <h1>Bubble Learn Kids</h1>
-  <p>Pop and learn ABC, 123, colors, shapes &amp; animals — ages 2–5</p>
-</header>
+<div class="sky">
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+
+  <!-- balloons drifting up behind the title -->
+  <svg class="float f1" width="54" height="72" viewBox="0 0 54 72" aria-hidden="true">
+    <path d="M27 2C38 2 46 13 46 26S38 48 27 48 8 39 8 26 16 2 27 2Z" fill="#FF5252"/>
+    <path d="M27 48l-4 6h8l-4-6z" fill="#d93a3a"/>
+    <path d="M27 54c4 5-4 9-1 15" stroke="#8E99AB" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="19" cy="16" rx="5" ry="7" fill="#fff" opacity=".5"/>
+  </svg>
+  <svg class="float f2" width="44" height="60" viewBox="0 0 54 72" aria-hidden="true">
+    <path d="M27 2C38 2 46 13 46 26S38 48 27 48 8 39 8 26 16 2 27 2Z" fill="#4D9BFF"/>
+    <path d="M27 48l-4 6h8l-4-6z" fill="#3a7ad0"/>
+    <path d="M27 54c4 5-4 9-1 15" stroke="#8E99AB" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="19" cy="16" rx="5" ry="7" fill="#fff" opacity=".5"/>
+  </svg>
+  <svg class="float f3" width="48" height="64" viewBox="0 0 54 72" aria-hidden="true">
+    <path d="M27 2C38 2 46 13 46 26S38 48 27 48 8 39 8 26 16 2 27 2Z" fill="#35C978"/>
+    <path d="M27 48l-4 6h8l-4-6z" fill="#2aa762"/>
+    <path d="M27 54c4 5-4 9-1 15" stroke="#8E99AB" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="19" cy="16" rx="5" ry="7" fill="#fff" opacity=".5"/>
+  </svg>
+  <svg class="float f4" width="40" height="54" viewBox="0 0 54 72" aria-hidden="true">
+    <path d="M27 2C38 2 46 13 46 26S38 48 27 48 8 39 8 26 16 2 27 2Z" fill="#A98BF0"/>
+    <path d="M27 48l-4 6h8l-4-6z" fill="#8a6dcc"/>
+    <path d="M27 54c4 5-4 9-1 15" stroke="#8E99AB" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="19" cy="16" rx="5" ry="7" fill="#fff" opacity=".5"/>
+  </svg>
+
+  <!-- the app's own balloon, with its face -->
+  <svg class="hero-icon" viewBox="0 0 112 150" role="img" aria-label="Bubble Learn Kids">
+    <path d="M56 84c5 7-6 12-1 22" stroke="#8E99AB" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+    <defs>
+      <radialGradient id="g" cx="35%" cy="30%" r="75%">
+        <stop offset="0%" stop-color="#ff9a9a"/><stop offset="55%" stop-color="#FF5252"/>
+        <stop offset="100%" stop-color="#d63b3b"/>
+      </radialGradient>
+    </defs>
+    <path d="M56 6c19 0 33 19 33 40S75 84 56 84 23 67 23 46 37 6 56 6Z" fill="url(#g)"/>
+    <path d="M50 84l6-7 6 7-6 6z" fill="#d63b3b"/>
+    <ellipse cx="41" cy="30" rx="9" ry="12" fill="#fff" opacity=".55" transform="rotate(-25 41 30)"/>
+    <ellipse cx="45" cy="46" rx="6.5" ry="8" fill="#fff"/>
+    <ellipse cx="67" cy="46" rx="6.5" ry="8" fill="#fff"/>
+    <circle cx="46.5" cy="47.5" r="3.4" fill="#2C3A57"/>
+    <circle cx="68.5" cy="47.5" r="3.4" fill="#2C3A57"/>
+    <path d="M37 37q4.5-4 9-1M66 36q4.5-3 9 1" stroke="#2C3A57" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <path d="M45 59q11 13 22 0q-11 6-22 0z" fill="#2C3A57"/>
+    <path d="M52 63q4 5 8 0q-4 3-8 0z" fill="#FF8FA3"/>
+  </svg>
+
+  <h1><span>Bubble</span> <span>Learn</span> <span>Kids</span></h1>
+  <p class="tag">Pop balloons. Learn ABC, 123, colours, shapes &amp; animals.</p>
+  <div class="ages">Made for ages 2–5 🎈</div>
+</div>
 
 <main>
-  <div class="card">
-    <h2>About the app</h2>
-    <p>
-      Bubble Learn Kids is a calm, cheerful balloon-popping game for toddlers and
-      preschoolers. Tap friendly balloons to pop them into confetti and gently learn
-      letters, numbers, colours, shapes and animals along the way.
-    </p>
-    <ul>
-      <li>🔤 <strong>A–Z</strong> — hear “A for Apple” with a picture</li>
-      <li>🔢 <strong>1–20</strong> — find each number and watch it fly into place</li>
-      <li>🌈 <strong>Colors</strong> — find the balloon of the spoken colour</li>
-      <li>⭐ <strong>Shapes</strong> — circle, square, triangle, star and heart</li>
-      <li>🐶 <strong>Animals</strong> — fourteen animals and the sounds they make</li>
-    </ul>
-  </div>
+  <section>
+    <div class="grid">
+      <div class="card">
+        <div class="pill p-green">🔤</div>
+        <h3>A – Z</h3>
+        <p>Find each letter in order and hear “A for Apple” with a picture.</p>
+      </div>
+      <div class="card">
+        <div class="pill p-blue">🔢</div>
+        <h3>1 – 20</h3>
+        <p>Pop the number you hear and watch it fly into place.</p>
+      </div>
+      <div class="card">
+        <div class="pill p-pink">🌈</div>
+        <h3>Colours</h3>
+        <p>Find the colour that is spoken — the whole screen celebrates.</p>
+      </div>
+      <div class="card">
+        <div class="pill p-purple">⭐</div>
+        <h3>Shapes</h3>
+        <p>Circle, square, triangle, star and heart — balloons moulded into each shape.</p>
+      </div>
+      <div class="card">
+        <div class="pill p-orange">🐶</div>
+        <h3>Animals</h3>
+        <p>Fourteen animals with real recorded sounds and their names spoken aloud.</p>
+      </div>
+    </div>
+  </section>
 
-  <div class="card">
+  <section>
     <h2>Safe by design</h2>
-    <ul>
-      <li>Works <strong>100% offline</strong> — the app has no internet permission at all</li>
-      <li><strong>No advertising</strong>, no in-app purchases, no subscriptions</li>
-      <li><strong>No data collected</strong> and nothing sent anywhere</li>
-      <li>No score pressure, no timers, nothing a child can get wrong</li>
-      <li>Settings are protected so a child cannot change them by accident</li>
-    </ul>
-  </div>
+    <p class="lead">Built for the youngest players, and for the grown-ups handing over the phone.</p>
+    <div class="safe">
+      <div><span>📴</span>Works 100% offline — no internet permission at all</div>
+      <div><span>🚫</span>No adverts, ever</div>
+      <div><span>🔒</span>No data collected, nothing sent anywhere</div>
+      <div><span>💸</span>No purchases, no subscriptions</div>
+      <div><span>😊</span>No timers, no score pressure, nothing to get wrong</div>
+      <div><span>🧮</span>Settings guarded by a simple sum only a grown-up can solve</div>
+    </div>
+  </section>
 
-  <div class="card links">
+  <section class="cta">
+    <h2>Get the app</h2>
+    <p class="lead">Free, small, and works on any Android phone or tablet.</p>
+    <a class="btn" href="https://github.com/Meetpatel2306/BubbleLearnKids/releases/latest/download/app-debug.apk">⬇ Download for Android</a>
+    <a class="btn alt" href="https://github.com/Meetpatel2306/BubbleLearnKids">View the source</a>
+    <p class="note">
+      Installing outside the Play Store? Your phone will ask permission once — tap
+      <strong>Settings → Allow from this source</strong>, then Install.
+    </p>
+  </section>
+
+  <section class="cta">
     <h2>Documents</h2>
-    <a href="privacy.html">Privacy Policy</a>
-    <a class="alt" href="terms.html">Terms of Use</a>
-  </div>
-
-  <div class="card">
-    <h2>Contact</h2>
-    <p>Questions or feedback: <a href="mailto:bubblelearnkids@gmail.com">bubblelearnkids@gmail.com</a></p>
-  </div>
+    <a class="btn ghost" href="privacy.html">Privacy Policy</a>
+    <a class="btn ghost" href="terms.html">Terms of Use</a>
+  </section>
 </main>
 
-<footer>© 2026 Bubble Learn Kids</footer>
+<footer>
+  Questions or feedback: <a href="mailto:bubblelearnkids@gmail.com">bubblelearnkids@gmail.com</a><br>
+  © 2026 Bubble Learn Kids
+</footer>
 
 </body>
 </html>
