@@ -323,7 +323,7 @@ private val TITLE_COLORS = listOf(
 )
 
 @Composable
-fun BouncyTitle(text: String = "Bubble Learn", fontSize: Int = 46) {
+fun BouncyTitle(text: String = "Bubble Learn Kids", fontSize: Int = 46) {
     val t = rememberInfiniteTransition(label = "title")
     val v by t.animateFloat(
         0f, 1f,

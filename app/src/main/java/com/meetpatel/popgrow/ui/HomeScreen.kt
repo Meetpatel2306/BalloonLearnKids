@@ -141,7 +141,7 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                BouncyTitle(fontSize = if (screenW < 380.dp) 36 else 44)
+                BouncyTitle(fontSize = if (screenW < 380.dp) 27 else 33)
                 Text(
                     text = stringResource(R.string.subtitle),
                     fontSize = 14.sp,
@@ -173,7 +173,7 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    BouncyTitle(fontSize = 34)
+                    BouncyTitle(fontSize = 26)
                     Text(
                         text = stringResource(R.string.subtitle),
                         fontSize = 13.sp,
@@ -648,6 +648,7 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
     var speed by remember { mutableFloatStateOf(prefs.speed) }
     var balloonSize by remember { mutableFloatStateOf(prefs.size) }
     var showPrivacy by remember { mutableStateOf(false) }
+    var showTerms by remember { mutableStateOf(false) }
     var showProgress by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
@@ -706,6 +707,7 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
                 ) {
                     PanelButton(stringResource(R.string.progress), Modifier.weight(1f)) { showProgress = true }
                     PanelButton(stringResource(R.string.privacy), Modifier.weight(1f)) { showPrivacy = true }
+                    PanelButton(stringResource(R.string.terms), Modifier.weight(1f)) { showTerms = true }
                 }
                 Text(
                     text = stringResource(R.string.settings_note),
@@ -740,14 +742,17 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
     }
 
     if (showPrivacy) {
-        AlertDialog(
-            onDismissRequest = { showPrivacy = false },
-            title = { Text(stringResource(R.string.privacy), fontWeight = FontWeight.Bold) },
-            text = { Text(stringResource(R.string.privacy_body), fontSize = 15.sp) },
-            confirmButton = {
-                TextButton(onClick = { showPrivacy = false }) { Text(stringResource(R.string.close)) }
-            }
-        )
+        LegalPage(
+            title = stringResource(R.string.privacy_title),
+            body = stringResource(R.string.privacy_full),
+        ) { showPrivacy = false }
+    }
+
+    if (showTerms) {
+        LegalPage(
+            title = stringResource(R.string.terms_title),
+            body = stringResource(R.string.terms_full),
+        ) { showTerms = false }
     }
 }
 
@@ -891,6 +896,68 @@ private fun RowScope.StatCell(text: String) {
         textAlign = TextAlign.Center,
         modifier = Modifier.weight(1f),
     )
+}
+
+/**
+ * A full-page notice — the privacy policy or the terms — shown inside the app
+ * rather than sending anyone to a web browser, which keeps a child safely in
+ * the game. One large OK button closes it; there is nothing else to press.
+ */
+@Composable
+private fun LegalPage(title: String, body: String, onClose: () -> Unit) {
+    Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Column(
+            Modifier
+                .fillMaxWidth(0.94f)
+                .fillMaxHeight(0.88f)
+                .background(Color(0xFF5BC0F0), RoundedCornerShape(26.dp))
+                .border(3.dp, Color.White, RoundedCornerShape(26.dp))
+                .padding(horizontal = 20.dp, vertical = 18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = title,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Black,
+                color = Color.White,
+                style = TextStyle(shadow = Shadow(Palette.Ink.copy(alpha = 0.45f), Offset(0f, 3f), 6f)),
+            )
+            Spacer(Modifier.height(12.dp))
+            Column(
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .background(Color.White.copy(alpha = 0.94f), RoundedCornerShape(16.dp))
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+            ) {
+                Text(
+                    text = body,
+                    fontSize = 13.sp,
+                    lineHeight = 19.sp,
+                    color = Palette.Ink,
+                )
+            }
+            Spacer(Modifier.height(14.dp))
+            Box(
+                Modifier
+                    .fillMaxWidth(0.55f)
+                    .background(Color(0xFF35C978), RoundedCornerShape(50))
+                    .border(2.dp, Color.White, RoundedCornerShape(50))
+                    .clickable(onClick = onClose)
+                    .padding(vertical = 13.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = stringResource(R.string.ok),
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White,
+                    style = TextStyle(shadow = Shadow(Palette.Ink.copy(alpha = 0.35f), Offset(0f, 3f), 5f)),
+                )
+            }
+        }
+    }
 }
 
 /** A label on the left, a chunky switch on the right. */

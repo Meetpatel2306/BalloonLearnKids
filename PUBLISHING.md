@@ -1,4 +1,4 @@
-﻿# Publishing Bubble Learn on the Google Play Store
+﻿# Publishing Bubble Learn Kids on the Google Play Store
 
 A complete, beginner-friendly walkthrough — from a signing key to a live store
 listing. Follow the phases in order. Steps you do once ever are marked
@@ -113,7 +113,7 @@ Any other public URL (Google Sites, your own site) works equally well.
 1. Go to <https://play.google.com/console> → pay the $25 → complete identity
    verification.
 2. **Create app**:
-   - App name: **Bubble Learn**
+   - App name: **Bubble Learn Kids**
    - Default language: English (United States)
    - App or game: **Game**
    - Free or paid: **Free** (a free app can never be made paid later — fine here)
@@ -147,8 +147,8 @@ Any other public URL (Google Sites, your own site) works equally well.
 ### Text (copy-paste, edit as you like)
 
 - **App name** (max 30 chars):
-  `Bubble Learn: ABC 123 Kids` (26 chars — the extra words are search terms;
-  plain `Bubble Learn` is 12 chars if you prefer it clean)
+  `Bubble Learn Kids: ABC 123` (26 chars — the extra words are search terms;
+  plain `Bubble Learn Kids` is 17 chars if you prefer it clean)
 
 - **Short description** (max 80 chars):
   `Pop and learn ABC, 123, colors, shapes, animals. Offline, ad-free. Ages 2-5.`
@@ -156,7 +156,7 @@ Any other public URL (Google Sites, your own site) works equally well.
 - **Full description** (max 4000 chars):
 
   ```
-  Bubble Learn is a calm, cheerful balloon-popping playground for toddlers and
+  Bubble Learn Kids is a calm, cheerful balloon-popping playground for toddlers and
   preschoolers (ages 2–5). Tap friendly balloons with smiling faces to pop
   them into confetti, grow a flower garden, meet butterflies, bees, puppies
   and bunnies — and gently learn along the way.

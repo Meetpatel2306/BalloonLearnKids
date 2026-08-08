@@ -1,4 +1,4 @@
-﻿# Making Money with Bubble Learn
+﻿# Making Money with Bubble Learn Kids
 ### Free app · no subscriptions · realistic numbers · $0-budget marketing
 
 This is the honest playbook. A kids' app (ages 2–5) is the **most regulated
@@ -128,11 +128,10 @@ from parents who *choose* to pay:
 ## 5) $0-budget marketing playbook (this is where the money really is)
 
 ### 5.1 App Store Optimization (ASO) — free, do first
-- **Title keywords:** "Bubble Learn" is short and memorable but only carries
-  *learn* — so put the searchable words in the rest of the listing: subtitle
-  *"Toddler games for 2–5: ABC, 123, colors, shapes, animals"*, and consider
-  the longer store title `Bubble Learn: ABC 123 Kids`. Every word is a term
-  parents actually type.
+- **Title keywords:** "Bubble Learn Kids" already carries *learn* and *kids* —
+  two words parents search. Put the rest in the listing: subtitle *"Toddler
+  games for 2–5: ABC, 123, colors, shapes, animals"*, and consider the longer
+  store title `Bubble Learn Kids: ABC 123` (26 of the 30 allowed characters).
 - **First 3 lines of the description** decide installs. Lead with what
   parents search: *toddler games offline free no ads, ABC learning, baby
   balloon pop.*
