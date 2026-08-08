@@ -77,6 +77,15 @@ fun DrawScope.drawScenery(world: GameWorld, dpUnit: Float) {
     drawRain(world.time, theme, dpUnit)
     drawSnow(world.time, theme, dpUnit)
     drawLightning(world.time, theme, dpUnit)
+    // A whisper of shade at the corners frames the scene and quietly pushes the
+    // balloons forward, the way a picture book page does.
+    drawRect(
+        Brush.radialGradient(
+            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.16f)),
+            center = Offset(size.width / 2f, size.height * 0.45f),
+            radius = maxOf(size.width, size.height) * 0.72f,
+        )
+    )
 }
 
 /**

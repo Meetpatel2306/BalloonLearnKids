@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -143,17 +144,18 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                BouncyTitle(fontSize = if (screenW < 380.dp) 27 else 33)
-                Text(
-                    text = stringResource(R.string.subtitle),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.White.copy(alpha = 0.95f),
-                )
-                // A little parade of friends, so the top of the screen is warm
-                // and inviting rather than just words.
-                Text("🐶 🐱 🐰 🐻 🦁", fontSize = 18.sp)
-                Spacer(Modifier.height(6.dp))
+                // The title rides a soft cloud, so it stays readable whatever
+                // colour the sky happens to be.
+                TitleCloud {
+                    BouncyTitle(fontSize = if (screenW < 380.dp) 27 else 33)
+                    Text(
+                        text = stringResource(R.string.subtitle),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Palette.InkSoft,
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
                 RainbowArch(
                     prefs, tones, haptics,
                     Modifier
@@ -175,13 +177,15 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    BouncyTitle(fontSize = 26)
-                    Text(
-                        text = stringResource(R.string.subtitle),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.White.copy(alpha = 0.95f),
-                    )
+                    TitleCloud {
+                        BouncyTitle(fontSize = 26)
+                        Text(
+                            text = stringResource(R.string.subtitle),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Palette.InkSoft,
+                        )
+                    }
                     Spacer(Modifier.height(14.dp))
                     ModeGrid(prefs, tones, haptics, onStart)
                 }
@@ -283,6 +287,22 @@ fun HomeScreen(
             accepted = true
         }
     }
+}
+
+/**
+ * A soft white cloud behind the title. The sky changes colour constantly, so
+ * the words need their own quiet backdrop to stay readable on every scene.
+ */
+@Composable
+private fun TitleCloud(content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        Modifier
+            .background(Color.White.copy(alpha = 0.82f), RoundedCornerShape(28.dp))
+            .border(2.dp, Color.White.copy(alpha = 0.9f), RoundedCornerShape(28.dp))
+            .padding(horizontal = 20.dp, vertical = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        content = content,
+    )
 }
 
 /**
@@ -579,10 +599,13 @@ private fun ModeBalloon(
                 }
             }
         }
+        // The name sits on a white pill ringed in the balloon's own colour, so
+        // each game reads as one object rather than a label under a picture.
         Box(
             Modifier
-                .background(Color.White.copy(alpha = 0.92f), RoundedCornerShape(50))
-                .padding(horizontal = 10.dp, vertical = 4.dp)
+                .background(Color.White.copy(alpha = 0.95f), RoundedCornerShape(50))
+                .border(2.5.dp, if (rainbow) Color(0xFFE84D8A) else color, RoundedCornerShape(50))
+                .padding(horizontal = 12.dp, vertical = 5.dp)
         ) {
             Text(label, fontSize = 13.sp, fontWeight = FontWeight.Black, color = Palette.Ink)
         }
