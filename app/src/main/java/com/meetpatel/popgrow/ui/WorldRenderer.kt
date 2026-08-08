@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
@@ -545,6 +546,15 @@ private fun DrawScope.drawBubble(bubble: Bubble, time: Float, dpUnit: Float, mea
     // what makes the motion read as real rather than as a drifting sprite.
     val tilt = sin(time * 0.85f + bubble.swayPhase) * 3.5f
 
+    // A shape balloon is moulded into the shape itself — a star balloon, a heart
+    // balloon — rather than a round one with a picture stuck on it.
+    if (bubble.label.isNotEmpty() && bubble.label in SHAPE_GLYPHS) {
+        rotate(tilt, c) {
+            drawShapeBalloon(c, r, bubble.color, dpUnit, bubble.label, time + bubble.swayPhase)
+        }
+        return
+    }
+
     // Learning bubbles that carry a number or letter: a real balloon with the
     // character printed on it, instead of a face.
     if (bubble.label.isNotEmpty() && measurer != null) {
@@ -591,6 +601,106 @@ private fun DrawScope.drawBubble(bubble: Bubble, time: Float, dpUnit: Float, mea
 private fun blinkOf(time: Float, phase: Float): Float {
     val t = ((time * 0.34f + phase * 0.16f) % 1f + 1f) % 1f
     return if (t > 0.91f) 0.12f else 1f
+}
+
+/** The glyphs that get a moulded balloon of their own. */
+private val SHAPE_GLYPHS = setOf("●", "■", "▲", "★", "♥")
+
+/**
+ * A balloon moulded into a shape — circle, square, triangle, star or heart —
+ * with the same knot, string and gloss as an ordinary balloon, so it still
+ * reads as something to pop rather than a flat sticker.
+ */
+private fun DrawScope.drawShapeBalloon(
+    c: Offset,
+    r: Float,
+    color: Color,
+    dpUnit: Float,
+    glyph: String,
+    wiggle: Float,
+) {
+    val knotY = c.y + r * 0.98f
+
+    // Wavy string, drawn first so the shape sits over its knot.
+    val sway = sin(wiggle * 0.9f) * r * 0.2f
+    val string = Path().apply {
+        moveTo(c.x, knotY + 2f * dpUnit)
+        cubicTo(
+            c.x + r * 0.30f, knotY + r * 0.42f,
+            c.x - r * 0.30f + sway, knotY + r * 0.80f,
+            c.x + sway, knotY + r * 1.18f,
+        )
+    }
+    drawPath(string, Color(0xFF8E99AB), style = Stroke(width = 2.2f * dpUnit, cap = StrokeCap.Round))
+
+    val body = shapePath(glyph, c, r)
+
+    // Soft shadow, then the body with light coming from the upper left.
+    translate(3f * dpUnit, 5f * dpUnit) {
+        drawPath(body, Color.Black.copy(alpha = 0.10f))
+    }
+    drawPath(
+        body,
+        Brush.radialGradient(
+            colors = listOf(lerp(color, Color.White, 0.5f), color, lerp(color, Color.Black, 0.16f)),
+            center = Offset(c.x - r * 0.34f, c.y - r * 0.38f),
+            radius = r * 1.6f,
+        ),
+    )
+    drawPath(body, Color.White.copy(alpha = 0.55f), style = Stroke(width = 3f * dpUnit))
+
+    // The knot at the bottom.
+    drawPath(
+        Path().apply {
+            moveTo(c.x, knotY - 2f * dpUnit)
+            lineTo(c.x - r * 0.14f, knotY + r * 0.12f)
+            lineTo(c.x + r * 0.14f, knotY + r * 0.12f)
+            close()
+        },
+        lerp(color, Color.Black, 0.2f),
+    )
+
+    // Gloss, clipped so it hugs the shape rather than floating over it.
+    clipPath(body) {
+        drawOval(
+            Color.White.copy(alpha = 0.5f),
+            topLeft = Offset(c.x - r * 0.72f, c.y - r * 0.8f),
+            size = Size(r * 0.52f, r * 0.34f),
+        )
+    }
+}
+
+/** The outline of one shape, sized to fit a balloon of radius [r]. */
+private fun shapePath(glyph: String, c: Offset, r: Float): Path = when (glyph) {
+    "■" -> Path().apply {
+        val s = r * 0.86f
+        addRoundRect(
+            androidx.compose.ui.geometry.RoundRect(
+                c.x - s, c.y - s, c.x + s, c.y + s,
+                androidx.compose.ui.geometry.CornerRadius(r * 0.22f, r * 0.22f),
+            )
+        )
+    }
+    "▲" -> Path().apply {
+        // A triangle with softly rounded corners, so it still looks inflated.
+        val h = r * 1.02f
+        val w = r * 1.05f
+        val k = r * 0.22f
+        moveTo(c.x, c.y - h + k * 0.3f)
+        quadraticTo(c.x + k * 0.5f, c.y - h, c.x + k * 0.9f, c.y - h + k * 0.7f)
+        lineTo(c.x + w - k * 0.5f, c.y + h - k)
+        quadraticTo(c.x + w, c.y + h, c.x + w - k * 1.4f, c.y + h)
+        lineTo(c.x - w + k * 1.4f, c.y + h)
+        quadraticTo(c.x - w, c.y + h, c.x - w + k * 0.5f, c.y + h - k)
+        lineTo(c.x - k * 0.9f, c.y - h + k * 0.7f)
+        quadraticTo(c.x - k * 0.5f, c.y - h, c.x, c.y - h + k * 0.3f)
+        close()
+    }
+    "★" -> starPath(c.x, c.y, r * 1.08f, r * 0.5f, 5, 0f)
+    "♥" -> heartPath(c.x, c.y, r * 0.86f)
+    else -> Path().apply {
+        addOval(androidx.compose.ui.geometry.Rect(c.x - r, c.y - r, c.x + r, c.y + r))
+    }
 }
 
 private fun DrawScope.drawBubbleLabel(text: String, c: Offset, baseRadius: Float, dpUnit: Float, measurer: TextMeasurer) {

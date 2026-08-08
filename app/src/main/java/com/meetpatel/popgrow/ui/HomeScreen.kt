@@ -105,6 +105,8 @@ fun HomeScreen(
     var haptic by remember { mutableStateOf(prefs.hapticsEnabled) }
     // The maths parental gate; non-null while the question box is open.
     var gate by remember { mutableStateOf<GateQuestion?>(null) }
+    // Shown once, on the very first launch, before anything can be played.
+    var accepted by remember { mutableStateOf(prefs.termsAccepted) }
 
     LaunchedEffect(Unit) {
         var last = 0L
@@ -271,6 +273,15 @@ fun HomeScreen(
 
     if (showSettings) {
         SettingsPanel(prefs) { showSettings = false }
+    }
+
+    // First launch only: this notice sits over everything, so no mode can be
+    // tapped until a grown-up has read it and pressed OK. Never shown again.
+    if (!accepted) {
+        FirstRunNotice {
+            prefs.termsAccepted = true
+            accepted = true
+        }
     }
 }
 
@@ -896,6 +907,109 @@ private fun RowScope.StatCell(text: String) {
         textAlign = TextAlign.Center,
         modifier = Modifier.weight(1f),
     )
+}
+
+/**
+ * The one-time welcome notice. It shows the privacy policy and the terms
+ * together on the very first launch and blocks everything behind it — the
+ * modes cannot be tapped until a grown-up presses OK. It never appears again.
+ */
+@Composable
+private fun FirstRunNotice(onAccept: () -> Unit) {
+    Dialog(
+        onDismissRequest = { },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+        ),
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth(0.94f)
+                .fillMaxHeight(0.9f)
+                .background(Color(0xFF5BC0F0), RoundedCornerShape(26.dp))
+                .border(3.dp, Color.White, RoundedCornerShape(26.dp))
+                .padding(horizontal = 20.dp, vertical = 18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text("🎈", fontSize = 34.sp)
+            Text(
+                text = stringResource(R.string.welcome_title),
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Black,
+                color = Color.White,
+                style = TextStyle(shadow = Shadow(Palette.Ink.copy(alpha = 0.45f), Offset(0f, 3f), 6f)),
+            )
+            Text(
+                text = stringResource(R.string.welcome_intro),
+                fontSize = 12.sp,
+                color = Color.White.copy(alpha = 0.95f),
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(10.dp))
+            Column(
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .background(Color.White.copy(alpha = 0.94f), RoundedCornerShape(16.dp))
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.welcome_summary),
+                    fontSize = 13.5.sp,
+                    lineHeight = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Palette.Ink,
+                )
+                NoticeHeading(stringResource(R.string.privacy_title))
+                Text(
+                    text = stringResource(R.string.privacy_full),
+                    fontSize = 12.5.sp,
+                    lineHeight = 18.sp,
+                    color = Palette.Ink,
+                )
+                NoticeHeading(stringResource(R.string.terms_title))
+                Text(
+                    text = stringResource(R.string.terms_full),
+                    fontSize = 12.5.sp,
+                    lineHeight = 18.sp,
+                    color = Palette.Ink,
+                )
+            }
+            Spacer(Modifier.height(14.dp))
+            Box(
+                Modifier
+                    .fillMaxWidth(0.55f)
+                    .background(Color(0xFF35C978), RoundedCornerShape(50))
+                    .border(2.dp, Color.White, RoundedCornerShape(50))
+                    .clickable(onClick = onAccept)
+                    .padding(vertical = 14.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = stringResource(R.string.ok),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White,
+                    style = TextStyle(shadow = Shadow(Palette.Ink.copy(alpha = 0.35f), Offset(0f, 3f), 5f)),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun NoticeHeading(text: String) {
+    Spacer(Modifier.height(14.dp))
+    Text(
+        text = text,
+        fontSize = 15.sp,
+        fontWeight = FontWeight.Black,
+        color = Color(0xFF17557F),
+    )
+    Spacer(Modifier.height(4.dp))
 }
 
 /**

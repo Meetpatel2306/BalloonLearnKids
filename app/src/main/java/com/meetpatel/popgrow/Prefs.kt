@@ -25,6 +25,14 @@ class Prefs(context: Context) {
         get() = sp.getBoolean(KEY_MUSIC, true)
         set(value) = sp.edit { putBoolean(KEY_MUSIC, value) }
 
+    /**
+     * Whether the grown-up has seen the welcome notice with the privacy policy
+     * and terms. It appears once, on the very first launch, and never again.
+     */
+    var termsAccepted: Boolean
+        get() = sp.getBoolean(KEY_TERMS, false)
+        set(value) = sp.edit { putBoolean(KEY_TERMS, value) }
+
     /** Bolder outlines and a calmer background — helps children with low vision
      * (and anyone playing in bright sunlight) pick the balloons out. */
     var highContrast: Boolean
@@ -105,6 +113,7 @@ class Prefs(context: Context) {
         private const val KEY_CONTRAST = "contrast"
         private const val KEY_SPEED = "speed"
         private const val KEY_SIZE = "size"
+        private const val KEY_TERMS = "terms_accepted"
         private const val KEY_TUTORIAL = "tutorial_"
         private const val KEY_SCORES = "scores_"
         private const val MAX_SESSIONS = 50
