@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Balloon Learn Kids – Pop and Learn ABC, 123, Colors, Shapes &amp; Animals</title>
-    <meta name="description" content="Balloon Learn Kids is a gentle, offline learning game for ages 2-5. Pop balloons to learn letters, numbers, colors, shapes and animals. No ads, no purchases, no data collected.">
+    <meta name="description" content="Balloon Learn Kids is a gentle, offline learning game for ages 2-5. Pop balloons to learn letters, numbers, colours, shapes and animals. No ads, no purchases, no data collected.">
+    <meta name="theme-color" content="#A573F5">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+
+    <div id="scroll-progress"></div>
 
     <!-- Header -->
     <nav class="navbar navbar-expand-lg sticky-top">
@@ -32,46 +35,84 @@
         </div>
     </nav>
 
-    <!-- Floating Balloons -->
-    <div class="balloons-container" aria-hidden="true">
-        <div class="balloon balloon-1"></div>
-        <div class="balloon balloon-2"></div>
-        <div class="balloon balloon-3"></div>
-        <div class="balloon balloon-4"></div>
-        <div class="balloon balloon-5"></div>
-    </div>
-
-    <!-- Hero -->
+    <!-- Hero with the playable balloon field -->
     <section class="hero-section">
         <div class="hero-shape-1"></div>
         <div class="hero-shape-2"></div>
-        <div class="container text-center">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <h1 class="display-4 fw-bold mb-4">Pop a balloon. Learn something.</h1>
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-9">
+                    <h1 class="hero-title fw-bold mb-3">
+                        Pop a
+                        <span class="rainbow"><span>b</span><span>a</span><span>l</span><span>l</span><span>o</span><span>o</span><span>n</span></span>.
+                        Learn something.
+                    </h1>
                     <p class="lead text-muted mb-4">
-                        Balloon Learn Kids is a calm, colourful first learning game for children
-                        aged about two to five. Every balloon your child pops teaches a letter,
-                        a number, a colour, a shape or an animal &mdash; spoken out loud, at a
-                        toddler's pace.
+                        A calm, colourful first learning game for children aged about two to five.
+                        Every balloon teaches a letter, a number, a colour, a shape or an animal
+                        &mdash; spoken out loud, at a toddler&rsquo;s pace.
                     </p>
-                    <div class="pill-row mb-5">
+                    <div class="pill-row mb-4">
                         <div class="pill"><span>&#128246;</span>Works fully offline</div>
                         <div class="pill"><span>&#128683;</span>No advertising</div>
                         <div class="pill"><span>&#128274;</span>No data collected</div>
                         <div class="pill"><span>&#128176;</span>Free, no purchases</div>
                     </div>
-                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
-                        <a href="#modes" class="btn btn-primary-custom btn-lg">See what it teaches</a>
-                        <a href="privacy.html" class="btn btn-secondary-custom btn-lg">Read the Privacy Policy</a>
-                    </div>
                 </div>
+            </div>
+
+            <!-- The interactive playground -->
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="playground" id="playground" role="application" aria-label="Interactive balloon demo. Tap the balloons to pop them.">
+                        <div class="sun" aria-hidden="true"></div>
+                        <div class="cloud cloud-a" aria-hidden="true"></div>
+                        <div class="cloud cloud-b" aria-hidden="true"></div>
+                        <div class="hill hill-1" aria-hidden="true"></div>
+                        <div class="hill hill-2" aria-hidden="true"></div>
+
+                        <div class="pg-toolbar">
+                            <button class="mode-chip active" data-mode="letters">A &ndash; Z</button>
+                            <button class="mode-chip" data-mode="numbers">1 &ndash; 20</button>
+                            <button class="mode-chip" data-mode="colours">Colours</button>
+                            <button class="mode-chip" data-mode="shapes">Shapes</button>
+                            <button class="mode-chip" data-mode="animals">Animals</button>
+                            <span class="pg-counter" id="pg-count">0 pops</span>
+                            <button class="pg-sound" id="pg-sound" aria-label="Mute pop sounds">&#128266;</button>
+                        </div>
+
+                        <div class="pg-hint" id="pg-hint">Tap the balloons &mdash; try the modes above</div>
+                    </div>
+                    <p class="text-center text-muted small mt-3 mb-0">
+                        This is a small taste of the game. The real app speaks every letter,
+                        number and colour out loud.
+                    </p>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
+                <a href="#modes" class="btn btn-primary-custom btn-lg">See what it teaches</a>
+                <a href="privacy.html" class="btn btn-secondary-custom btn-lg">Read the Privacy Policy</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Numbers -->
+    <section class="py-4 bg-white reveal">
+        <div class="container">
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-2">
+                <div class="col"><div class="stat-tile"><div class="stat-num" data-count="5">0</div><div class="stat-label">learning modes</div></div></div>
+                <div class="col"><div class="stat-tile"><div class="stat-num" data-count="26">0</div><div class="stat-label">letters</div></div></div>
+                <div class="col"><div class="stat-tile"><div class="stat-num" data-count="20">0</div><div class="stat-label">numbers</div></div></div>
+                <div class="col"><div class="stat-tile"><div class="stat-num" data-count="14">0</div><div class="stat-label">animal sounds</div></div></div>
+                <div class="col"><div class="stat-tile"><div class="stat-num" data-count="0">0</div><div class="stat-label">ads</div></div></div>
+                <div class="col"><div class="stat-tile"><div class="stat-num" data-count="0">0</div><div class="stat-label">data collected</div></div></div>
             </div>
         </div>
     </section>
 
     <!-- Learning modes -->
-    <section id="modes" class="py-5 bg-white">
+    <section id="modes" class="py-5 reveal">
         <div class="container text-center">
             <h5 class="text-uppercase fw-bold text-muted mb-2" style="letter-spacing: 2px;">Five ways to play</h5>
             <h2 class="mb-5">Each mode is one gentle lesson</h2>
@@ -121,8 +162,38 @@
         </div>
     </section>
 
+    <!-- How a round works -->
+    <section class="py-5 bg-white reveal">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-5 text-center">
+                    <div class="phone">
+                        <div class="phone-screen">
+                            <div class="phone-target">Find&nbsp; C</div>
+                            <div class="mini-balloon">A</div>
+                            <div class="mini-balloon">C</div>
+                            <div class="mini-balloon">B</div>
+                            <div class="mini-balloon">D</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <h5 class="text-uppercase fw-bold text-muted mb-2" style="letter-spacing: 2px;">How a round works</h5>
+                    <h2 class="mb-4">Simple enough for a two&#8209;year&#8209;old</h2>
+                    <ol class="ps-3">
+                        <li class="mb-3"><strong>The app asks for one thing.</strong> &ldquo;Find C&rdquo; is shown on a card and said out loud.</li>
+                        <li class="mb-3"><strong>The right balloon glows.</strong> If your child waits a moment, a gentle hint appears &mdash; never a scolding.</li>
+                        <li class="mb-3"><strong>They tap it and it pops.</strong> The letter is spoken again, then a word: &ldquo;C for Cat&rdquo;.</li>
+                        <li class="mb-3"><strong>The next target arrives.</strong> Letters run A to Z in order, so there is a real beginning and end.</li>
+                        <li class="mb-0"><strong>Finishing is a party.</strong> Confetti, sounds and stars &mdash; then straight back to the menu.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Designed for kids -->
-    <section class="py-5">
+    <section class="py-5 reveal">
         <div class="container text-center">
             <h5 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 2px;">Designed for Kids &amp; Families</h5>
             <div class="row g-4 mt-2">
@@ -133,7 +204,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
                         </div>
                         <h3 class="h5">Nothing to get wrong</h3>
-                        <p class="text-muted mb-0">There is no timer, no losing and no game over. A tap on empty sky makes a friendly sparkle, never a buzzer.</p>
+                        <p class="text-muted mb-0">No timer, no losing, no game over. A tap on empty sky makes a friendly sparkle, never a buzzer.</p>
                     </div>
                 </div>
 
@@ -150,7 +221,7 @@
                 <div class="col-md-4">
                     <div class="card-custom text-center">
                         <div class="icon-wrapper icon-purple mx-auto">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                         </div>
                         <h3 class="h5">Settings kept for grown-ups</h3>
                         <p class="text-muted mb-0">A small sum has to be answered before Settings will open, so little fingers cannot change things by mistake.</p>
@@ -179,11 +250,11 @@
 
                 <div class="col-md-4">
                     <div class="card-custom text-center">
-                        <div class="icon-wrapper icon-blue mx-auto">
+                        <div class="icon-wrapper icon-red mx-auto">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
                         </div>
                         <h3 class="h5">Adjustable pace</h3>
-                        <p class="text-muted mb-0">Balloon speed, balloon size, sound, background sound, vibration and high contrast can all be tuned by a grown-up.</p>
+                        <p class="text-muted mb-0">Balloon speed, size, sound, background sound, vibration and high contrast can all be tuned by a grown-up.</p>
                     </div>
                 </div>
 
@@ -191,8 +262,8 @@
         </div>
     </section>
 
-    <!-- For parents -->
-    <section class="py-5 bg-white">
+    <!-- Parents -->
+    <section class="py-5 bg-white reveal">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-9">
@@ -217,8 +288,57 @@
         </div>
     </section>
 
+    <!-- FAQ -->
+    <section class="py-5 reveal">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <h2 class="text-center mb-5">Questions parents ask</h2>
+                    <div class="accordion" id="faq">
+
+                        <div class="accordion-item">
+                            <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q1">Does it need the internet?</button></h3>
+                            <div id="q1" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body">No. The app does not even request the Android internet permission, so it works on a plane, in a car, or on a tablet with no SIM. Nothing is ever downloaded after you install it.</div></div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">Are there any ads?</button></h3>
+                            <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body">None at all. There is no advertising network in the app, no banners, no pop-ups and no videos. If that ever changed, it would be stated on the store listing before release.</div></div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q3">What information does it collect?</button></h3>
+                            <div id="q3" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body">Nothing. No name, no email, no age, no location, no advertising identifier. The only things stored are your own settings and recent scores, kept privately on the device and deleted when the app is uninstalled.</div></div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q4">What age is it for?</button></h3>
+                            <div id="q4" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body">About two to five. Younger children enjoy popping and hearing the sounds; older ones start recognising the letters and numbers. It is meant to be used with a grown-up nearby.</div></div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q5">Can my child break something by tapping?</button></h3>
+                            <div id="q5" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body">No. Settings are behind a simple sum that a small child cannot answer, and there is nothing to buy, no links out of the app and no way to reach a browser.</div></div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q6">Which devices does it run on?</button></h3>
+                            <div id="q6" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body">Phones and tablets running Android 7.0 or newer. The download is small, and the game is designed for landscape so a tablet propped on a table works nicely.</div></div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q7">Is it really free?</button></h3>
+                            <div id="q7" class="accordion-collapse collapse" data-bs-parent="#faq"><div class="accordion-body">Yes. Free to download, with no in-app purchases and no subscriptions. Every mode is unlocked from the first launch.</div></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Download -->
-    <section id="download" class="py-5">
+    <section id="download" class="py-5 bg-white reveal">
         <div class="container text-center">
             <h2 class="mb-3">Coming soon to Google Play</h2>
             <p class="text-muted mb-4">
@@ -247,7 +367,10 @@
         </div>
     </footer>
 
+    <button id="to-top" aria-label="Back to top">&uarr;</button>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>
+    <script src="assets/js/balloons.js"></script>
 </body>
 </html>
