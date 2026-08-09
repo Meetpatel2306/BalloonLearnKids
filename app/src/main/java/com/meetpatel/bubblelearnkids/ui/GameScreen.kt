@@ -1,4 +1,4 @@
-package com.meetpatel.popgrow.ui
+package com.meetpatel.bubblelearnkids.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
@@ -65,17 +65,17 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.meetpatel.popgrow.Haptics
-import com.meetpatel.popgrow.Prefs
-import com.meetpatel.popgrow.audio.Ambience
-import com.meetpatel.popgrow.audio.AnimalVoices
-import com.meetpatel.popgrow.audio.Speaker
-import com.meetpatel.popgrow.audio.ToneEngine
-import com.meetpatel.popgrow.game.BubbleKind
-import com.meetpatel.popgrow.game.GameMode
-import com.meetpatel.popgrow.game.GameSound
-import com.meetpatel.popgrow.game.GameWorld
-import com.meetpatel.popgrow.game.LearningContent
+import com.meetpatel.bubblelearnkids.Haptics
+import com.meetpatel.bubblelearnkids.Prefs
+import com.meetpatel.bubblelearnkids.audio.Ambience
+import com.meetpatel.bubblelearnkids.audio.AnimalVoices
+import com.meetpatel.bubblelearnkids.audio.Speaker
+import com.meetpatel.bubblelearnkids.audio.ToneEngine
+import com.meetpatel.bubblelearnkids.game.BubbleKind
+import com.meetpatel.bubblelearnkids.game.GameMode
+import com.meetpatel.bubblelearnkids.game.GameSound
+import com.meetpatel.bubblelearnkids.game.GameWorld
+import com.meetpatel.bubblelearnkids.game.LearningContent
 import kotlin.math.cos
 import kotlin.math.sin
 

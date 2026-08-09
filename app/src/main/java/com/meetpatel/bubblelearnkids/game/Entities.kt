@@ -1,4 +1,4 @@
-package com.meetpatel.popgrow.game
+package com.meetpatel.bubblelearnkids.game
 
 import androidx.compose.ui.graphics.Color
 

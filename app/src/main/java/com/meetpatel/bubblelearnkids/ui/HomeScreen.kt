@@ -1,4 +1,4 @@
-package com.meetpatel.popgrow.ui
+package com.meetpatel.bubblelearnkids.ui
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -79,12 +79,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.meetpatel.popgrow.Haptics
-import com.meetpatel.popgrow.Prefs
-import com.meetpatel.popgrow.R
-import com.meetpatel.popgrow.audio.ToneEngine
-import com.meetpatel.popgrow.game.GameMode
-import com.meetpatel.popgrow.game.GameWorld
+import com.meetpatel.bubblelearnkids.Haptics
+import com.meetpatel.bubblelearnkids.Prefs
+import com.meetpatel.bubblelearnkids.R
+import com.meetpatel.bubblelearnkids.audio.ToneEngine
+import com.meetpatel.bubblelearnkids.game.GameMode
+import com.meetpatel.bubblelearnkids.game.GameWorld
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.cos

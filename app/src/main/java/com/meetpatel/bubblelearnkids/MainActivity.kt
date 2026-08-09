@@ -1,4 +1,4 @@
-package com.meetpatel.popgrow
+package com.meetpatel.bubblelearnkids
 
 import android.os.Bundle
 import android.view.WindowManager
@@ -16,14 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.meetpatel.popgrow.audio.Ambience
-import com.meetpatel.popgrow.audio.AnimalVoices
-import com.meetpatel.popgrow.audio.Speaker
-import com.meetpatel.popgrow.audio.ToneEngine
-import com.meetpatel.popgrow.game.GameMode
-import com.meetpatel.popgrow.ui.GameScreen
-import com.meetpatel.popgrow.ui.HomeScreen
-import com.meetpatel.popgrow.ui.SplashScreen
+import com.meetpatel.bubblelearnkids.audio.Ambience
+import com.meetpatel.bubblelearnkids.audio.AnimalVoices
+import com.meetpatel.bubblelearnkids.audio.Speaker
+import com.meetpatel.bubblelearnkids.audio.ToneEngine
+import com.meetpatel.bubblelearnkids.game.GameMode
+import com.meetpatel.bubblelearnkids.ui.GameScreen
+import com.meetpatel.bubblelearnkids.ui.HomeScreen
+import com.meetpatel.bubblelearnkids.ui.SplashScreen
 
 private sealed interface Screen {
     data object Splash : Screen

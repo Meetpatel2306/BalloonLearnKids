@@ -1,7 +1,7 @@
-package com.meetpatel.popgrow.game
+package com.meetpatel.bubblelearnkids.game
 
 import androidx.compose.ui.graphics.Color
-import com.meetpatel.popgrow.ui.Palette
+import com.meetpatel.bubblelearnkids.ui.Palette
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.hypot

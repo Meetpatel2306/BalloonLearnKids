@@ -1,4 +1,4 @@
-package com.meetpatel.popgrow.ui
+package com.meetpatel.bubblelearnkids.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp

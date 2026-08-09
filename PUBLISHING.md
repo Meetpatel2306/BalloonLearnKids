@@ -30,7 +30,7 @@ Play releases must be signed. The key is created once and reused forever —
 Open **Command Prompt** in this project folder and run:
 
 ```bat
-"%ProgramFiles%\Eclipse Adoptium\jdk-17.0.20.8-hotspot\bin\keytool" -genkeypair -v -keystore popgrow-release.jks -alias popgrow -keyalg RSA -keysize 2048 -validity 10000
+"%ProgramFiles%\Eclipse Adoptium\jdk-17.0.20.8-hotspot\bin\keytool" -genkeypair -v -keystore bubblelearn-release.jks -alias bubblelearn -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 It asks for:
@@ -38,15 +38,15 @@ It asks for:
 - Your name/organisation/city — fill what you like (shown to nobody)
 - A **key password** — press Enter to reuse the keystore password
 
-This creates `popgrow-release.jks` in the project folder.
+This creates `bubblelearn-release.jks` in the project folder.
 
 Now create a file named **`keystore.properties`** in the project folder
 (next to `build.gradle.kts`) with exactly these four lines:
 
 ```properties
-storeFile=popgrow-release.jks
+storeFile=bubblelearn-release.jks
 storePassword=YOUR_PASSWORD_HERE
-keyAlias=popgrow
+keyAlias=bubblelearn
 keyPassword=YOUR_PASSWORD_HERE
 ```
 
@@ -54,7 +54,7 @@ The build is already wired to pick this up automatically (see
 `app/build.gradle.kts`) — with the file present, release builds sign
 themselves; without it they build unsigned.
 
-> 🔒 Both `popgrow-release.jks` and `keystore.properties` are already in
+> 🔒 Both `bubblelearn-release.jks` and `keystore.properties` are already in
 > `.gitignore` — they will never be committed. **Copy both to a safe place**
 > (USB stick, password manager) right now.
 
@@ -101,7 +101,7 @@ no internet permission). It just needs to be reachable on the web.
 1. Push this project to a public GitHub repository (or a private repo with just
    the PRIVACY.md in a public one).
 2. Open PRIVACY.md on github.com and copy the URL, e.g.
-   `https://github.com/YOURNAME/PopAndGrow/blob/main/PRIVACY.md`
+   `https://github.com/Meetpatel2306/BubbleLearnKids/blob/main/PRIVACY.md`
 3. That URL goes into the Play Console form later.
 
 Any other public URL (Google Sites, your own site) works equally well.
@@ -253,7 +253,7 @@ Users get the update automatically within a day or so.
 ## Quick checklist
 
 - [ ] Play Console account created & verified ($25)
-- [ ] `popgrow-release.jks` created and **backed up**
+- [ ] `bubblelearn-release.jks` created and **backed up**
 - [ ] `keystore.properties` created (never committed)
 - [ ] `versionCode` correct
 - [ ] `gradlew.bat bundleRelease` → `.aab` built

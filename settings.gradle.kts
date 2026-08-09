@@ -20,5 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PopAndGrow"
+rootProject.name = "BubbleLearnKids"
 include(":app")

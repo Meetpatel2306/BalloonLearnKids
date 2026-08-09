@@ -1,4 +1,4 @@
-package com.meetpatel.popgrow.ui
+package com.meetpatel.bubblelearnkids.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitEachGesture

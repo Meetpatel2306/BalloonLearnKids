@@ -1,4 +1,4 @@
-package com.meetpatel.popgrow.ui
+package com.meetpatel.bubblelearnkids.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.meetpatel.popgrow.audio.ToneEngine
+import com.meetpatel.bubblelearnkids.audio.ToneEngine
 import kotlinx.coroutines.delay
 import kotlin.math.PI
 import kotlin.math.cos

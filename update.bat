@@ -1,5 +1,5 @@
 @echo off
-REM One-tap updater for Pop & Grow.
+REM One-tap updater for Bubble Learn Kids.
 REM Builds the app and installs it on the connected phone, then relaunches it.
 REM
 REM How to use: plug the phone in (USB debugging on), then either
@@ -52,8 +52,8 @@ if errorlevel 1 (
 )
 
 REM --- Restart the app fresh on the phone -----------------------------------
-adb shell am force-stop com.meetpatel.popgrow.debug
-adb shell am start -n com.meetpatel.popgrow.debug/com.meetpatel.popgrow.MainActivity >nul
+adb shell am force-stop com.meetpatel.bubblelearnkids.debug
+adb shell am start -n com.meetpatel.bubblelearnkids.debug/com.meetpatel.bubblelearnkids.MainActivity >nul
 
 echo.
 echo [OK] Updated and launched on the phone. Have fun!
