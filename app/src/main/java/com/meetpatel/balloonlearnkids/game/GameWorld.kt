@@ -1,7 +1,7 @@
-package com.meetpatel.bubblelearnkids.game
+package com.meetpatel.balloonlearnkids.game
 
 import androidx.compose.ui.graphics.Color
-import com.meetpatel.bubblelearnkids.ui.Palette
+import com.meetpatel.balloonlearnkids.ui.Palette
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.hypot

@@ -1,4 +1,4 @@
-package com.meetpatel.bubblelearnkids
+package com.meetpatel.balloonlearnkids
 
 import android.os.Bundle
 import android.view.WindowManager
@@ -16,14 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.meetpatel.bubblelearnkids.audio.Ambience
-import com.meetpatel.bubblelearnkids.audio.AnimalVoices
-import com.meetpatel.bubblelearnkids.audio.Speaker
-import com.meetpatel.bubblelearnkids.audio.ToneEngine
-import com.meetpatel.bubblelearnkids.game.GameMode
-import com.meetpatel.bubblelearnkids.ui.GameScreen
-import com.meetpatel.bubblelearnkids.ui.HomeScreen
-import com.meetpatel.bubblelearnkids.ui.SplashScreen
+import com.meetpatel.balloonlearnkids.audio.Ambience
+import com.meetpatel.balloonlearnkids.audio.AnimalVoices
+import com.meetpatel.balloonlearnkids.audio.Speaker
+import com.meetpatel.balloonlearnkids.audio.ToneEngine
+import com.meetpatel.balloonlearnkids.game.GameMode
+import com.meetpatel.balloonlearnkids.ui.GameScreen
+import com.meetpatel.balloonlearnkids.ui.HomeScreen
+import com.meetpatel.balloonlearnkids.ui.SplashScreen
 
 private sealed interface Screen {
     data object Splash : Screen

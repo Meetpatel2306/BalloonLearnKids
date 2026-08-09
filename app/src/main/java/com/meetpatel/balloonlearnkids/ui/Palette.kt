@@ -1,4 +1,4 @@
-package com.meetpatel.bubblelearnkids.ui
+package com.meetpatel.balloonlearnkids.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp

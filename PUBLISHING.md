@@ -1,4 +1,4 @@
-﻿# Publishing Bubble Learn Kids on the Google Play Store
+﻿# Publishing Balloon Learn Kids on the Google Play Store
 
 A complete, beginner-friendly walkthrough — from a signing key to a live store
 listing. Follow the phases in order. Steps you do once ever are marked
@@ -30,7 +30,7 @@ Play releases must be signed. The key is created once and reused forever —
 Open **Command Prompt** in this project folder and run:
 
 ```bat
-"%ProgramFiles%\Eclipse Adoptium\jdk-17.0.20.8-hotspot\bin\keytool" -genkeypair -v -keystore bubblelearn-release.jks -alias bubblelearn -keyalg RSA -keysize 2048 -validity 10000
+"%ProgramFiles%\Eclipse Adoptium\jdk-17.0.20.8-hotspot\bin\keytool" -genkeypair -v -keystore balloonlearn-release.jks -alias balloonlearn -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 It asks for:
@@ -38,15 +38,15 @@ It asks for:
 - Your name/organisation/city — fill what you like (shown to nobody)
 - A **key password** — press Enter to reuse the keystore password
 
-This creates `bubblelearn-release.jks` in the project folder.
+This creates `balloonlearn-release.jks` in the project folder.
 
 Now create a file named **`keystore.properties`** in the project folder
 (next to `build.gradle.kts`) with exactly these four lines:
 
 ```properties
-storeFile=bubblelearn-release.jks
+storeFile=balloonlearn-release.jks
 storePassword=YOUR_PASSWORD_HERE
-keyAlias=bubblelearn
+keyAlias=balloonlearn
 keyPassword=YOUR_PASSWORD_HERE
 ```
 
@@ -54,9 +54,16 @@ The build is already wired to pick this up automatically (see
 `app/build.gradle.kts`) — with the file present, release builds sign
 themselves; without it they build unsigned.
 
-> 🔒 Both `bubblelearn-release.jks` and `keystore.properties` are already in
+> 🔒 Both `balloonlearn-release.jks` and `keystore.properties` are already in
 > `.gitignore` — they will never be committed. **Copy both to a safe place**
 > (USB stick, password manager) right now.
+
+> ⚠️ **The key already in this project** was generated before the app was
+> renamed, so the alias stored *inside* `balloonlearn-release.jks` is
+> **`bubblelearn`**, not `balloonlearn`. An alias cannot be renamed after the
+> key is created, and it is never shown to users — so the working
+> `keystore.properties` correctly reads `keyAlias=bubblelearn`. Use that same
+> value for the `KEY_ALIAS` CI secret.
 
 ---
 
@@ -101,7 +108,7 @@ no internet permission). It just needs to be reachable on the web.
 1. Push this project to a public GitHub repository (or a private repo with just
    the PRIVACY.md in a public one).
 2. Open PRIVACY.md on github.com and copy the URL, e.g.
-   `https://github.com/Meetpatel2306/BubbleLearnKids/blob/main/PRIVACY.md`
+   `https://github.com/Meetpatel2306/BalloonLearnKids/blob/main/PRIVACY.md`
 3. That URL goes into the Play Console form later.
 
 Any other public URL (Google Sites, your own site) works equally well.
@@ -113,7 +120,7 @@ Any other public URL (Google Sites, your own site) works equally well.
 1. Go to <https://play.google.com/console> → pay the $25 → complete identity
    verification.
 2. **Create app**:
-   - App name: **Bubble Learn Kids**
+   - App name: **Balloon Learn Kids**
    - Default language: English (United States)
    - App or game: **Game**
    - Free or paid: **Free** (a free app can never be made paid later — fine here)
@@ -147,8 +154,8 @@ Any other public URL (Google Sites, your own site) works equally well.
 ### Text (copy-paste, edit as you like)
 
 - **App name** (max 30 chars):
-  `Bubble Learn Kids: ABC 123` (26 chars — the extra words are search terms;
-  plain `Bubble Learn Kids` is 17 chars if you prefer it clean)
+  `Balloon Learn Kids: ABC 123` (26 chars — the extra words are search terms;
+  plain `Balloon Learn Kids` is 17 chars if you prefer it clean)
 
 - **Short description** (max 80 chars):
   `Pop and learn ABC, 123, colors, shapes, animals. Offline, ad-free. Ages 2-5.`
@@ -156,7 +163,7 @@ Any other public URL (Google Sites, your own site) works equally well.
 - **Full description** (max 4000 chars):
 
   ```
-  Bubble Learn Kids is a calm, cheerful balloon-popping playground for toddlers and
+  Balloon Learn Kids is a calm, cheerful balloon-popping playground for toddlers and
   preschoolers (ages 2–5). Tap friendly balloons with smiling faces to pop
   them into confetti, grow a flower garden, meet butterflies, bees, puppies
   and bunnies — and gently learn along the way.
@@ -253,7 +260,7 @@ Users get the update automatically within a day or so.
 ## Quick checklist
 
 - [ ] Play Console account created & verified ($25)
-- [ ] `bubblelearn-release.jks` created and **backed up**
+- [ ] `balloonlearn-release.jks` created and **backed up**
 - [ ] `keystore.properties` created (never committed)
 - [ ] `versionCode` correct
 - [ ] `gradlew.bat bundleRelease` → `.aab` built

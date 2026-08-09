@@ -1,5 +1,5 @@
 @echo off
-REM One-tap updater for Bubble Learn Kids.
+REM One-tap updater for Balloon Learn Kids.
 REM Builds the app and installs it on the connected phone, then relaunches it.
 REM
 REM How to use: plug the phone in (USB debugging on), then either
@@ -23,7 +23,7 @@ if "%ANDROID_HOME%"=="" set "ANDROID_HOME=%LOCALAPPDATA%\Android\Sdk"
 set "PATH=%JAVA_HOME%\bin;%ANDROID_HOME%\platform-tools;%PATH%"
 
 echo.
-echo === Bubble Learn Kids updater ===
+echo === Balloon Learn Kids updater ===
 echo JDK: %JAVA_HOME%
 echo SDK: %ANDROID_HOME%
 echo.
@@ -52,8 +52,8 @@ if errorlevel 1 (
 )
 
 REM --- Restart the app fresh on the phone -----------------------------------
-adb shell am force-stop com.meetpatel.bubblelearnkids.debug
-adb shell am start -n com.meetpatel.bubblelearnkids.debug/com.meetpatel.bubblelearnkids.MainActivity >nul
+adb shell am force-stop com.meetpatel.balloonlearnkids.debug
+adb shell am start -n com.meetpatel.balloonlearnkids.debug/com.meetpatel.balloonlearnkids.MainActivity >nul
 
 echo.
 echo [OK] Updated and launched on the phone. Have fun!

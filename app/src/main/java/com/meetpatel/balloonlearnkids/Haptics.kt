@@ -1,4 +1,4 @@
-package com.meetpatel.bubblelearnkids
+package com.meetpatel.balloonlearnkids
 
 import android.content.Context
 import android.os.Build

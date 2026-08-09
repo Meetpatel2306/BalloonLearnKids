@@ -1,10 +1,10 @@
-﻿# Privacy Policy — Bubble Learn Kids
+﻿# Privacy Policy — Balloon Learn Kids
 
 _Last updated: 5 August 2026_
 
 ## Short version
 
-Bubble Learn Kids collects nothing, sends nothing and stores nothing about you or your
+Balloon Learn Kids collects nothing, sends nothing and stores nothing about you or your
 child. It has no internet access.
 
 ## The long version

@@ -1,4 +1,4 @@
-﻿# Bubble Learn Kids 🫧🌼
+﻿# Balloon Learn Kids 🫧🌼
 
 A bubble-popping music toy for children aged roughly **2 to 5**. Pop a bubble,
 hear a note, grow a flower. That is the entire game.
@@ -198,11 +198,11 @@ seconds. When it prints `BUILD SUCCESSFUL`, the app is on your device.
 
 ### Step 5 — Play
 
-Find the **Bubble Learn Kids** icon in the phone's app drawer and tap it. Or launch it
+Find the **Balloon Learn Kids** icon in the phone's app drawer and tap it. Or launch it
 from the terminal:
 
 ```bash
-adb shell am start -n com.meetpatel.bubblelearnkids.debug/com.meetpatel.bubblelearnkids.MainActivity
+adb shell am start -n com.meetpatel.balloonlearnkids.debug/com.meetpatel.balloonlearnkids.MainActivity
 ```
 
 Tap **1 Player** or **2 Players** and start popping.
@@ -301,7 +301,7 @@ From inside the project directory, with a phone connected and USB debugging on:
 ```bash
 source env.sh                 # Windows: env.bat  — sets JAVA_HOME, ANDROID_HOME, PATH
 ./gradlew installDebug        # Windows: gradlew.bat installDebug
-adb shell am start -n com.meetpatel.bubblelearnkids.debug/com.meetpatel.bubblelearnkids.MainActivity
+adb shell am start -n com.meetpatel.balloonlearnkids.debug/com.meetpatel.balloonlearnkids.MainActivity
 ```
 
 That is it. The app is now running on your phone.
@@ -381,10 +381,10 @@ if they are not already in your environment.
 | `./gradlew uninstallDebug` | Remove it again |
 | `adb devices` | List connected devices (should show one, not `unauthorized`) |
 | `adb install -r app/build/outputs/apk/debug/app-debug.apk` | Install an APK by hand |
-| `adb shell am start -n com.meetpatel.bubblelearnkids.debug/com.meetpatel.bubblelearnkids.MainActivity` | Launch it |
-| `adb logcat -s BubbleLearnKids AndroidRuntime` | Watch for crashes |
+| `adb shell am start -n com.meetpatel.balloonlearnkids.debug/com.meetpatel.balloonlearnkids.MainActivity` | Launch it |
+| `adb logcat -s BalloonLearnKids AndroidRuntime` | Watch for crashes |
 
-> The debug build installs as `com.meetpatel.bubblelearnkids.debug` so it can sit
+> The debug build installs as `com.meetpatel.balloonlearnkids.debug` so it can sit
 > side-by-side with a release install. Drop the `.debug` suffix in the launch
 > command when running a release build.
 
@@ -421,7 +421,7 @@ if they are not already in your environment.
 5. Install and launch:
    ```bash
    ./gradlew installDebug
-   adb shell am start -n com.meetpatel.bubblelearnkids.debug/com.meetpatel.bubblelearnkids.MainActivity
+   adb shell am start -n com.meetpatel.balloonlearnkids.debug/com.meetpatel.balloonlearnkids.MainActivity
    ```
 
 **Without a cable:** build the APK, copy `app-debug.apk` onto the device however
@@ -511,9 +511,9 @@ Now create and boot a tablet — two-player mode is designed for that shape:
 ```bash
 source env.sh
 sdkmanager "system-images;android-36;google_apis;x86_64" "emulator"
-avdmanager create avd -n bubblelearn \
+avdmanager create avd -n balloonlearn \
   -k "system-images;android-36;google_apis;x86_64" -d "pixel_tablet"
-emulator -avd bubblelearn &
+emulator -avd balloonlearn &
 ./gradlew installDebug
 ```
 
@@ -548,7 +548,7 @@ get an installable release build, create a key once:
 keytool -genkey -v \
   -keystore release.jks \
   -keyalg RSA -keysize 2048 -validity 10000 \
-  -alias bubblelearn
+  -alias balloonlearn
 ```
 
 Then create `keystore.properties` in the project root:
@@ -556,7 +556,7 @@ Then create `keystore.properties` in the project root:
 ```properties
 storeFile=release.jks
 storePassword=your-store-password
-keyAlias=bubblelearn
+keyAlias=balloonlearn
 keyPassword=your-key-password
 ```
 
@@ -592,7 +592,7 @@ To have CI sign the release, add four repository secrets under
 |---|---|
 | `KEYSTORE_BASE64` | `base64 -w0 release.jks` |
 | `KEYSTORE_PASSWORD` | your store password |
-| `KEY_ALIAS` | `bubblelearn` |
+| `KEY_ALIAS` | `balloonlearn` |
 | `KEY_PASSWORD` | your key password |
 
 Without them the workflow still passes and publishes the debug APK.
@@ -630,7 +630,7 @@ PopAndGrow/
 │   └── src/
 │       ├── main/
 │       │   ├── AndroidManifest.xml   One permission: VIBRATE
-│       │   ├── java/com/meetpatel/bubblelearnkids/
+│       │   ├── java/com/meetpatel/balloonlearnkids/
 │       │   │   ├── MainActivity.kt       Immersive mode, screen routing
 │       │   │   ├── Prefs.kt              Two booleans, nothing else
 │       │   │   ├── Haptics.kt            The buzz on each pop

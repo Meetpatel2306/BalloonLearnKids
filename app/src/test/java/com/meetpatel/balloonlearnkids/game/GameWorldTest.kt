@@ -1,4 +1,4 @@
-package com.meetpatel.bubblelearnkids.game
+package com.meetpatel.balloonlearnkids.game
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull

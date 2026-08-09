@@ -20,11 +20,11 @@ val keystoreProps = Properties().apply {
 val hasSigning = keystoreProps.getProperty("storeFile") != null
 
 android {
-    namespace = "com.meetpatel.bubblelearnkids"
+    namespace = "com.meetpatel.balloonlearnkids"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.meetpatel.bubblelearnkids"
+        applicationId = "com.meetpatel.balloonlearnkids"
         minSdk = 24
         targetSdk = 36
         versionCode = 2

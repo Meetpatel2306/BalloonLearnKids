@@ -1,4 +1,4 @@
-package com.meetpatel.bubblelearnkids.game
+package com.meetpatel.balloonlearnkids.game
 
 import androidx.compose.ui.graphics.Color
 
