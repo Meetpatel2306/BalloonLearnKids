@@ -37,22 +37,24 @@
 
     <!-- Hero with the playable balloon field -->
     <section class="hero-section">
-        <div class="hero-shape-1"></div>
-        <div class="hero-shape-2"></div>
+        <div class="mesh" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="hero-shape-1" aria-hidden="true"></div>
+        <div class="hero-shape-2" aria-hidden="true"></div>
+
         <div class="container">
             <div class="row justify-content-center text-center">
                 <div class="col-lg-9">
                     <h1 class="hero-title fw-bold mb-3">
                         Pop a
-                        <span class="rainbow"><span>b</span><span>a</span><span>l</span><span>l</span><span>o</span><span>o</span><span>n</span></span>.
-                        Learn something.
+                        <span class="rainbow"><span>b</span><span>a</span><span>l</span><span>l</span><span>o</span><span>o</span><span>n</span></span>.<br class="d-none d-sm-block">
+                        <span class="grad-text">Learn something.</span>
                     </h1>
                     <p class="lead text-muted mb-4">
                         A calm, colourful first learning game for children aged about two to five.
                         Every balloon teaches a letter, a number, a colour, a shape or an animal
                         &mdash; spoken out loud, at a toddler&rsquo;s pace.
                     </p>
-                    <div class="pill-row mb-4">
+                    <div class="pill-row mb-2">
                         <div class="pill"><span>&#128246;</span>Works fully offline</div>
                         <div class="pill"><span>&#128683;</span>No advertising</div>
                         <div class="pill"><span>&#128274;</span>No data collected</div>
@@ -84,7 +86,7 @@
                         <div class="pg-hint" id="pg-hint">Tap the balloons &mdash; try the modes above</div>
                     </div>
                     <p class="text-center text-muted small mt-3 mb-0">
-                        This is a small taste of the game. The real app speaks every letter,
+                        A small taste of the game. The real app speaks every letter,
                         number and colour out loud.
                     </p>
                 </div>
@@ -96,6 +98,8 @@
             </div>
         </div>
     </section>
+
+    <svg class="wave wave-white" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,32 C240,64 480,0 720,16 C960,32 1200,64 1440,40 L1440,60 L0,60 Z"/></svg>
 
     <!-- Numbers -->
     <section class="py-4 bg-white reveal">
@@ -111,56 +115,72 @@
         </div>
     </section>
 
+    <!-- Alphabet ribbon -->
+    <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+            <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span><span>K</span><span>L</span><span>M</span><span>&#9733;</span><span>N</span><span>O</span><span>P</span><span>Q</span><span>R</span><span>S</span><span>T</span><span>U</span><span>V</span><span>W</span><span>X</span><span>Y</span><span>Z</span><span>&#9829;</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>&#128054;</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>&#9679;</span>
+            <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span><span>K</span><span>L</span><span>M</span><span>&#9733;</span><span>N</span><span>O</span><span>P</span><span>Q</span><span>R</span><span>S</span><span>T</span><span>U</span><span>V</span><span>W</span><span>X</span><span>Y</span><span>Z</span><span>&#9829;</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>&#128054;</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>&#9679;</span>
+        </div>
+    </div>
+
     <!-- Learning modes -->
     <section id="modes" class="py-5 reveal">
         <div class="container text-center">
-            <h5 class="text-uppercase fw-bold text-muted mb-2" style="letter-spacing: 2px;">Five ways to play</h5>
-            <h2 class="mb-5">Each mode is one gentle lesson</h2>
+            <p class="eyebrow">Five ways to play</p>
+            <h2 class="mb-2">Each mode is one gentle lesson</h2>
+            <p class="text-muted mb-5">Tap any card to try that mode in the balloon field above.</p>
             <div class="row g-4 justify-content-center">
 
                 <div class="col-6 col-lg">
-                    <div class="mode-tile">
+                    <button class="mode-tile" data-jump="letters">
                         <div class="mode-glyph" style="background:#4FA5F0;">A</div>
                         <h3>A &ndash; Z</h3>
                         <p>Letters in order, with a word for each one.</p>
-                    </div>
+                        <span class="try">Try it &uarr;</span>
+                    </button>
                 </div>
 
                 <div class="col-6 col-lg">
-                    <div class="mode-tile">
+                    <button class="mode-tile" data-jump="numbers">
                         <div class="mode-glyph" style="background:#FF7EB3;">1</div>
                         <h3>1 &ndash; 20</h3>
                         <p>Counting up, one number at a time.</p>
-                    </div>
+                        <span class="try">Try it &uarr;</span>
+                    </button>
                 </div>
 
                 <div class="col-6 col-lg">
-                    <div class="mode-tile">
+                    <button class="mode-tile" data-jump="colours">
                         <div class="mode-glyph" style="background:linear-gradient(135deg,#FF7EB3,#FFB443,#3BC46B,#4FA5F0);">&#9679;</div>
                         <h3>Colours</h3>
                         <p>Seven colours, named as they are found.</p>
-                    </div>
+                        <span class="try">Try it &uarr;</span>
+                    </button>
                 </div>
 
                 <div class="col-6 col-lg">
-                    <div class="mode-tile">
+                    <button class="mode-tile" data-jump="shapes">
                         <div class="mode-glyph" style="background:#A573F5;">&#9733;</div>
                         <h3>Shapes</h3>
                         <p>Circle, square, triangle, star and heart.</p>
-                    </div>
+                        <span class="try">Try it &uarr;</span>
+                    </button>
                 </div>
 
                 <div class="col-6 col-lg">
-                    <div class="mode-tile">
+                    <button class="mode-tile" data-jump="animals">
                         <div class="mode-glyph" style="background:#3BC46B;">&#128054;</div>
                         <h3>Animals</h3>
                         <p>Fourteen animals with their real sounds.</p>
-                    </div>
+                        <span class="try">Try it &uarr;</span>
+                    </button>
                 </div>
 
             </div>
         </div>
     </section>
+
+    <svg class="wave wave-white" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,24 C280,60 520,4 760,24 C1000,44 1220,52 1440,28 L1440,60 L0,60 Z"/></svg>
 
     <!-- How a round works -->
     <section class="py-5 bg-white reveal">
@@ -178,7 +198,7 @@
                     </div>
                 </div>
                 <div class="col-lg-7">
-                    <h5 class="text-uppercase fw-bold text-muted mb-2" style="letter-spacing: 2px;">How a round works</h5>
+                    <p class="eyebrow">How a round works</p>
                     <h2 class="mb-4">Simple enough for a two&#8209;year&#8209;old</h2>
                     <ol class="ps-3">
                         <li class="mb-3"><strong>The app asks for one thing.</strong> &ldquo;Find C&rdquo; is shown on a card and said out loud.</li>
@@ -192,11 +212,56 @@
         </div>
     </section>
 
-    <!-- Designed for kids -->
+    <svg class="wave wave-bg" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,36 C240,8 480,56 720,40 C960,24 1200,8 1440,36 L1440,60 L0,60 Z"/></svg>
+
+    <!-- What is and is not inside -->
     <section class="py-5 reveal">
+        <div class="container">
+            <div class="text-center mb-5">
+                <p class="eyebrow">Straight answers</p>
+                <h2>What is in it &mdash; and what is not</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="io-card io-yes">
+                        <h3>&#9989;&nbsp; What you get</h3>
+                        <ul>
+                            <li><span class="tick">&check;</span><span><b>Five learning modes</b>, all unlocked from the first launch</span></li>
+                            <li><span class="tick">&check;</span><span><b>Every word spoken aloud</b> at a slow, clear pace</span></li>
+                            <li><span class="tick">&check;</span><span><b>Fourteen real animal recordings</b></span></li>
+                            <li><span class="tick">&check;</span><span><b>Ten changing worlds</b> &mdash; day, night, rain, snow, desert, jungle</span></li>
+                            <li><span class="tick">&check;</span><span><b>Adjustable speed and balloon size</b> for younger hands</span></li>
+                            <li><span class="tick">&check;</span><span><b>A grown-up gate</b> on Settings</span></li>
+                            <li><span class="tick">&check;</span><span><b>Works with no internet</b>, forever</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="io-card io-no">
+                        <h3>&#128683;&nbsp; What is never in it</h3>
+                        <ul>
+                            <li><span class="cross">&times;</span><span><b>No adverts</b> of any kind</span></li>
+                            <li><span class="cross">&times;</span><span><b>No in-app purchases</b> or subscriptions</span></li>
+                            <li><span class="cross">&times;</span><span><b>No accounts</b>, sign-ups or logins</span></li>
+                            <li><span class="cross">&times;</span><span><b>No data collection</b> &mdash; not even anonymous analytics</span></li>
+                            <li><span class="cross">&times;</span><span><b>No internet permission</b>, so nothing can be sent anywhere</span></li>
+                            <li><span class="cross">&times;</span><span><b>No links out</b> of the app to a browser</span></li>
+                            <li><span class="cross">&times;</span><span><b>No timers, scores to lose or game over</b></span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <svg class="wave wave-white" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,28 C300,56 540,0 780,20 C1020,40 1230,56 1440,32 L1440,60 L0,60 Z"/></svg>
+
+    <!-- Designed for kids -->
+    <section class="py-5 bg-white reveal">
         <div class="container text-center">
-            <h5 class="text-uppercase fw-bold text-muted mb-4" style="letter-spacing: 2px;">Designed for Kids &amp; Families</h5>
-            <div class="row g-4 mt-2">
+            <p class="eyebrow">Designed for kids &amp; families</p>
+            <h2 class="mb-5">Small details that matter at this age</h2>
+            <div class="row g-4">
 
                 <div class="col-md-4">
                     <div class="card-custom text-center">
@@ -263,7 +328,7 @@
     </section>
 
     <!-- Parents -->
-    <section class="py-5 bg-white reveal">
+    <section class="py-5 reveal">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-9">
@@ -288,11 +353,14 @@
         </div>
     </section>
 
+    <svg class="wave wave-white" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,40 C260,12 500,52 740,36 C980,20 1210,4 1440,32 L1440,60 L0,60 Z"/></svg>
+
     <!-- FAQ -->
-    <section class="py-5 reveal">
+    <section class="py-5 bg-white reveal">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-9">
+                    <p class="eyebrow text-center">Good to know</p>
                     <h2 class="text-center mb-5">Questions parents ask</h2>
                     <div class="accordion" id="faq">
 
@@ -337,15 +405,15 @@
         </div>
     </section>
 
-    <!-- Download -->
-    <section id="download" class="py-5 bg-white reveal">
-        <div class="container text-center">
+    <!-- Closing call to action -->
+    <section id="download" class="cta-band">
+        <div class="container">
             <h2 class="mb-3">Coming soon to Google Play</h2>
-            <p class="text-muted mb-4">
+            <p class="mb-4">
                 Balloon Learn Kids is finished and in testing. This page will carry the
-                download link as soon as it is published.
+                download link the moment it is published.
             </p>
-            <a href="contact.html" class="btn btn-primary-custom btn-lg">Get in touch</a>
+            <a href="contact.html" class="btn btn-white btn-lg">Get in touch</a>
         </div>
     </section>
 

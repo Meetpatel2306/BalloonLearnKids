@@ -17,12 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
   /* Reading-progress bar across the top. */
   const bar = document.getElementById('scroll-progress');
   const toTop = document.getElementById('to-top');
+  const nav = document.querySelector('.navbar');
 
   function onScroll() {
     const max = document.documentElement.scrollHeight - window.innerHeight;
     const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
     if (bar) bar.style.width = pct + '%';
     if (toTop) toTop.classList.toggle('show', window.scrollY > 500);
+    if (nav) nav.classList.toggle('scrolled', window.scrollY > 40);
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
@@ -68,4 +70,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { threshold: 0.4 });
     stats.forEach(el => io2.observe(el));
   }
+});
+
+/* A mode card scrolls you up to the balloon field and switches it to that mode. */
+document.addEventListener('DOMContentLoaded', () => {
+  const field = document.getElementById('playground');
+  document.querySelectorAll('.mode-tile[data-jump]').forEach(tile => {
+    tile.addEventListener('click', () => {
+      const chip = document.querySelector(`.mode-chip[data-mode="${tile.dataset.jump}"]`);
+      if (!chip) return;
+      chip.click();
+      if (field) field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
 });

@@ -396,3 +396,95 @@ section { position: relative; }
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important }
   .reveal { opacity: 1; transform: none }
 }
+
+/* ==========================================================================
+   v2 polish: mesh hero, wave dividers, marquee, clickable modes, CTA band
+   ========================================================================== */
+
+/* --- navbar shrinks and deepens once you scroll --- */
+.navbar { transition: padding .25s ease, box-shadow .25s ease, background-color .25s ease; }
+.navbar.scrolled { padding-top: 2px; padding-bottom: 2px; box-shadow: 0 6px 20px rgba(23,63,95,.10); }
+
+/* --- soft colour blobs behind the hero --- */
+.mesh { position:absolute; inset:0; overflow:hidden; z-index:0; pointer-events:none; }
+.mesh i {
+  position:absolute; display:block; border-radius:50%; filter: blur(60px); opacity:.5;
+}
+.mesh i:nth-child(1) { width:420px; height:420px; top:-120px; left:-80px;  background:#FFB6D5; }
+.mesh i:nth-child(2) { width:380px; height:380px; top:-60px;  right:-60px; background:#B9DCFF; }
+.mesh i:nth-child(3) { width:320px; height:320px; bottom:-140px; left:38%; background:#CFF4D2; }
+
+/* --- gradient headline accent --- */
+.grad-text {
+  background: linear-gradient(100deg, #FF6BA8, #A573F5 55%, #4FA5F0);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* --- wave dividers between bands --- */
+.wave { display:block; width:100%; height:60px; }
+.wave path { fill: currentColor; }
+.wave-white { color:#fff; }
+.wave-bg    { color: var(--pb-bg); }
+
+/* --- scrolling alphabet ribbon --- */
+.marquee {
+  overflow:hidden; padding:14px 0; white-space:nowrap;
+  background: linear-gradient(90deg, #FF7EB3, #A573F5, #4FA5F0, #3BC46B, #FFB443, #FF7EB3);
+  background-size: 300% 100%;
+  animation: hue 18s linear infinite;
+}
+.marquee-track { display:inline-block; animation: slide 30s linear infinite; }
+.marquee-track span {
+  display:inline-block; color:#fff; font-weight:700; font-size:1.1rem;
+  padding: 0 18px; text-shadow: 0 2px 4px rgba(0,0,0,.18);
+}
+@keyframes slide { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+@keyframes hue   { from { background-position: 0% 50% } to { background-position: 300% 50% } }
+
+/* --- mode tiles are buttons now --- */
+.mode-tile {
+  border:none; width:100%; cursor:pointer; font-family:inherit;
+  display:block; text-align:center;
+}
+.mode-tile:focus-visible { outline:3px solid var(--pb-purple); outline-offset:3px; }
+.mode-tile .try {
+  display:inline-block; margin-top:.65rem; font-size:.78rem; font-weight:700;
+  color:var(--pb-purple); opacity:0; transform:translateY(4px); transition:all .25s ease;
+}
+.mode-tile:hover .try { opacity:1; transform:none; }
+
+/* --- in / not-in comparison --- */
+.io-card { border-radius:20px; padding:2rem; height:100%; box-shadow: var(--pb-shadow); }
+.io-yes  { background:#F1FBF4; border:1px solid #C4E8D1; }
+.io-no   { background:#FFF5F5; border:1px solid #F6D2D2; }
+.io-card h3 { font-size:1.15rem; margin-bottom:1rem; }
+.io-card ul { list-style:none; padding:0; margin:0; }
+.io-card li { display:flex; gap:.6rem; align-items:flex-start; margin-bottom:.6rem; font-weight:500; }
+.io-card li b { font-weight:700; }
+.tick  { color:#2FA35C; font-weight:800; flex:none; }
+.cross { color:#D45B5B; font-weight:800; flex:none; }
+
+/* --- closing call to action --- */
+.cta-band {
+  background: linear-gradient(135deg, #FF7EB3 0%, #A573F5 55%, #4FA5F0 100%);
+  color:#fff; padding:4rem 0; text-align:center; position:relative; overflow:hidden;
+}
+.cta-band h2 { color:#fff; }
+.cta-band p  { color:rgba(255,255,255,.92); }
+.cta-band .btn-white {
+  background:#fff; color:#8B4BD8; border:none; border-radius:30px;
+  padding:12px 30px; font-weight:700; box-shadow:0 8px 22px rgba(0,0,0,.18);
+  transition: transform .2s ease;
+}
+.cta-band .btn-white:hover { transform: translateY(-2px); color:#8B4BD8; }
+
+/* --- section eyebrow --- */
+.eyebrow {
+  text-transform:uppercase; letter-spacing:2px; font-weight:700;
+  font-size:.82rem; color:var(--pb-muted); margin-bottom:.5rem;
+}
+
+@media (max-width: 768px) {
+  .mesh i { filter: blur(40px); }
+  .wave { height:38px; }
+}
