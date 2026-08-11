@@ -108,6 +108,10 @@ class GameWorld(
      * well-done screen; only the celebration keeps animating.
      */
     var frozen: Boolean = false
+
+    /** Fireworks still queued for the end-of-set party, and the gap until the next. */
+    private var fireworksLeft: Int = 0
+    private var fireworkTimer: Float = 0f
         private set
 
     /**
@@ -279,6 +283,7 @@ class GameWorld(
             bubbles.removeAll { it.y + it.radius < 0f }
         }
 
+        tickFireworks(dt)
         particles.forEach { it.advance(dt, dp(GRAVITY_DP)) }
         particles.removeAll { !it.alive }
 
@@ -443,6 +448,9 @@ class GameWorld(
         val spokenReward: String? = null,
         val rewardWord: String? = null,
         val rewardEmoji: String? = null,
+        /** The popped balloon's own colour, so a plain glyph reward (a shape, say)
+         * can be shown in that colour instead of falling back to black. */
+        val rewardColor: Color? = null,
         /** True on the correct pop that finishes the whole A–Z / 1–20 / colour set. */
         val completedSet: Boolean = false,
         /** Where the popped bubble was, so the UI can fly its value to the strip. */
@@ -482,6 +490,7 @@ class GameWorld(
         var spokenReward: String? = null
         var rewardWord: String? = null
         var rewardEmoji: String? = null
+        var rewardColor: Color? = null
         var completedSet = false
         var doneIndex = -1
         if (isLearning) {
@@ -517,6 +526,9 @@ class GameWorld(
                     GameMode.SHAPES -> {
                         rewardWord = bubble.matchKey
                         rewardEmoji = LearningContent.glyphFor(bubble.matchKey)
+                        // A shape glyph carries no colour of its own, so it borrows
+                        // the balloon's — otherwise it would render as a black blob.
+                        rewardColor = bubble.color
                         spokenReward = bubble.matchKey
                     }
                     GameMode.ANIMALS -> {
@@ -572,6 +584,7 @@ class GameWorld(
             spokenReward = spokenReward,
             rewardWord = rewardWord,
             rewardEmoji = rewardEmoji,
+            rewardColor = rewardColor,
             completedSet = completedSet,
             x = bubble.x,
             y = bubble.y,
@@ -660,31 +673,126 @@ class GameWorld(
         }
     }
 
-    /** A public celebration, used by the UI for the end-of-set party: confetti
-     * rain plus proper firework bursts in the sky. */
+    /**
+     * The end-of-set party. Rather than firing everything at once, the fireworks
+     * are spaced out over a couple of seconds by [tickFireworks], so the sky keeps
+     * giving a child something new to look at right through the celebration.
+     */
     fun celebrate() {
         celebrateLevelUp()
-        repeat(3) {
-            val fx = width * (0.15f + decoRandom.nextFloat() * 0.7f)
-            val fy = height * (0.12f + decoRandom.nextFloat() * 0.35f)
+        streamerRain()
+        goldenFountain()
+        fireworksLeft = 8
+        fireworkTimer = 0f
+    }
+
+    /** Long paper streamers tumbling down, slower and heavier than the confetti. */
+    private fun streamerRain() {
+        repeat(26) {
             val col = Palette.Rainbow[decoRandom.nextInt(Palette.Rainbow.size)]
-            val n = 18
-            for (k in 0 until n) {
-                val ang = k * (6.2832f / n)
-                val sp = dp(140f) + decoRandom.nextFloat() * dp(120f)
+            particles += Particle(
+                x = decoRandom.nextFloat() * width,
+                y = -decoRandom.nextFloat() * dp(120f),
+                vx = (decoRandom.nextFloat() - 0.5f) * dp(60f),
+                vy = dp(70f) + decoRandom.nextFloat() * dp(90f),
+                radius = dp(4f) + decoRandom.nextFloat() * dp(3f),
+                color = col,
+                maxLife = 2.6f + decoRandom.nextFloat() * 1.2f,
+                shape = ParticleShape.RIBBON,
+                rotation = decoRandom.nextFloat() * 6.28f,
+                spin = (decoRandom.nextFloat() - 0.5f) * 9f,
+                gravityScale = 0.16f,
+            )
+        }
+    }
+
+    /** Warm sparks rushing up from the ground, like a stage fountain. */
+    private fun goldenFountain() {
+        repeat(2) { side ->
+            val fx = if (side == 0) width * 0.18f else width * 0.82f
+            repeat(22) {
+                val ang = -1.5708f + (decoRandom.nextFloat() - 0.5f) * 0.9f
+                val sp = dp(320f) + decoRandom.nextFloat() * dp(220f)
                 particles += Particle(
-                    x = fx,
-                    y = fy,
+                    x = fx + (decoRandom.nextFloat() - 0.5f) * dp(24f),
+                    y = height,
                     vx = cos(ang) * sp,
                     vy = sin(ang) * sp,
-                    radius = dp(2.5f) + decoRandom.nextFloat() * dp(3.5f),
-                    color = if (k % 3 == 0) Color.White else col,
-                    maxLife = 0.8f + decoRandom.nextFloat() * 0.4f,
-                    shape = if (k % 4 == 0) ParticleShape.SPARKLE else ParticleShape.CIRCLE,
-                    gravityScale = 0.35f,
-                    twinkle = k % 2 == 0,
+                    radius = dp(2f) + decoRandom.nextFloat() * dp(2.5f),
+                    color = if (it % 3 == 0) Color(0xFFFFF3B0) else Color(0xFFFFC94D),
+                    maxLife = 1.1f + decoRandom.nextFloat() * 0.6f,
+                    shape = ParticleShape.SPARKLE,
+                    spin = (decoRandom.nextFloat() - 0.5f) * 8f,
+                    gravityScale = 0.85f,
+                    twinkle = true,
                 )
             }
+        }
+    }
+
+    /** Releases the queued fireworks one at a time. Runs even while the world is
+     *  frozen, so the party plays out over the whole celebration. */
+    private fun tickFireworks(dt: Float) {
+        if (fireworksLeft <= 0) return
+        fireworkTimer -= dt
+        if (fireworkTimer > 0f) return
+        fireworksLeft--
+        fireworkTimer = 0.22f + decoRandom.nextFloat() * 0.22f
+        firework(
+            width * (0.12f + decoRandom.nextFloat() * 0.76f),
+            height * (0.10f + decoRandom.nextFloat() * 0.38f),
+        )
+    }
+
+    /** One burst: a bright shockwave ring, a two-tone shell, and drifting embers. */
+    private fun firework(fx: Float, fy: Float) {
+        val col = Palette.Rainbow[decoRandom.nextInt(Palette.Rainbow.size)]
+        val inner = Palette.Rainbow[decoRandom.nextInt(Palette.Rainbow.size)]
+
+        // The flash and the expanding ring that sells the bang.
+        particles += Particle(
+            x = fx, y = fy, vx = 0f, vy = 0f,
+            radius = dp(6f), color = Color.White,
+            maxLife = 0.42f, shape = ParticleShape.RING, gravityScale = 0f,
+        )
+        particles += Particle(
+            x = fx, y = fy, vx = 0f, vy = 0f,
+            radius = dp(4f), color = col,
+            maxLife = 0.55f, shape = ParticleShape.RING, gravityScale = 0f,
+        )
+
+        // Outer shell.
+        val n = 26
+        for (k in 0 until n) {
+            val ang = k * (6.2832f / n) + decoRandom.nextFloat() * 0.12f
+            val sp = dp(190f) + decoRandom.nextFloat() * dp(150f)
+            particles += Particle(
+                x = fx, y = fy,
+                vx = cos(ang) * sp, vy = sin(ang) * sp,
+                radius = dp(2.5f) + decoRandom.nextFloat() * dp(3.5f),
+                color = if (k % 4 == 0) Color.White else col,
+                maxLife = 0.9f + decoRandom.nextFloat() * 0.5f,
+                shape = if (k % 3 == 0) ParticleShape.SPARKLE else ParticleShape.CIRCLE,
+                spin = (decoRandom.nextFloat() - 0.5f) * 8f,
+                gravityScale = 0.30f,
+                twinkle = k % 2 == 0,
+            )
+        }
+        // A smaller, slower shell inside it, in a second colour.
+        for (k in 0 until 12) {
+            val ang = k * (6.2832f / 12) + 0.26f
+            val sp = dp(90f) + decoRandom.nextFloat() * dp(70f)
+            particles += Particle(
+                x = fx, y = fy,
+                vx = cos(ang) * sp, vy = sin(ang) * sp,
+                radius = dp(3f) + decoRandom.nextFloat() * dp(2f),
+                color = inner,
+                maxLife = 1.2f + decoRandom.nextFloat() * 0.5f,
+                shape = ParticleShape.STAR,
+                spin = (decoRandom.nextFloat() - 0.5f) * 6f,
+                gravityScale = 0.22f,
+                twinkle = true,
+            )
         }
     }
 

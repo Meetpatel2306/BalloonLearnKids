@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Color
 enum class BubbleKind { BUBBLE, BALLOON, STAR, HEART, RAINBOW }
 
 /** Shape of a single confetti fleck. */
-enum class ParticleShape { CIRCLE, STAR, HEART, SPARKLE }
+enum class ParticleShape { CIRCLE, STAR, HEART, SPARKLE, RIBBON, RING }
 
 /** Which little creature wanders the garden when it fills up. */
 enum class VisitorKind { BUTTERFLY, BEE, LADYBUG, BIRD }

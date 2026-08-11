@@ -78,6 +78,8 @@ object LearningContent {
         Shape("Triangle", "▲"),
         Shape("Star", "★"),
         Shape("Heart", "♥"),
+        Shape("Diamond", "◆"),
+        Shape("Rectangle", "▬"),
     )
 
     fun glyphFor(name: String): String = shapes.firstOrNull { it.name == name }?.glyph ?: name

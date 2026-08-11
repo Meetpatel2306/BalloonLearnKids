@@ -197,6 +197,7 @@ fun GameScreen(
     // The "A for Apple" reward card, shown briefly after a correct answer.
     var rewardWord by remember { mutableStateOf<String?>(null) }
     var rewardEmoji by remember { mutableStateOf<String?>(null) }
+    var rewardColor by remember { mutableStateOf<Color?>(null) }
     var rewardTick by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(rewardTick) {
@@ -204,6 +205,7 @@ fun GameScreen(
             kotlinx.coroutines.delay(1700)
             rewardWord = null
             rewardEmoji = null
+            rewardColor = null
         }
     }
 
@@ -328,6 +330,7 @@ fun GameScreen(
                                     if (pop.correct) {
                                         rewardWord = pop.rewardWord
                                         rewardEmoji = pop.rewardEmoji
+                                        rewardColor = pop.rewardColor
                                         if (pop.rewardWord != null || pop.rewardEmoji != null) rewardTick++
                                         // Send the found value flying into its slot.
                                         if (pop.completedIndex >= 0) {
@@ -576,6 +579,12 @@ fun GameScreen(
                         text = it,
                         fontSize = if (it.length > 6) 34.sp else 100.sp,
                         textAlign = TextAlign.Center,
+                        // A shape glyph is plain text with no colour of its own, so
+                        // it wears the balloon's colour; a real emoji keeps its own.
+                        color = rewardColor ?: Color.Unspecified,
+                        style = if (rewardColor != null) {
+                            TextStyle(shadow = Shadow(Color.White, Offset(0f, 0f), 26f))
+                        } else TextStyle.Default,
                     )
                 }
                 rewardWord?.let {

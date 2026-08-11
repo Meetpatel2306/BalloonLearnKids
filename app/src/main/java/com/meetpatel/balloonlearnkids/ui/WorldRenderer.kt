@@ -613,7 +613,7 @@ private fun blinkOf(time: Float, phase: Float): Float {
 }
 
 /** The glyphs that get a moulded balloon of their own. */
-private val SHAPE_GLYPHS = setOf("●", "■", "▲", "★", "♥")
+private val SHAPE_GLYPHS = setOf("●", "■", "▲", "★", "♥", "◆", "▬")
 
 /**
  * A balloon moulded into a shape — circle, square, triangle, star or heart —
@@ -707,6 +707,31 @@ private fun shapePath(glyph: String, c: Offset, r: Float): Path = when (glyph) {
     }
     "★" -> starPath(c.x, c.y, r * 1.08f, r * 0.5f, 5, 0f)
     "♥" -> heartPath(c.x, c.y, r * 0.86f)
+    // A diamond: the square stood on its point, with the corners eased off so it
+    // still looks like something full of air.
+    "◆" -> Path().apply {
+        val d = r * 1.06f
+        val k = d * 0.22f
+        moveTo(c.x, c.y - d)
+        quadraticTo(c.x + k, c.y - d + k, c.x + d - k, c.y - k)
+        quadraticTo(c.x + d, c.y, c.x + d - k, c.y + k)
+        quadraticTo(c.x + k, c.y + d - k, c.x, c.y + d)
+        quadraticTo(c.x - k, c.y + d - k, c.x - d + k, c.y + k)
+        quadraticTo(c.x - d, c.y, c.x - d + k, c.y - k)
+        quadraticTo(c.x - k, c.y - d + k, c.x, c.y - d)
+        close()
+    }
+    // A rectangle: wider than it is tall, so a child can tell it from the square.
+    "▬" -> Path().apply {
+        val w = r * 1.12f
+        val h = r * 0.68f
+        addRoundRect(
+            androidx.compose.ui.geometry.RoundRect(
+                c.x - w, c.y - h, c.x + w, c.y + h,
+                androidx.compose.ui.geometry.CornerRadius(r * 0.20f, r * 0.20f),
+            )
+        )
+    }
     else -> Path().apply {
         addOval(androidx.compose.ui.geometry.Rect(c.x - r, c.y - r, c.x + r, c.y + r))
     }
@@ -913,6 +938,27 @@ private fun DrawScope.drawParticle(p: Particle) {
         }
         ParticleShape.SPARKLE -> rotate(p.rotation * 57.2958f, pivot) {
             drawPath(starPath(p.x, p.y, s * 1.7f, s * 0.4f, 4, 0f), col)
+        }
+        // A paper streamer: a long thin rectangle that tumbles end over end, so it
+        // reads as a real ribbon rather than another dot.
+        ParticleShape.RIBBON -> rotate(p.rotation * 57.2958f, pivot) {
+            val w = s * 0.75f
+            val h = s * 3.1f
+            drawRect(col, Offset(p.x - w / 2f, p.y - h / 2f), Size(w, h))
+            drawRect(
+                Color.White.copy(alpha = alpha * 0.35f),
+                Offset(p.x - w / 2f, p.y - h / 2f), Size(w * 0.4f, h),
+            )
+        }
+        // The shockwave of a firework: a ring that races outwards and thins as it goes.
+        ParticleShape.RING -> {
+            val grow = 1f - p.fade
+            drawCircle(
+                p.color.copy(alpha = alpha * 0.8f),
+                p.radius * (1f + grow * 9f),
+                pivot,
+                style = Stroke(width = (p.radius * 0.7f) * p.fade + 0.6f),
+            )
         }
     }
 }

@@ -27,8 +27,8 @@ android {
         applicationId = "com.meetpatel.balloonlearnkids"
         minSdk = 24
         targetSdk = 36
-        versionCode = 3
-        versionName = "26.1.1"
+        versionCode = 4
+        versionName = "26.1.2"
     }
 
     androidResources {
