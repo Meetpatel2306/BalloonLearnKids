@@ -34,6 +34,7 @@ import com.meetpatel.balloonlearnkids.game.GroundCritterKind
 import com.meetpatel.balloonlearnkids.game.Particle
 import com.meetpatel.balloonlearnkids.game.ParticleShape
 import com.meetpatel.balloonlearnkids.game.Ripple
+import com.meetpatel.balloonlearnkids.game.RiderKind
 import com.meetpatel.balloonlearnkids.game.SkyRider
 import com.meetpatel.balloonlearnkids.game.VisitorKind
 import kotlin.math.PI
@@ -950,6 +951,20 @@ private fun DrawScope.drawParticle(p: Particle) {
                 Offset(p.x - w / 2f, p.y - h / 2f), Size(w * 0.4f, h),
             )
         }
+        // A scrap of torn balloon skin: a curled sliver, lighter along one edge
+        // where the light catches it, tumbling as it falls.
+        ParticleShape.SHRED -> rotate(p.rotation * 57.2958f, pivot) {
+            val w = s * 1.9f
+            val h = s * 1.15f
+            val shred = Path().apply {
+                moveTo(p.x - w / 2f, p.y)
+                quadraticTo(p.x - w * 0.15f, p.y - h, p.x + w / 2f, p.y - h * 0.25f)
+                quadraticTo(p.x + w * 0.1f, p.y + h * 0.55f, p.x - w / 2f, p.y)
+                close()
+            }
+            drawPath(shred, col)
+            drawPath(shred, Color.White.copy(alpha = alpha * 0.30f), style = Stroke(width = s * 0.22f))
+        }
         // The shockwave of a firework: a ring that races outwards and thins as it goes.
         ParticleShape.RING -> {
             val grow = 1f - p.fade
@@ -1154,8 +1169,114 @@ private fun DrawScope.drawCritterFacingRight(c: GroundCritter, dpUnit: Float) {
     }
 }
 
-/** A big, cheerful striped hot-air balloon drifting across the top of the sky. */
+/** A diamond kite with a bow tail, tilted into the wind it is flying through. */
+private fun DrawScope.drawKite(rider: SkyRider, dpUnit: Float) {
+    val s = dpUnit * rider.scale
+    val cx = rider.x
+    val cy = rider.y
+    val w = 13f * s
+    val h = 19f * s
+
+    rotate(-16f, Offset(cx, cy)) {
+        val body = Path().apply {
+            moveTo(cx, cy - h)
+            lineTo(cx + w, cy)
+            lineTo(cx, cy + h)
+            lineTo(cx - w, cy)
+            close()
+        }
+        drawPath(body, rider.color.copy(alpha = 0.94f))
+        // The two paler panels that every paper kite seems to have.
+        drawPath(
+            Path().apply {
+                moveTo(cx, cy - h); lineTo(cx + w, cy); lineTo(cx, cy); close()
+            },
+            Color.White.copy(alpha = 0.55f),
+        )
+        drawPath(
+            Path().apply {
+                moveTo(cx, cy); lineTo(cx - w, cy); lineTo(cx, cy + h); close()
+            },
+            Color.White.copy(alpha = 0.30f),
+        )
+        drawPath(body, Color.White.copy(alpha = 0.75f), style = Stroke(width = 1.6f * dpUnit))
+        drawLine(Color.White.copy(alpha = 0.5f), Offset(cx, cy - h), Offset(cx, cy + h), 1.2f * dpUnit)
+        drawLine(Color.White.copy(alpha = 0.5f), Offset(cx - w, cy), Offset(cx + w, cy), 1.2f * dpUnit)
+
+        // A trailing tail with little bows knotted along it.
+        val tail = Path().apply {
+            moveTo(cx, cy + h)
+            cubicTo(cx - w * 0.9f, cy + h * 1.7f, cx + w * 0.7f, cy + h * 2.3f, cx - w * 0.3f, cy + h * 3.1f)
+        }
+        drawPath(tail, Palette.InkSoft.copy(alpha = 0.55f), style = Stroke(width = 1.4f * dpUnit, cap = StrokeCap.Round))
+        for (k in 1..3) {
+            val t = k / 3.4f
+            val bx = cx + (-w * 0.5f) * sin(t * 3.1f)
+            val by = cy + h + h * 2.1f * t
+            drawOval(
+                Palette.Confetti[(k + rider.color.hashCode()).mod(Palette.Confetti.size)].copy(alpha = 0.9f),
+                topLeft = Offset(bx - 3.4f * s, by - 2f * s),
+                size = Size(6.8f * s, 4f * s),
+            )
+        }
+    }
+}
+
+/** A little folded paper plane gliding along, with a soft trail behind it. */
+private fun DrawScope.drawPaperPlane(rider: SkyRider, dpUnit: Float) {
+    val s = dpUnit * rider.scale
+    val cx = rider.x
+    val cy = rider.y
+    val l = 17f * s
+    val w = 9f * s
+    // Nose points the way it is travelling.
+    val dir = if (rider.speed >= 0f) 1f else -1f
+
+    // A faint vapour trail so it reads as moving, not parked.
+    for (k in 1..5) {
+        drawCircle(
+            Color.White.copy(alpha = 0.16f - k * 0.026f),
+            (2.6f - k * 0.3f) * s,
+            Offset(cx - dir * (l * 0.9f + k * 6f * s), cy + k * 0.7f * s),
+        )
+    }
+
+    rotate(-8f * dir, Offset(cx, cy)) {
+        // Upper wing.
+        drawPath(
+            Path().apply {
+                moveTo(cx + dir * l, cy)
+                lineTo(cx - dir * l * 0.75f, cy - w)
+                lineTo(cx - dir * l * 0.35f, cy)
+                close()
+            },
+            Color.White.copy(alpha = 0.96f),
+        )
+        // Lower wing, shaded so the fold reads.
+        drawPath(
+            Path().apply {
+                moveTo(cx + dir * l, cy)
+                lineTo(cx - dir * l * 0.75f, cy + w)
+                lineTo(cx - dir * l * 0.35f, cy)
+                close()
+            },
+            Color(0xFFDCE6F0),
+        )
+        drawLine(
+            Palette.InkSoft.copy(alpha = 0.35f),
+            Offset(cx + dir * l, cy), Offset(cx - dir * l * 0.35f, cy),
+            1.2f * dpUnit,
+        )
+    }
+}
+
+/** Whatever is crossing the sky: a hot-air balloon, a kite, or a paper plane. */
 private fun DrawScope.drawSkyRider(rider: SkyRider, dpUnit: Float) {
+    when (rider.kind) {
+        RiderKind.KITE -> return drawKite(rider, dpUnit)
+        RiderKind.PLANE -> return drawPaperPlane(rider, dpUnit)
+        RiderKind.HOT_AIR -> Unit
+    }
     val s = dpUnit * rider.scale
     val cx = rider.x
     val cy = rider.y

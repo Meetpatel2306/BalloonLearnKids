@@ -199,13 +199,17 @@ class GameWorld(
                     kind = kind,
                 )
             }
-            skyRiders += SkyRider(
-                x = decoRandom.nextFloat() * w,
-                y = h * (0.08f + decoRandom.nextFloat() * 0.12f),
-                speed = dp(7f) + decoRandom.nextFloat() * dp(6f),
-                scale = 0.85f + decoRandom.nextFloat() * 0.4f,
-                color = Palette.Confetti[decoRandom.nextInt(Palette.Confetti.size)],
-            )
+            // One of each kind, so the sky above always has a little variety.
+            RiderKind.entries.forEach { kind ->
+                skyRiders += SkyRider(
+                    x = decoRandom.nextFloat() * w,
+                    y = h * (0.06f + decoRandom.nextFloat() * 0.16f),
+                    speed = dp(7f) + decoRandom.nextFloat() * dp(9f),
+                    scale = 0.85f + decoRandom.nextFloat() * 0.4f,
+                    color = Palette.Confetti[decoRandom.nextInt(Palette.Confetti.size)],
+                    kind = kind,
+                )
+            }
         }
     }
 
@@ -859,6 +863,35 @@ class GameWorld(
                 spin = (random.nextFloat() - 0.5f) * 18f,
             )
         }
+        // Torn rubber. A real balloon does not turn into confetti — it bursts into
+        // curling scraps of its own skin, and that is what sells the pop.
+        repeat(if (festive) 9 else 6) {
+            val angle = random.nextFloat() * 6.283185f
+            val speed = dp(120f) + random.nextFloat() * dp(200f)
+            particles += Particle(
+                x = b.x,
+                y = b.y,
+                vx = cos(angle) * speed,
+                vy = sin(angle) * speed,
+                radius = b.radius * (0.18f + random.nextFloat() * 0.20f),
+                color = b.color,
+                maxLife = 0.42f + random.nextFloat() * 0.30f,
+                shape = ParticleShape.SHRED,
+                rotation = random.nextFloat() * 6.283185f,
+                spin = (random.nextFloat() - 0.5f) * 22f,
+                gravityScale = 1.25f,
+            )
+        }
+        // The shockwave of the burst: a quick ring of air pushing outwards.
+        particles += Particle(
+            x = b.x, y = b.y, vx = 0f, vy = 0f,
+            radius = b.radius * 0.42f,
+            color = Color.White,
+            maxLife = 0.26f,
+            shape = ParticleShape.RING,
+            gravityScale = 0f,
+        )
+
         // A rainbow pop also sends up a fountain of slow, twinkling gold sparkles.
         if (festive) {
             repeat(SPARKLE_FOUNTAIN) {

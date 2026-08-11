@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Color
 enum class BubbleKind { BUBBLE, BALLOON, STAR, HEART, RAINBOW }
 
 /** Shape of a single confetti fleck. */
-enum class ParticleShape { CIRCLE, STAR, HEART, SPARKLE, RIBBON, RING }
+enum class ParticleShape { CIRCLE, STAR, HEART, SPARKLE, RIBBON, RING, SHRED }
 
 /** Which little creature wanders the garden when it fills up. */
 enum class VisitorKind { BUTTERFLY, BEE, LADYBUG, BIRD }
@@ -221,13 +221,18 @@ class GroundCritter(
     }
 }
 
-/** A big friendly hot-air balloon that drifts slowly across the top of the sky. */
+/** What is crossing the sky up there. */
+enum class RiderKind { HOT_AIR, KITE, PLANE }
+
+/** Something friendly drifting slowly across the top of the sky: a hot-air
+ *  balloon, a kite on a string, or a little paper plane. */
 class SkyRider(
     var x: Float,
     val y: Float,
     val speed: Float,
     val scale: Float,
     val color: Color,
+    val kind: RiderKind = RiderKind.HOT_AIR,
 ) {
     fun advance(dt: Float, w: Float, margin: Float) {
         x += speed * dt
