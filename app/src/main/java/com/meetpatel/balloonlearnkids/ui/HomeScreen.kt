@@ -137,6 +137,16 @@ fun HomeScreen(
         }
 
         if (portrait) {
+            // The five game balloons must always land on screen whole, on a tall
+            // phone and on a short one alike, so their size is worked out from
+            // whatever height is left once the title and the arch have had theirs.
+            val titleBlock = 84.dp
+            val archH = (screenH * 0.30f).coerceIn(120.dp, 260.dp)
+            val gridSpace = (screenH - titleBlock - archH - 44.dp).coerceAtLeast(132.dp)
+            val byHeight = (gridSpace - 74.dp) / 2 / BALLOON_RATIO
+            val byWidth = (screenW - 36.dp) / 3
+            val balloonW = minOf(byHeight, byWidth).coerceIn(48.dp, 92.dp)
+
             Column(
                 Modifier
                     .fillMaxSize()
@@ -160,10 +170,10 @@ fun HomeScreen(
                     prefs, tones, haptics,
                     Modifier
                         .fillMaxWidth()
-                        .height(screenH * 0.34f),
+                        .height(archH),
                 )
-                Spacer(Modifier.height(16.dp))
-                ModeGrid(prefs, tones, haptics, onStart)
+                Spacer(Modifier.height(12.dp))
+                ModeGrid(prefs, tones, haptics, balloonW, onStart)
             }
         } else {
             Row(
@@ -172,6 +182,12 @@ fun HomeScreen(
                     .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                // Same idea in landscape: the grid only gets the room the title
+                // has not already taken, and shrinks rather than overflowing.
+                val byHeight = (screenH - 96.dp - 74.dp) / 2 / BALLOON_RATIO
+                val byWidth = (screenW * 0.46f - 32.dp) / 3
+                val balloonW = minOf(byHeight, byWidth).coerceIn(48.dp, 92.dp)
+
                 Column(
                     Modifier.weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -186,8 +202,8 @@ fun HomeScreen(
                             color = Palette.InkSoft,
                         )
                     }
-                    Spacer(Modifier.height(14.dp))
-                    ModeGrid(prefs, tones, haptics, onStart)
+                    Spacer(Modifier.height(12.dp))
+                    ModeGrid(prefs, tones, haptics, balloonW, onStart)
                 }
                 RainbowArch(
                     prefs, tones, haptics,
@@ -457,28 +473,40 @@ private fun PoppableBalloon(
     }
 }
 
-/** The six games, each its own balloon. Tap one: it bursts, then the game opens. */
+/** How much taller a mode balloon is than it is wide, label included. */
+private const val BALLOON_RATIO = 1.26f
+
+/** The five games, each its own balloon. Tap one: it bursts, then the game opens.
+ *  [balloonW] comes from the caller, which has already measured the screen, so the
+ *  whole grid shrinks to fit rather than running off the bottom edge. */
 @Composable
-private fun ModeGrid(prefs: Prefs, tones: ToneEngine, haptics: Haptics, onStart: (GameMode) -> Unit) {
+private fun ModeGrid(
+    prefs: Prefs,
+    tones: ToneEngine,
+    haptics: Haptics,
+    balloonW: Dp,
+    onStart: (GameMode) -> Unit,
+) {
+    val gap = if (balloonW < 68.dp) 4.dp else 6.dp
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         // Each balloon wears the thing it teaches: A, 1, a shape, an animal.
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            ModeBalloon(stringResource(R.string.mode_az), Color(0xFF35C978), 0L, prefs, tones, haptics, symbol = "A") {
+        Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+            ModeBalloon(stringResource(R.string.mode_az), Color(0xFF35C978), 0L, prefs, tones, haptics, balloonW, symbol = "A") {
                 onStart(GameMode.LETTERS)
             }
-            ModeBalloon(stringResource(R.string.mode_120), Color(0xFF4D9BFF), 90L, prefs, tones, haptics, symbol = "1") {
+            ModeBalloon(stringResource(R.string.mode_120), Color(0xFF4D9BFF), 90L, prefs, tones, haptics, balloonW, symbol = "1") {
                 onStart(GameMode.NUMBERS)
             }
-            ModeBalloon(stringResource(R.string.mode_colors), Color.White, 180L, prefs, tones, haptics, rainbow = true) {
+            ModeBalloon(stringResource(R.string.mode_colors), Color.White, 180L, prefs, tones, haptics, balloonW, rainbow = true) {
                 onStart(GameMode.COLORS)
             }
         }
-        Spacer(Modifier.height(6.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            ModeBalloon(stringResource(R.string.mode_shapes), Color(0xFFA98BF0), 270L, prefs, tones, haptics, symbol = "★") {
+        Spacer(Modifier.height(gap))
+        Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+            ModeBalloon(stringResource(R.string.mode_shapes), Color(0xFFA98BF0), 270L, prefs, tones, haptics, balloonW, symbol = "★") {
                 onStart(GameMode.SHAPES)
             }
-            ModeBalloon(stringResource(R.string.mode_animals), Color(0xFFFF9F43), 360L, prefs, tones, haptics, symbol = "🐶") {
+            ModeBalloon(stringResource(R.string.mode_animals), Color(0xFFFF9F43), 360L, prefs, tones, haptics, balloonW, symbol = "🐶") {
                 onStart(GameMode.ANIMALS)
             }
         }
@@ -498,6 +526,7 @@ private fun ModeBalloon(
     prefs: Prefs,
     tones: ToneEngine,
     haptics: Haptics,
+    balloonW: Dp,
     rainbow: Boolean = false,
     symbol: String? = null,
     onStart: () -> Unit,
@@ -525,7 +554,7 @@ private fun ModeBalloon(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Canvas(
             Modifier
-                .size(width = 92.dp, height = 116.dp)
+                .size(width = balloonW, height = balloonW * BALLOON_RATIO)
                 .graphicsLayer {
                     translationY = sin((bob + phase) * 6.2832f) * 5.dp.toPx() +
                         (1f - enter.value) * 40.dp.toPx()
@@ -601,13 +630,20 @@ private fun ModeBalloon(
         }
         // The name sits on a white pill ringed in the balloon's own colour, so
         // each game reads as one object rather than a label under a picture.
+        val small = balloonW < 68.dp
         Box(
             Modifier
                 .background(Color.White.copy(alpha = 0.95f), RoundedCornerShape(50))
-                .border(2.5.dp, if (rainbow) Color(0xFFE84D8A) else color, RoundedCornerShape(50))
-                .padding(horizontal = 12.dp, vertical = 5.dp)
+                .border(if (small) 2.dp else 2.5.dp, if (rainbow) Color(0xFFE84D8A) else color, RoundedCornerShape(50))
+                .padding(horizontal = if (small) 8.dp else 12.dp, vertical = if (small) 3.dp else 5.dp)
         ) {
-            Text(label, fontSize = 13.sp, fontWeight = FontWeight.Black, color = Palette.Ink)
+            Text(
+                label,
+                fontSize = if (small) 11.sp else 13.sp,
+                fontWeight = FontWeight.Black,
+                color = Palette.Ink,
+                maxLines = 1,
+            )
         }
     }
 }
