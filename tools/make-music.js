@@ -335,10 +335,46 @@ function trackWin(seconds) {
 
 // -------------------------------------------------------------------- main
 
+/** A wide, unhurried meadow tune — the one that plays while a child dawdles. */
+function trackMeadow(seconds) {
+  const buf = blank(seconds);
+  const beat = 60 / 74;
+  const scale = ['D5', 'E5', 'F#5', 'A5', 'B5', 'D6', 'E6'];
+  const chords = [
+    ['D3', 'D4', 'F#4', 'A4'],
+    ['B2', 'B3', 'D4', 'F#4'],
+    ['G2', 'G3', 'B3', 'D4'],
+    ['A2', 'A3', 'C#4', 'E4'],
+  ];
+  const bars = Math.floor(seconds / (beat * 4));
+  const shape = [0, 2, 3, 2, 4, 3, 2, 1, 3, 4, 5, 4, 2, 1, 0, 2];
+
+  for (let bar = 0; bar < bars; bar++) {
+    const t0 = bar * beat * 4;
+    const chord = chords[bar % chords.length];
+    pad(buf, t0, beat * 4.2, hz(chord[1]), 0.32, -0.3);
+    pad(buf, t0, beat * 4.2, hz(chord[2]), 0.28, 0.3);
+    pad(buf, t0, beat * 4.2, hz(chord[3]), 0.22, 0);
+    bass(buf, t0, beat * 2.9, hz(chord[0]), 0.5, 0);
+
+    for (let step = 0; step < 6; step++) {
+      const t = t0 + step * beat * 0.666;
+      const idx = shape[(bar * 6 + step) % shape.length];
+      mallet(buf, t, beat * 1.1, hz(scale[idx % scale.length]), 0.38, ((step % 3) - 1) * 0.28);
+      if (step === 3) bell(buf, t + beat * 0.3, beat * 2.2, hz(scale[(idx + 3) % scale.length]) * 2, 0.22, 0.3);
+    }
+  }
+  reverb(buf, 0.36);
+  crossfadeLoop(buf, 1.8);
+  normalise(buf, 0.78);
+  return buf;
+}
+
 const jobs = [
   ['music_day.wav', () => trackDay(76)],
   ['music_night.wav', () => trackNight(80)],
   ['music_play.wav', () => trackPlay(72)],
+  ['music_meadow.wav', () => trackMeadow(88)],
   ['music_win.wav', () => trackWin(7)],
 ];
 

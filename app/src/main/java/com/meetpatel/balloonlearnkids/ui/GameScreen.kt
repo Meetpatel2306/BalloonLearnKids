@@ -117,7 +117,14 @@ fun GameScreen(
     // for a few seconds first — they earned a party — then offer the choices.
     LaunchedEffect(completePending) {
         if (completePending) {
+            // A real fanfare, a real crowd clapping, and bells over the top —
+            // finishing the whole alphabet should feel like an occasion.
             music.playFanfare()
+            if (prefs.soundEnabled) {
+                music.playCheer()
+                kotlinx.coroutines.delay(600)
+                music.playApplause()
+            }
             repeat(4) { i ->
                 world.celebrate()
                 if (prefs.soundEnabled) {
@@ -331,6 +338,9 @@ fun GameScreen(
                                     }
                                     // Rewards show even when sound is off.
                                     if (pop.correct) {
+                                        // A proper recorded chime for getting it
+                                        // right, rather than another synth beep.
+                                        if (prefs.soundEnabled && !pop.completedSet) music.playCorrect()
                                         rewardWord = pop.rewardWord
                                         rewardEmoji = pop.rewardEmoji
                                         rewardColor = pop.rewardColor

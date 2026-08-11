@@ -132,6 +132,28 @@ fun DrawScope.drawCuteBalloon(
             topLeft = Offset(c.x - rx * 0.95f, c.y - ry * 0.85f),
             size = Size(rx * 1.05f, ry * 1.15f),
         )
+        // Light bouncing up off the grass, warming the underside. Real balloons
+        // pick up the colour of whatever they are floating over, and this is the
+        // single thing that stops them looking like flat stickers.
+        drawOval(
+            Brush.radialGradient(
+                listOf(Color(0xFF9BE39B).copy(alpha = 0.30f), Color.Transparent),
+                center = Offset(c.x, c.y + ry * 0.86f),
+                radius = rx * 0.95f,
+            ),
+            topLeft = Offset(c.x - rx, c.y + ry * 0.10f),
+            size = Size(rx * 2f, ry * 1.05f),
+        )
+        // A faint mirror of the sky across the upper third, the way latex does.
+        drawOval(
+            Brush.verticalGradient(
+                listOf(Color.White.copy(alpha = 0.16f), Color.Transparent),
+                startY = c.y - ry,
+                endY = c.y - ry * 0.15f,
+            ),
+            topLeft = Offset(c.x - rx * 0.92f, c.y - ry),
+            size = Size(rx * 1.84f, ry * 0.9f),
+        )
     }
 
     // The neck, then the knot on top of it.

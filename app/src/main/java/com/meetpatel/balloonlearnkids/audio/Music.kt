@@ -24,6 +24,7 @@ class Music(private val context: Context) {
         DAY(R.raw.music_day),
         NIGHT(R.raw.music_night),
         PLAY(R.raw.music_play),
+        MEADOW(R.raw.music_meadow),
     }
 
     private val handler = Handler(Looper.getMainLooper())
@@ -75,10 +76,26 @@ class Music(private val context: Context) {
     /** The little fanfare when a whole set is finished. Plays over the music. */
     fun playFanfare() {
         if (!enabled) return
-        fanfare?.runCatching { release() }
-        val mp = MediaPlayer.create(context, R.raw.music_win) ?: return
-        mp.setVolume(0.7f, 0.7f)
-        mp.setOnCompletionListener { runCatching { it.release() }; fanfare = null }
+        oneShot(R.raw.music_win, 0.7f)
+    }
+
+    /** A room full of children clapping. Used for the end-of-set party. */
+    fun playApplause() = oneShot(R.raw.sfx_applause, 0.75f)
+
+    /** A rising shower of bells, played as the confetti goes up. */
+    fun playCheer() = oneShot(R.raw.sfx_cheer, 0.6f)
+
+    /** The warm three-note chime for a correct answer. */
+    fun playCorrect() = oneShot(R.raw.sfx_correct, 0.55f)
+
+    /**
+     * Fires a bundled clip once and lets it clean itself up. These are the
+     * moments worth a real recording, so they are not synthesised live.
+     */
+    private fun oneShot(res: Int, volume: Float) {
+        val mp = MediaPlayer.create(context, res) ?: return
+        mp.setVolume(volume, volume)
+        mp.setOnCompletionListener { runCatching { it.release() } }
         runCatching { mp.start() }
         fanfare = mp
     }

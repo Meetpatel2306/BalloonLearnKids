@@ -1406,20 +1406,71 @@ private fun Color.darker(): Color = lerp(this, Color.Black, 0.2f)
 /** A few far-off birds gliding across the daytime sky, wings flapping. */
 private fun DrawScope.drawFarBirds(time: Float, theme: Palette.SkyTheme, dpUnit: Float) {
     if (theme.night) return
-    val col = Palette.Ink.copy(alpha = 0.30f)
-    for (i in 0 until 3) {
-        val speed = (14f + i * 5f) * dpUnit
-        val s = (7f + i * 2f) * dpUnit
-        val x = ((time * speed + i * size.width / 3f) % (size.width + s * 4f)) - s * 2f
-        val y = size.height * (0.15f + 0.05f * i) + sin(time * 1.2f + i * 2f) * 6f * dpUnit
-        val flap = sin(time * 7f + i * 1.7f) * s * 0.45f
-        val p = Path().apply {
-            moveTo(x - s, y)
-            quadraticTo(x - s / 2f, y - s * 0.7f - flap, x, y)
-            quadraticTo(x + s / 2f, y - s * 0.7f - flap, x + s, y)
+
+    // Three flocks, each in a loose V, crossing the sky at its own height and
+    // speed. Within a flock the birds beat their wings slightly out of step —
+    // that small offset is what stops it looking like one stamped shape.
+    val flocks = 3
+    for (f in 0 until flocks) {
+        val speed = (13f + f * 6f) * dpUnit
+        val lead = (7.5f + f * 2.2f) * dpUnit
+        val span = size.width + lead * 14f
+        val headX = ((time * speed + f * size.width * 0.45f) % span) - lead * 7f
+        val headY = size.height * (0.13f + 0.055f * f) + sin(time * 1.1f + f * 2f) * 7f * dpUnit
+        // Nearer flocks are darker; the far ones fade into the haze.
+        val col = Palette.Ink.copy(alpha = 0.14f + f * 0.09f)
+
+        val count = 5 - f            // 5, 4, then 3 birds
+        for (b in 0 until count) {
+            // Alternate left and right of the leader to make the V.
+            val rank = (b + 1) / 2
+            val side = if (b == 0) 0f else if (b % 2 == 1) -1f else 1f
+            val s = lead * (1f - rank * 0.07f)
+            val x = headX - rank * s * 2.3f
+            val y = headY + side * rank * s * 1.15f + sin(time * 1.6f + b) * 1.6f * dpUnit
+
+            drawFlappingBird(x, y, s, time * 6.4f + b * 0.9f + f * 2.1f, col, dpUnit)
         }
-        drawPath(p, col, style = Stroke(width = 2f * dpUnit, cap = StrokeCap.Round))
     }
+}
+
+/**
+ * One distant bird. The wings sweep through a real beat — up fast, down slow,
+ * with the tips bending back on the downstroke — and the body rises and falls a
+ * little with it, which is what the eye reads as flight.
+ */
+private fun DrawScope.drawFlappingBird(
+    x: Float,
+    y: Float,
+    s: Float,
+    phase: Float,
+    col: Color,
+    dpUnit: Float,
+) {
+    // A real wingbeat is not a sine wave: the downstroke is the slow, powerful
+    // half. Skewing the phase gives that snap.
+    val raw = sin(phase)
+    val beat = if (raw > 0f) raw * raw else -(raw * raw) * 0.75f
+    val lift = beat * s * 0.62f
+    val bend = (1f - abs(beat)) * s * 0.28f
+    val by = y - beat * s * 0.10f      // the body bobs against the beat
+
+    val wing = Path().apply {
+        moveTo(x - s, by - lift * 0.55f + bend)
+        // Left wing: shoulder, then the tip trailing behind.
+        quadraticTo(x - s * 0.52f, by - lift, x - s * 0.10f, by)
+        quadraticTo(x, by + s * 0.10f, x + s * 0.10f, by)
+        // Right wing, mirrored.
+        quadraticTo(x + s * 0.52f, by - lift, x + s, by - lift * 0.55f + bend)
+    }
+    drawPath(wing, col, style = Stroke(width = 1.9f * dpUnit, cap = StrokeCap.Round))
+
+    // A hint of a body, so it is a bird and not a tick mark.
+    drawOval(
+        col,
+        topLeft = Offset(x - s * 0.13f, by - s * 0.07f),
+        size = Size(s * 0.26f, s * 0.15f),
+    )
 }
 
 private fun starPath(cx: Float, cy: Float, outer: Float, inner: Float, points: Int, rot: Float): Path {

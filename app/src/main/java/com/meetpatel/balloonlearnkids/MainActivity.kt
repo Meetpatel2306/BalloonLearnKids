@@ -74,7 +74,14 @@ class MainActivity : ComponentActivity() {
                     when (screen) {
                         is Screen.Splash -> Unit
                         is Screen.Home -> music.play(Music.Track.DAY)
-                        is Screen.Play -> music.play(Music.Track.PLAY)
+                        // The quieter modes get the unhurried meadow tune; the
+                        // ones a child races through get the bouncier one.
+                        is Screen.Play -> music.play(
+                            when ((screen as Screen.Play).mode) {
+                                GameMode.LETTERS, GameMode.NUMBERS -> Music.Track.PLAY
+                                else -> Music.Track.MEADOW
+                            }
+                        )
                     }
                 }
 
