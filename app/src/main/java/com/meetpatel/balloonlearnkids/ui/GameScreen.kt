@@ -70,6 +70,7 @@ import com.meetpatel.balloonlearnkids.Prefs
 import com.meetpatel.balloonlearnkids.audio.Ambience
 import com.meetpatel.balloonlearnkids.audio.AnimalVoices
 import com.meetpatel.balloonlearnkids.audio.Speaker
+import com.meetpatel.balloonlearnkids.audio.Music
 import com.meetpatel.balloonlearnkids.audio.ToneEngine
 import com.meetpatel.balloonlearnkids.game.BubbleKind
 import com.meetpatel.balloonlearnkids.game.GameMode
@@ -88,6 +89,7 @@ fun GameScreen(
     animals: AnimalVoices,
     haptics: Haptics,
     prefs: Prefs,
+    music: Music,
     onExit: () -> Unit,
 ) {
     val density = LocalDensity.current.density
@@ -115,6 +117,7 @@ fun GameScreen(
     // for a few seconds first — they earned a party — then offer the choices.
     LaunchedEffect(completePending) {
         if (completePending) {
+            music.playFanfare()
             repeat(4) { i ->
                 world.celebrate()
                 if (prefs.soundEnabled) {

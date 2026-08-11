@@ -82,6 +82,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.meetpatel.balloonlearnkids.Haptics
 import com.meetpatel.balloonlearnkids.Prefs
 import com.meetpatel.balloonlearnkids.R
+import com.meetpatel.balloonlearnkids.audio.Music
 import com.meetpatel.balloonlearnkids.audio.ToneEngine
 import com.meetpatel.balloonlearnkids.game.GameMode
 import com.meetpatel.balloonlearnkids.game.GameWorld
@@ -95,6 +96,7 @@ fun HomeScreen(
     prefs: Prefs,
     tones: ToneEngine,
     haptics: Haptics,
+    music: Music,
     onStart: (mode: GameMode) -> Unit,
 ) {
     val density = LocalDensity.current.density
@@ -292,7 +294,7 @@ fun HomeScreen(
     }
 
     if (showSettings) {
-        SettingsPanel(prefs) { showSettings = false }
+        SettingsPanel(prefs, music) { showSettings = false }
     }
 
     // First launch only: this notice sits over everything, so no mode can be
@@ -710,9 +712,9 @@ private fun ModeButton(
  * control changes the game for real — nothing here is decoration.
  */
 @Composable
-private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
+private fun SettingsPanel(prefs: Prefs, music: Music, onClose: () -> Unit) {
     var sound by remember { mutableStateOf(prefs.soundEnabled) }
-    var music by remember { mutableStateOf(prefs.musicEnabled) }
+    var musicOn by remember { mutableStateOf(prefs.musicEnabled) }
     var haptic by remember { mutableStateOf(prefs.hapticsEnabled) }
     var contrast by remember { mutableStateOf(prefs.highContrast) }
     var speed by remember { mutableFloatStateOf(prefs.speed) }
@@ -746,7 +748,11 @@ private fun SettingsPanel(prefs: Prefs, onClose: () -> Unit) {
                 )
                 Spacer(Modifier.height(6.dp))
 
-                ToggleRow(stringResource(R.string.music), music) { music = it; prefs.musicEnabled = it }
+                ToggleRow(stringResource(R.string.music), musicOn) {
+                    musicOn = it
+                    prefs.musicEnabled = it
+                    music.setEnabled(it)
+                }
                 ToggleRow(stringResource(R.string.sound), sound) { sound = it; prefs.soundEnabled = it }
                 ToggleRow(stringResource(R.string.haptics), haptic) { haptic = it; prefs.hapticsEnabled = it }
                 ToggleRow(stringResource(R.string.high_contrast), contrast) { contrast = it; prefs.highContrast = it }
