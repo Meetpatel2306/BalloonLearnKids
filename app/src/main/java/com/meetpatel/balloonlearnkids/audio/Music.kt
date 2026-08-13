@@ -24,7 +24,6 @@ class Music(private val context: Context) {
         DAY(R.raw.music_day),
         NIGHT(R.raw.music_night),
         PLAY(R.raw.music_play),
-        MEADOW(R.raw.music_meadow),
     }
 
     private val handler = Handler(Looper.getMainLooper())

@@ -371,10 +371,9 @@ function trackMeadow(seconds) {
 }
 
 const jobs = [
-  ['music_day.wav', () => trackDay(76)],
-  ['music_night.wav', () => trackNight(80)],
-  ['music_play.wav', () => trackPlay(72)],
-  ['music_meadow.wav', () => trackMeadow(88)],
+  ['music_day.wav', () => trackDay(60)],
+  ['music_night.wav', () => trackNight(60)],
+  ['music_play.wav', () => trackPlay(60)],
   ['music_win.wav', () => trackWin(7)],
 ];
 

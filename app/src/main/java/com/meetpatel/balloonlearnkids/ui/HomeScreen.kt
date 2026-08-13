@@ -139,15 +139,7 @@ fun HomeScreen(
         }
 
         if (portrait) {
-            // The five game balloons must always land on screen whole, on a tall
-            // phone and on a short one alike, so their size is worked out from
-            // whatever height is left once the title and the arch have had theirs.
-            val titleBlock = 84.dp
-            val archH = (screenH * 0.30f).coerceIn(120.dp, 260.dp)
-            val gridSpace = (screenH - titleBlock - archH - 44.dp).coerceAtLeast(132.dp)
-            val byHeight = (gridSpace - 74.dp) / 2 / BALLOON_RATIO
-            val byWidth = (screenW - 36.dp) / 3
-            val balloonW = minOf(byHeight, byWidth).coerceIn(48.dp, 92.dp)
+            val archH = (screenH * 0.28f).coerceIn(110.dp, 240.dp)
 
             Column(
                 Modifier
@@ -174,8 +166,10 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .height(archH),
                 )
-                Spacer(Modifier.height(12.dp))
-                ModeGrid(prefs, tones, haptics, balloonW, onStart)
+                Spacer(Modifier.height(10.dp))
+                // The grid takes whatever height is left and sizes its balloons
+                // from that, so the second row can never fall off the bottom.
+                ModeGrid(prefs, tones, haptics, Modifier.weight(1f, fill = true), onStart)
             }
         } else {
             Row(
@@ -184,12 +178,6 @@ fun HomeScreen(
                     .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Same idea in landscape: the grid only gets the room the title
-                // has not already taken, and shrinks rather than overflowing.
-                val byHeight = (screenH - 96.dp - 74.dp) / 2 / BALLOON_RATIO
-                val byWidth = (screenW * 0.46f - 32.dp) / 3
-                val balloonW = minOf(byHeight, byWidth).coerceIn(48.dp, 92.dp)
-
                 Column(
                     Modifier.weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -204,8 +192,8 @@ fun HomeScreen(
                             color = Palette.InkSoft,
                         )
                     }
-                    Spacer(Modifier.height(12.dp))
-                    ModeGrid(prefs, tones, haptics, balloonW, onStart)
+                    Spacer(Modifier.height(10.dp))
+                    ModeGrid(prefs, tones, haptics, Modifier.weight(1f, fill = true), onStart)
                 }
                 RainbowArch(
                     prefs, tones, haptics,
@@ -486,10 +474,31 @@ private fun ModeGrid(
     prefs: Prefs,
     tones: ToneEngine,
     haptics: Haptics,
-    balloonW: Dp,
+    modifier: Modifier = Modifier,
     onStart: (GameMode) -> Unit,
-) {
-    val gap = if (balloonW < 68.dp) 4.dp else 6.dp
+) = BoxWithConstraints(modifier, contentAlignment = Alignment.Center) {
+    // The balloons are sized from the space this grid was actually given, not
+    // from a guess about how tall the title turned out to be. Whatever the
+    // screen, both rows and both labels land inside.
+    val gap = 6.dp
+    // Generous allowances: a 13sp label in its bordered pill measures about
+    // 32dp, an 11sp one about 25dp. Rounding up guarantees the column can only
+    // come out shorter than the space it was given, never taller.
+    val labelTall = 36.dp
+    val labelShort = 28.dp
+
+    fun widthFor(labelH: Dp): Dp {
+        val byHeight = (maxHeight - labelH * 2 - gap) / 2 / BALLOON_RATIO
+        val byWidth = (maxWidth - gap * 2) / 3
+        return minOf(byHeight, byWidth)
+    }
+
+    // Work it out assuming full-size labels; if that forces small balloons, the
+    // labels shrink too, which frees a little more height for a second pass.
+    var balloonW = widthFor(labelTall)
+    if (balloonW < 68.dp) balloonW = widthFor(labelShort)
+    balloonW = balloonW.coerceIn(32.dp, 92.dp)
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         // Each balloon wears the thing it teaches: A, 1, a shape, an animal.
         Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
