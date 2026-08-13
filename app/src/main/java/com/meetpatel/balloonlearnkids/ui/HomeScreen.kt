@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -144,6 +145,9 @@ fun HomeScreen(
             Column(
                 Modifier
                     .fillMaxSize()
+                    // Keeps every control clear of notches, curved corners and
+                    // the gesture bar. The scenery behind still fills the glass.
+                    .safeDrawingPadding()
                     .padding(horizontal = 12.dp, vertical = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -175,6 +179,7 @@ fun HomeScreen(
             Row(
                 Modifier
                     .fillMaxSize()
+                    .safeDrawingPadding()
                     .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -210,6 +215,7 @@ fun HomeScreen(
         Row(
             Modifier
                 .align(Alignment.BottomEnd)
+                .safeDrawingPadding()
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
