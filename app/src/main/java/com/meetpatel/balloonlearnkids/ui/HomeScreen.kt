@@ -140,7 +140,13 @@ fun HomeScreen(
         }
 
         if (portrait) {
-            val archH = (screenH * 0.28f).coerceIn(110.dp, 240.dp)
+            // The arch is a fixed-size child, so it is measured before the
+            // grid and would happily take room the grid needs. Cap it by what is
+            // actually spare, and it yields instead of squeezing the balloons.
+            val titleBlock = if (screenH < 620.dp) 74.dp else 92.dp
+            val archH = (screenH * 0.28f)
+                .coerceAtMost(screenH - titleBlock - 200.dp)
+                .coerceIn(70.dp, 240.dp)
 
             Column(
                 Modifier
@@ -155,7 +161,7 @@ fun HomeScreen(
                 // The title rides a soft cloud, so it stays readable whatever
                 // colour the sky happens to be.
                 TitleCloud {
-                    BouncyTitle(fontSize = if (screenW < 380.dp) 27 else 33)
+                    BouncyTitle(fontSize = if (screenW < 380.dp || screenH < 620.dp) 25 else 33)
                     Text(
                         text = stringResource(R.string.subtitle),
                         fontSize = 13.sp,
@@ -189,7 +195,7 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.Center,
                 ) {
                     TitleCloud {
-                        BouncyTitle(fontSize = 26)
+                        BouncyTitle(fontSize = if (screenH < 340.dp) 19 else 26)
                         Text(
                             text = stringResource(R.string.subtitle),
                             fontSize = 12.sp,
@@ -503,7 +509,10 @@ private fun ModeGrid(
     // labels shrink too, which frees a little more height for a second pass.
     var balloonW = widthFor(labelTall)
     if (balloonW < 68.dp) balloonW = widthFor(labelShort)
-    balloonW = balloonW.coerceIn(32.dp, 92.dp)
+    // Only an upper bound. A lower one would override the arithmetic above and
+    // let the column grow past the space it was given, which is exactly how the
+    // labels used to end up below the bottom of the screen.
+    balloonW = balloonW.coerceIn(20.dp, 92.dp)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         // Each balloon wears the thing it teaches: A, 1, a shape, an animal.

@@ -1,5 +1,7 @@
 package com.meetpatel.balloonlearnkids
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -42,6 +44,21 @@ class MainActivity : ComponentActivity() {
     private lateinit var animals: AnimalVoices
     private lateinit var haptics: Haptics
     private lateinit var prefs: Prefs
+
+    /**
+     * The game draws itself in fixed proportions — balloons, labels and cards are
+     * all sized from the screen — so it uses its own text sizes rather than the
+     * phone's. Someone with Android's text set to 2x would otherwise push the
+     * second row of game balloons clean off the bottom.
+     *
+     * Nothing readable is lost: the welcome notice, the privacy policy and the
+     * terms are all scrolling text, and Settings stays legible at these sizes.
+     */
+    override fun attachBaseContext(newBase: Context) {
+        val config = Configuration(newBase.resources.configuration)
+        config.fontScale = 1f
+        super.attachBaseContext(newBase.createConfigurationContext(config))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
