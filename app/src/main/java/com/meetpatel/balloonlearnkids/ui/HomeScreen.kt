@@ -475,9 +475,6 @@ private fun PoppableBalloon(
     }
 }
 
-/** How much taller a mode balloon is than it is wide, label included. */
-private const val BALLOON_RATIO = 1.26f
-
 /** The five games, each its own balloon. Tap one: it bursts, then the game opens.
  *  [balloonW] comes from the caller, which has already measured the screen, so the
  *  whole grid shrinks to fit rather than running off the bottom edge. */
@@ -492,27 +489,10 @@ private fun ModeGrid(
     // The balloons are sized from the space this grid was actually given, not
     // from a guess about how tall the title turned out to be. Whatever the
     // screen, both rows and both labels land inside.
-    val gap = 6.dp
-    // Generous allowances: a 13sp label in its bordered pill measures about
-    // 32dp, an 11sp one about 25dp. Rounding up guarantees the column can only
-    // come out shorter than the space it was given, never taller.
-    val labelTall = 36.dp
-    val labelShort = 28.dp
-
-    fun widthFor(labelH: Dp): Dp {
-        val byHeight = (maxHeight - labelH * 2 - gap) / 2 / BALLOON_RATIO
-        val byWidth = (maxWidth - gap * 2) / 3
-        return minOf(byHeight, byWidth)
-    }
-
-    // Work it out assuming full-size labels; if that forces small balloons, the
-    // labels shrink too, which frees a little more height for a second pass.
-    var balloonW = widthFor(labelTall)
-    if (balloonW < 68.dp) balloonW = widthFor(labelShort)
-    // Only an upper bound. A lower one would override the arithmetic above and
-    // let the column grow past the space it was given, which is exactly how the
-    // labels used to end up below the bottom of the screen.
-    balloonW = balloonW.coerceIn(20.dp, 92.dp)
+    // The sizing rules live in MenuLayout so they can be tested against a shelf
+    // of real devices without a phone attached - see MenuLayoutTest.
+    val gap = MenuLayout.GAP
+    val balloonW = MenuLayout.balloonWidth(maxWidth, maxHeight)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         // Each balloon wears the thing it teaches: A, 1, a shape, an animal.
@@ -580,7 +560,7 @@ private fun ModeBalloon(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Canvas(
             Modifier
-                .size(width = balloonW, height = balloonW * BALLOON_RATIO)
+                .size(width = balloonW, height = balloonW * MenuLayout.BALLOON_RATIO)
                 .graphicsLayer {
                     translationY = sin((bob + phase) * 6.2832f) * 5.dp.toPx() +
                         (1f - enter.value) * 40.dp.toPx()
@@ -656,7 +636,7 @@ private fun ModeBalloon(
         }
         // The name sits on a white pill ringed in the balloon's own colour, so
         // each game reads as one object rather than a label under a picture.
-        val small = balloonW < 68.dp
+        val small = MenuLayout.usesShortLabel(balloonW)
         Box(
             Modifier
                 .background(Color.White.copy(alpha = 0.95f), RoundedCornerShape(50))
